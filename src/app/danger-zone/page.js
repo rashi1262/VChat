@@ -19,30 +19,59 @@ export default function DangerZonePage() {
   }, []);
 
   const handleDeleteChats = async () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete all chats? This action cannot be undone."
+    toast(
+      () => (
+        <div>
+          <p className="text-gray-900 font-medium">
+            Are you sure you want to delete all chats?
+          </p>
+          <p className="text-sm text-gray-600">
+            This action cannot be undone.
+          </p>
+          <div className="flex justify-end gap-2 mt-2">
+            <button
+              className="px-3 py-1 text-sm text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+              onClick={() => {
+                toast.dismiss(); // ✅ Dismiss the latest toast
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              className="px-3 py-1 text-sm text-white bg-red-600 rounded-md hover:bg-red-700"
+              onClick={() => {
+                toast.dismiss(); // ✅ Dismiss the toast
+                confirmDeleteChats(); // ✅ Call function to delete chats
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      ),
+      { duration: Infinity } // Keeps the popup open until the user clicks a button
     );
-    if (!confirmDelete) return;
-
+  };
+  
+  // Function to delete chats
+  const confirmDeleteChats = async () => {
     setLoadingChats(true);
     try {
-      console.log("process.env.VCHAT_API_URL ", process.env.VCHAT_API_URL);
+      console.log("process.env.NEXT_PUBLIC_VCHAT_API_URL", process.env.NEXT_PUBLIC_VCHAT_API_URL);
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_VCHAT_API_URL}/chatbot/delete-all`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
+      const response = await fetch(`${process.env.NEXT_PUBLIC_VCHAT_API_URL}/chatbot/delete-all`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
       const data = await response.json();
-
+  
       if (!response.ok) {
         throw new Error(data.message || "Failed to delete chats");
       }
-
+  
       toast.success("All chats deleted successfully!");
     } catch (error) {
       toast.error(`Error: ${error.message}`);
@@ -50,35 +79,65 @@ export default function DangerZonePage() {
       setLoadingChats(false);
     }
   };
+  
 
   const handleDeleteAccount = async () => {
-    if (!userId) {
-      toast.error("Error: No user found. Please log in again.");
-      return;
-    }
-
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete your account? This action is permanent and cannot be undone."
+    // if (!userId) {
+    //   toast.error("Error: No user found. Please log in again.");
+    //   return;
+    // }
+  
+    toast(
+      () => (
+        <div>
+          <p className="text-gray-900 font-medium">
+            Are you sure you want to delete your account?
+          </p>
+          <p className="text-sm text-gray-600">
+            This action is permanent and cannot be undone.
+          </p>
+          <div className="flex justify-end gap-2 mt-2">
+            <button
+              className="px-3 py-1 text-sm text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+              onClick={() => {
+                toast.dismiss(); // ✅ Dismiss toast when cancel is clicked
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              className="px-3 py-1 text-sm text-white bg-red-600 rounded-md hover:bg-red-700"
+              onClick={() => {
+                toast.dismiss(); // ✅ Dismiss the toast before proceeding
+                confirmDeleteAccount(); // ✅ Call function to delete account
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      ),
+      { duration: Infinity } // ✅ Keeps the popup open until a button is clicked
     );
-    if (!confirmDelete) return;
-
+  };
+  
+  // Function to delete the account
+  const confirmDeleteAccount = async () => {
     setLoadingAccount(true);
     try {
-      const response = await fetch( `${process.env.NEXT_PUBLIC_VCHAT_API_URL}/user-delete/${userId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
+      const response = await fetch(`${process.env.NEXT_PUBLIC_VCHAT_API_URL}/user-delete/${userId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
       const data = await response.json();
-
+  
       if (!response.ok) {
         throw new Error(data.message || "Failed to delete account");
       }
-
+  
       toast.success("Your account has been deleted successfully.");
       localStorage.removeItem("user");
       signOut();
@@ -88,6 +147,7 @@ export default function DangerZonePage() {
       setLoadingAccount(false);
     }
   };
+  
 
   return (
     <div className="flex w-full justify-between bg-gray-50 text-sm">
