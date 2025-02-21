@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   User,
   Key,
- 
+  Cuboid,
   CreditCard,
   FileText,
   Receipt,
@@ -41,11 +41,11 @@ export default function Sidebar() {
               Profile
             </Link>
             <Link className="flex items-center gap-2 px-4 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-md" href="/change-password" >
-            <Key size={18} />
+            <Key size={13} />
               Change Password
             </Link>
             <Link className="flex items-center gap-2 px-4 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-md" href="/login-connection" >
-          
+          <Cuboid size={13}/>
               Login Connection
             </Link>
           </div>
@@ -55,15 +55,15 @@ export default function Sidebar() {
           <h2 className="text-gray-500 text-sm text-bold font-medium mb-2">Plan</h2>
           <div className="space-y-1">
             <Link  className="flex items-center gap-2 px-4 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-md" href="/plans" >
-            <CreditCard size={18} />
+           <FileText size={13} />
               Plans
             </Link>
             <Link className="flex items-center gap-2 px-4 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-md" href="/billing" >
-            <FileText size={18} />
+            <CreditCard size={13} /> 
               Billing Details
             </Link>
             <Link className="flex items-center gap-2 px-4 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-md" href="/invoices" >
-            <Receipt size={18} />
+            <Receipt size={13} />
             
               Invoices
             </Link>
@@ -76,18 +76,19 @@ export default function Sidebar() {
           </h2>
           <div className="space-y-1">
             <Link className="flex items-center gap-2 px-4 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-md" href="/danger-zone" >
-            <AlertTriangle size={18} />
+            <AlertTriangle size={13} />
               Danger Zone
             </Link>
-            <Link className="flex items-center gap-2 px-4 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-md" href="/support" >
-            <HelpCircle size={18} />
+            <Link href="mailto:support@yourdomain.com?subject=Support Request&body=Hello, I need help with..."
+                  className="flex items-center gap-2 px-4 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-md" >
+            <HelpCircle size={13} />
               Support
             </Link>
             <button
           className="w-full flex  gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
           onClick={handleLogout}
         >
-          <LogOut size={18} />
+          <LogOut size={13} />
           Log Out
         </button>
           </div>

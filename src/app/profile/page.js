@@ -146,7 +146,7 @@ export default function ProfilePage() {
                 <input
                   type="email"
                   value={email}
-                  disabled   
+                  disabled
                   className="w-2/5 max-w-md px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed text-gray-500"
                 />
               </div>
