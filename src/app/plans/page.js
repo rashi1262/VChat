@@ -31,7 +31,7 @@ export default function PlansPage() {
 
           <div className="flex-1 mr-64">
             <div className="mb-6">
-              <h1 className="text-lg font-semibold text-gray-900">Plans</h1>
+              <h1 className="text-lg font-semibold text-gray-600">Plans</h1>
               <p className="text-sm text-gray-500">
                 View and manage your subscription plans
               </p>
@@ -45,13 +45,13 @@ export default function PlansPage() {
                 <div className="flex justify-between items-center">
                   
                   <div className="flex">
-                    <h3 className="text-xl mr-5 font-semibold text-gray-900">Free</h3>
+                    <h3 className="text-xl mr-5 font-semibold text-gray-600">Free</h3>
                     <span className=" px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-full">
                       Limited Used
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-2xl font-bold text-gray-900">$0</span>
+                    <span className="text-2xl font-bold text-gray-600">$0</span>
                     <span className="text-gray-500 text-sm">/ Per Day</span>
                   </div>
                 </div>
@@ -65,17 +65,17 @@ export default function PlansPage() {
             </div>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Free</h3>
+                <h3 className="text-xl font-semibold text-gray-600 mb-2">Free</h3>
                 <div className="mb-4">
-                  <span className="text-2xl font-bold text-gray-900">$0</span>
+                  <span className="text-2xl font-bold text-gray-600">$0</span>
                   <span className="text-gray-500 text-sm">/ Per Day</span>
                 </div>
-                <div className="p-3 mb-4 bg-gray-50 rounded-md text-center">
+                <div className="p-3 mb-4 bg-gray-50 rounded-md border text-gray-500 text-center">
                   Current Plan
                 </div>
                 <div className="space-y-3">
-                  <h4 className="font-medium text-gray-900">Features included in the Free plan:</h4>
-                  <div className="space-y-2">
+                  <h4 className="font-medium text-gray-600">Features included in the Free plan:</h4>
+                  <div className="space-y-2 text-gray-600">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-5 h-5 text-green-500" />
                       <span>Access to OpenAI GPT-4o</span>
@@ -102,7 +102,7 @@ export default function PlansPage() {
 
               <div className="bg-white rounded-lg shadow p-6">
   <div className="flex justify-between items-center mb-4">
-    <h3 className="text-xl font-semibold text-gray-900 mb-0">Pro</h3>
+    <h3 className="text-xl font-semibold text-gray-600 mb-0">Pro</h3>
     <div className="flex gap-1 bg-gray-100 py-1 px-1 rounded-full">
       <button
         className={`px-1 text-sm  rounded-full whitespace-nowrap hover:text-black ${selectedButton === "1 Month" ? "bg-white border-gray-300" : "text-gray-500 "}`}
@@ -133,8 +133,8 @@ export default function PlansPage() {
     Upgrade
   </button>
   <div className="space-y-3">
-    <h4 className="font-medium text-gray-900">Features included in the Pro plan:</h4>
-    <div className="space-y-2">
+    <h4 className="font-medium text-gray-600">Features included in the Pro plan:</h4>
+    <div className="space-y-2 text-gray-600">
       <div className="flex items-center gap-2">
         <CheckCircle2 className="w-5 h-5 text-green-500" />
         <span>Access to OpenAI GPT-4o</span>
