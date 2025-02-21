@@ -6,29 +6,33 @@ import apple from "../../../public/assests/Apple-Logo.png";
 import google from "../../../public/assests/download.png";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
 import { signIn } from "next-auth/react";
 import { useSession } from "next-auth/react";
+import { toast, Toaster} from "sonner";
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-
-  const[isLogin,setIsLogin]= useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLogin, setIsLogin] = useState(false);
 
   const { data: session, status } = useSession();
-
   const router = useRouter();
 
   useEffect(() => {
-    if (session) {
-      router.replace("/model");
-      localStorage.setItem("user", JSON.stringify(session.user));
-      console.log(session.user);
+    if (session?.user) {
+      try {
+        localStorage.setItem("user", JSON.stringify(session.user));
+        console.log("User data saved:", session.user);
+        router.push("/model");
+      } catch (error) {
+        console.error("Error saving user data:", error);
+        toast.error("Error saving user data");
+      }
     }
-  }, [session]);
+  }, [session, router]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,50 +42,55 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = async(e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (isLogin) {
-      const storedUser = localStorage.getItem("user");
-      if (!storedUser) {
-        alert("No user found. Please sign up first.");
-        return;
-      }
-
-      const user = JSON.parse(storedUser);
-      if (
-        user.email === formData.email &&
-        user.password === formData.password
-      ) {
-        alert("Login successful!");
-      } else {
-        alert("Invalid email or password.");
-      }
-    } else {
+    setIsLoading(true);
   
-        const newUser = {
-          email: formData.email,
-          password: formData.password,
-        };
-
-        const response = await fetch(" https://chatbot-2vqr.onrender.com/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        });
-    
-        const data = await response.json();
-    
-
-        localStorage.setItem("user", JSON.stringify(newUser));
-        alert(" Successfully logged  in.");
-        setIsLogin(true);
-        router.push("/model");
-   
+    try {
+      const response = await fetch("https://chatbot-2vqr.onrender.com/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+  
+      const data = await response.json();
+      console.log("Login response:", data);
+  
+      if (data.status !== 200) {
+        if (response.status === 401 && data.message.includes("verify your email")) {
+          throw new Error("Please check your email and verify your account before logging in.");
+        } else if (response.status === 401) {
+          throw new Error("Invalid email or password.");
+        } else if (response.status === 404) {
+          throw new Error("User not found.");
+        } else if (response.status === 500) {
+          throw new Error("Server error. Please try again later.");
+        } else {
+          throw new Error(data.message || "Login failed.");
+        }
+      }
+  
+      const userData = {
+        email: data.email,
+        name: data.name || "Guest", 
+      };
+  
+      localStorage.setItem("user", JSON.stringify(userData));
+      toast.success("Login successful!");
+      setIsLogin(true);
+      router.push("/model");
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error(error.message || "Something went wrong. Please try again later.");
+    } finally {
+      setIsLoading(false);
     }
   };
+  
+  
 
   const handleAppleLogin = () => {
     console.log("Apple login");
@@ -89,6 +98,7 @@ const Login = () => {
 
   return (
     <div className="flex justify-center items-center h-screen bg-white">
+      <Toaster position="top-center" richColors />
       <div className="w-full max-w-md p-5 bg-white rounded-lg">
         <Image
           src={logo}
@@ -104,6 +114,7 @@ const Login = () => {
           <button
             onClick={() => signIn("google")}
             className="flex items-center justify-center gap-2 p-2 border border-gray-300 rounded bg-white text-gray-600"
+            disabled={isLoading}
           >
             <Image src={google} className="w-6 h-6" alt="logo" />
             Continue with Google
@@ -112,6 +123,7 @@ const Login = () => {
           <button
             onClick={handleAppleLogin}
             className="flex items-center justify-center gap-2 p-2 border border-gray-300 rounded bg-white text-gray-600"
+            disabled={isLoading}
           >
             <Image src={apple} className="w-6 h-6" alt="Apple logo" />
             Continue with Apple
@@ -136,6 +148,7 @@ const Login = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
+              disabled={isLoading}
               required
             />
           </div>
@@ -151,15 +164,17 @@ const Login = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
+              disabled={isLoading}
               required
             />
           </div>
 
           <button
             type="submit"
-            className="w-full p-2 text-base bg-gray-800 text-white border-none rounded cursor-pointer mt-2 hover:bg-gray-900"
+            className="w-full p-2 text-base bg-gray-800 text-white border-none rounded cursor-pointer mt-2 hover:bg-gray-900 disabled:bg-gray-500"
+            disabled={isLoading}
           >
-            Log In
+            {isLoading ? "Logging in..." : "Log In"}
           </button>
         </form>
 
