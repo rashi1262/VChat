@@ -1,5 +1,5 @@
 "use client";
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import logo from "../../../public/assests/logo.jpg";
 import apple from "../../../public/assests/Apple-Logo.png";
@@ -9,28 +9,31 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-
+import { toast, Toaster} from "sonner";
 
 const Signup = () => {
-  const {status} = useSession()
+  const {status} = useSession();
   const { data: session } = useSession();
-  const router = useRouter()
+  const router = useRouter();
+
   useEffect(() => {
-    if (session) {
-      router.replace('/profile')
-      localStorage.setItem("user", JSON.stringify(session.user));
-      console.log(session.user)
+    if (session?.user) {
+      try {
+        localStorage.setItem("user", JSON.stringify(session.user));
+        console.log("User data saved:", session.user);
+        router.replace('/profile');
+      } catch (error) {
+        console.error("Error saving user data:", error);
+        toast.error("Error saving user data");
+      }
     }
-  }, [session]);
+  }, [session, router]);
 
-  const [isLogin, setIsLogin] = useState(true); 
-
+  const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-
-
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -50,7 +53,7 @@ const Signup = () => {
     setSuccess("");
   
     try {
-      const response = await fetch("https://chatbot-2vqr.onrender.com/signup", {
+      const response = await fetch("https://chatbot-2vqr.onrender.com/signup-verification", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -59,36 +62,42 @@ const Signup = () => {
       });
   
       const data = await response.json();
+      console.log("Response data:", data); 
   
       if (!response.ok) {
         throw new Error(data.message || "Signup failed!");
       }
   
-      setSuccess("Signup successful! You can now log in.");
-      setFormData({ email: "", password: "" });
+      if (data.token) {
+        localStorage.setItem("userToken", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user)); 
+      }
   
-      // Redirect to the login page after successful signup
-      router.push("/model");
+      toast.success("Signup successful!");
+      setFormData({ email: "", password: "" });
+     
+      router.push("/login");
+  
     } catch (error) {
-      setError(error.message);
+      console.error("Signup error:", error.message);
+      toast.error(error.message || "Something went wrong. Please try again later.");
     }
   };
-
+  
+  
   
 
-
-  
   const handleGoogleLogin = () => {
     window.location.href = "http://localhost:8080/auth/google/callback";
   };
 
-  
   const handleAppleLogin = () => {
     console.log("Apple login");
   };
 
- return (
+  return (
     <div className="flex justify-center items-center h-screen bg-white">
+      <Toaster position="top-center" richColors />
       <div className="w-full max-w-md p-5 bg-white rounded-lg">
         <Image
           src={logo}
@@ -149,15 +158,11 @@ const Signup = () => {
             <hr className="flex-grow border-t border-gray-300" />
           </div>
 
-          {/* <button onClick={} className="flex items-center justify-center gap-2 p-2 border border-gray-300 rounded bg-white text-gray-600"/>
-            <Image src={google} className="w-6 h-6" alt="logo" /> */}
-
           <button
-            onClick={()=>signIn("google")}
+            onClick={() => signIn("google")}
             className="flex items-center justify-center gap-2 p-2 border border-gray-300 rounded bg-white text-gray-600"
           >
             <Image src={google} className="w-6 h-6" alt="Google logo" />
-
             Continue with Google
           </button>
 
