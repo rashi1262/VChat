@@ -32,7 +32,7 @@ export default function DangerZonePage() {
             <button
               className="px-3 py-1 text-sm text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
               onClick={() => {
-                toast.dismiss(); // ✅ Dismiss the latest toast
+                toast.dismiss(); 
               }}
             >
               Cancel
@@ -40,8 +40,8 @@ export default function DangerZonePage() {
             <button
               className="px-3 py-1 text-sm text-white bg-red-600 rounded-md hover:bg-red-700"
               onClick={() => {
-                toast.dismiss(); // ✅ Dismiss the toast
-                confirmDeleteChats(); // ✅ Call function to delete chats
+                toast.dismiss(); 
+                confirmDeleteChats(); 
               }}
             >
               Delete
@@ -49,11 +49,11 @@ export default function DangerZonePage() {
           </div>
         </div>
       ),
-      { duration: Infinity } // Keeps the popup open until the user clicks a button
+      { duration: Infinity } 
     );
   };
   
-  // Function to delete chats
+  
   const confirmDeleteChats = async () => {
     setLoadingChats(true);
     try {
@@ -82,10 +82,10 @@ export default function DangerZonePage() {
   
 
   const handleDeleteAccount = async () => {
-    // if (!userId) {
-    //   toast.error("Error: No user found. Please log in again.");
-    //   return;
-    // }
+    if (!userId) {
+      toast.error("Error: No user found. Please log in again.");
+      return;
+    }
   
     toast(
       () => (
@@ -100,7 +100,7 @@ export default function DangerZonePage() {
             <button
               className="px-3 py-1 text-sm text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
               onClick={() => {
-                toast.dismiss(); // ✅ Dismiss toast when cancel is clicked
+                toast.dismiss(); 
               }}
             >
               Cancel
@@ -108,8 +108,8 @@ export default function DangerZonePage() {
             <button
               className="px-3 py-1 text-sm text-white bg-red-600 rounded-md hover:bg-red-700"
               onClick={() => {
-                toast.dismiss(); // ✅ Dismiss the toast before proceeding
-                confirmDeleteAccount(); // ✅ Call function to delete account
+                toast.dismiss();
+                confirmDeleteAccount(); 
               }}
             >
               Delete
@@ -117,11 +117,10 @@ export default function DangerZonePage() {
           </div>
         </div>
       ),
-      { duration: Infinity } // ✅ Keeps the popup open until a button is clicked
+      { duration: Infinity } 
     );
   };
   
-  // Function to delete the account
   const confirmDeleteAccount = async () => {
     setLoadingAccount(true);
     try {
