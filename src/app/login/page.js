@@ -2,13 +2,12 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import logo from "../../../public/assests/logo.jpg";
-import apple from "../../../public/assests/Apple-Logo.png";
-import google from "../../../public/assests/download.png";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useSession } from "next-auth/react";
-import { toast, Toaster} from "sonner";
+import { toast, Toaster } from "sonner";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -25,10 +24,8 @@ const Login = () => {
     if (session?.user) {
       try {
         localStorage.setItem("user", JSON.stringify(session.user));
-        console.log("User data saved:", session.user);
         router.push("/model");
       } catch (error) {
-        console.error("Error saving user data:", error);
         toast.error("Error saving user data");
       }
     }
@@ -42,26 +39,30 @@ const Login = () => {
     }));
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-  
+
     try {
-      const response = await fetch("https://chatbot-2vqr.onrender.com/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-  
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
       const data = await response.json();
-      console.log("Login response:", data);
-  
       if (data.status !== 200) {
-        if (response.status === 401 && data.message.includes("verify your email")) {
-          throw new Error("Please check your email and verify your account before logging in.");
+        if (
+          response.status === 401 &&
+          data.message.includes("verify your email")
+        ) {
+          router.push("/verify"); 
+          return;
         } else if (response.status === 401) {
           throw new Error("Invalid email or password.");
         } else if (response.status === 404) {
@@ -72,25 +73,24 @@ const Login = () => {
           throw new Error(data.message || "Login failed.");
         }
       }
-  
+
       const userData = {
         email: data.email,
-        name: data.name || "Guest", 
+        name: data.name || "Guest",
       };
-  
+
       localStorage.setItem("user", JSON.stringify(userData));
       toast.success("Login successful!");
       setIsLogin(true);
       router.push("/model");
     } catch (error) {
-      console.error("Login error:", error);
-      toast.error(error.message || "Something went wrong. Please try again later.");
+      toast.error(
+        error.message || "Something went wrong. Please try again later."
+      );
     } finally {
       setIsLoading(false);
     }
   };
-  
-  
 
   const handleAppleLogin = () => {
     console.log("Apple login");
@@ -116,7 +116,12 @@ const Login = () => {
             className="flex items-center justify-center gap-2 p-2 border border-gray-300 rounded bg-white text-gray-600"
             disabled={isLoading}
           >
-            <Image src={google} className="w-6 h-6" alt="logo" />
+            <Image
+              src="/assests/download.png"
+              width={24}
+              height={24}
+              alt="logo"
+            />
             Continue with Google
           </button>
 
@@ -125,7 +130,12 @@ const Login = () => {
             className="flex items-center justify-center gap-2 p-2 border border-gray-300 rounded bg-white text-gray-600"
             disabled={isLoading}
           >
-            <Image src={apple} className="w-6 h-6" alt="Apple logo" />
+            <Image
+              src="/assests/Apple-Logo.png"
+              width={24}
+              height={24}
+              alt="Apple logo"
+            />
             Continue with Apple
           </button>
 

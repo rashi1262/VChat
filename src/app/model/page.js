@@ -21,9 +21,7 @@ const page = () => {
           setEmail(user?.email || "No Email");
           setName(user?.name || "No Name");
         }
-      } catch (error) {
-        console.error("Error parsing user data:", error);
-      }
+      } catch (error) {}
     }
   }, []);
 
@@ -31,9 +29,9 @@ const page = () => {
   const handleResponse = async () => {
     try {
       const searchRes = await fetch(
-        `https://chatbot-2vqr.onrender.com/chatbot/search?message=${encodeURIComponent(
-          prompt
-        )}`
+        `${
+          process.env.NEXT_PUBLIC_BASE_URL
+        }/chatbot/search?message=${encodeURIComponent(prompt)}`
       );
 
       if (!searchRes.ok) {
@@ -44,12 +42,12 @@ const page = () => {
       const formattedResponse = data
         .split(/[*-]\s+/)
         .filter((point) => point.trim())
-        .join(" "); 
+        .join(" ");
 
       setResponse(formattedResponse);
 
       const createChatRes = await fetch(
-        "https://chatbot-2vqr.onrender.com/chatbot/create",
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/create`,
         {
           method: "POST",
           headers: {
@@ -73,8 +71,6 @@ const page = () => {
       const chatData = await createChatRes.json();
 
       router.push(`/chat/${chatData.id}`);
-
-      console.log("Chat created successfully with bot response");
     } catch (error) {
       setError(error.message);
     }
@@ -82,8 +78,6 @@ const page = () => {
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      console.log("enter key pressed");
-
       e.preventDefault();
       handleResponse();
     }
@@ -106,7 +100,6 @@ const page = () => {
                   href="/model"
                   className="block p-0.5 border hover:bg-gray-100 rounded items-center justify-center"
                 >
-                  {/* <Image src={new1} className="w-7 h-6 p-1 rounded" alt="logo" /> */}
                   <div className="w-7 h-6 p-1 ">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -130,7 +123,6 @@ const page = () => {
                   href="/mybot"
                   className="flex block p-2 hover:bg-gray-100 rounded text-sm mt-6"
                 >
-                  {/* <Image src={op} className="w-4 h-4 mr-2 rounded" alt="logo" /> */}
                   <div className="w-7 h-6 p-1 ">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -162,7 +154,6 @@ const page = () => {
                   href="/chat"
                   className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded text-sm"
                 >
-                  {/* <Image src={logo} className="w-4 h-4 mr-2 rounded" alt="logo" /> */}
                   <div className="w-7 h-6 p-1 ">
                     <svg
                       viewBox="0 0 42 42"
@@ -480,7 +471,6 @@ const page = () => {
                   setPrompt("Solve a debate: is a hot dog a sandwich?")
                 }
               >
-                {/* <Image src={n22} className="w-5 h-5 mb-2" alt="logo" /> */}
                 <div className="w-10 h-10 mb-2">
                   {" "}
                   <svg
@@ -527,7 +517,6 @@ const page = () => {
                   )
                 }
               >
-                {/* <Image src={gift} className="w-5 h-5 mb-2" alt="logo" /> */}
                 <div className="w-10 h-10 mb-2">
                   {" "}
                   <svg

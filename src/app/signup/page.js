@@ -2,17 +2,13 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import logo from "../../../public/assests/logo.jpg";
-import apple from "../../../public/assests/Apple-Logo.png";
-import google from "../../../public/assests/download.png";
 import Link from "next/link";
-
 import { signIn } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { toast, Toaster} from "sonner";
+import { toast, Toaster } from "sonner";
 
 const Signup = () => {
-  const {status} = useSession();
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -20,25 +16,18 @@ const Signup = () => {
     if (session?.user) {
       try {
         localStorage.setItem("user", JSON.stringify(session.user));
-        console.log("User data saved:", session.user);
-        router.replace('/profile');
+        router.replace("/model");
       } catch (error) {
-        console.error("Error saving user data:", error);
         toast.error("Error saving user data");
       }
     }
   }, [session, router]);
 
-  const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-
-  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -49,43 +38,43 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
-  
     try {
-      const response = await fetch("https://chatbot-2vqr.onrender.com/signup-verification", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-  
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/signup-verification`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
       const data = await response.json();
-      console.log("Response data:", data); 
-  
+
       if (!response.ok) {
-        throw new Error(data.message || "Signup failed!");
+        const errorMessage =
+          data.message ||
+          (response.status === 409
+            ? "Email already exists. Please log in."
+            : "Signup failed! Try again.");
+
+        throw new Error(errorMessage);
       }
-  
+
       if (data.token) {
         localStorage.setItem("userToken", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user)); 
+        localStorage.setItem("user", JSON.stringify(data.user));
       }
-  
+
       toast.success("Signup successful!");
-      setFormData({ email: "", password: "" });
-     
       router.push("/login");
-  
+      setFormData({ email: "", password: "" });
     } catch (error) {
       console.error("Signup error:", error.message);
-      toast.error(error.message || "Something went wrong. Please try again later.");
+      toast.error(error.message);
     }
   };
-  
-  
-  
 
   const handleGoogleLogin = () => {
     window.location.href = "http://localhost:8080/auth/google/callback";
@@ -108,9 +97,6 @@ const Signup = () => {
         <h1 className="text-center mb-5 text-gray-800 text-xl">
           <b>Create Your Account</b>
         </h1>
-
-        {error && <p className="text-red-500 text-center mb-3">{error}</p>}
-        {success && <p className="text-green-500 text-center mb-3">{success}</p>}
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -162,7 +148,12 @@ const Signup = () => {
             onClick={() => signIn("google")}
             className="flex items-center justify-center gap-2 p-2 border border-gray-300 rounded bg-white text-gray-600"
           >
-            <Image src={google} className="w-6 h-6" alt="Google logo" />
+            <Image
+              src="/assests/download.png"
+              width={24}
+              height={24}
+              alt="Google logo"
+            />
             Continue with Google
           </button>
 
@@ -170,7 +161,12 @@ const Signup = () => {
             onClick={handleAppleLogin}
             className="flex items-center justify-center gap-2 p-2 border border-gray-300 rounded bg-white text-gray-600"
           >
-            <Image src={apple} className="w-6 h-6" alt="Apple logo" />
+            <Image
+              src="/assests/Apple-Logo.png"
+              width={24}
+              height={24}
+              alt="Apple logo"
+            />
             Continue with Apple
           </button>
         </div>

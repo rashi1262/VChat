@@ -1,40 +1,51 @@
 "use client";
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useRef } from "react";
 import Link from "next/link";
 const ChatPage = ({ params }) => {
   const { id } = use(params);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
-  const [prompt, setPrompt] = useState("");
-  const [response, setResponse] = useState("");
+
   const [botResponse, setBotResponse] = useState("");
   const [loading, setLoading] = useState(true);
   const [morePrompt, setMorePrompt] = useState("");
   const [moreResponse, setMoreResponse] = useState("");
 
-  const [chatHistory, setChatHistory] = useState([]); 
+  const [chatHistory, setChatHistory] = useState([]);
 
+  const chatContainerRef = useRef(null);
+
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  };
 
   useEffect(() => {
-      if (typeof window !== "undefined") {
-        try {
-          const storedUser = localStorage.getItem("user");
-          if (storedUser) {
-            const user = JSON.parse(storedUser);
-            setEmail(user?.email || "No Email");
-            setName(user?.name || "No Name");
-          }
-        } catch (error) {
-          console.error("Error parsing user data:", error);
+    if (typeof window !== "undefined") {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const user = JSON.parse(storedUser);
+          setEmail(user?.email || "No Email");
+          setName(user?.name || "No Name");
         }
+      } catch (error) {
+        console.error("Error parsing user data:", error);
       }
-    }, []);
+    }
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatHistory, morePrompt]);
 
   const fetchBotResponse = async () => {
     try {
       const searchRes = await fetch(
-        `https://chatbot-2vqr.onrender.com/chatbot/get-By/${id}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${id}`
       );
 
       if (!searchRes.ok) {
@@ -42,11 +53,8 @@ const ChatPage = ({ params }) => {
       }
 
       const data = await searchRes.json();
-      console.log("API Response:", data);
-
-      setChatHistory(data?.userSearch || []); // Store the entire chat history
+      setChatHistory(data?.userSearch || []);
     } catch (error) {
-      console.error("Fetch Error:", error);
       setError(error.message);
     } finally {
       setLoading(false);
@@ -56,22 +64,13 @@ const ChatPage = ({ params }) => {
   const handleAddChat = async () => {
     if (!id || !morePrompt) return;
 
+    setLoading(true);
+
     try {
-      const getRes = await fetch(
-        `https://chatbot-2vqr.onrender.com/chatbot/get-By/${id}`
-      );
-
-      if (!getRes.ok) {
-        throw new Error("Failed to fetch existing chat.");
-      }
-
-      const existingData = await getRes.json();
-      const existingChat = existingData?.userSearch || [];
-
       const searchRes = await fetch(
-        `https://chatbot-2vqr.onrender.com/chatbot/search?message=${encodeURIComponent(
-          morePrompt
-        )}`
+        `${
+          process.env.NEXT_PUBLIC_BASE_URL
+        }/chatbot/search?message=${encodeURIComponent(morePrompt)}`
       );
 
       if (!searchRes.ok) {
@@ -82,43 +81,34 @@ const ChatPage = ({ params }) => {
       const formattedResponse = data
         .split(/[*-]\s+/)
         .filter((point) => point.trim())
-        .join(" "); // Format response
+        .join(" ");
 
       setMoreResponse(formattedResponse);
 
-      const updatedChatHistory = [
-        {
-          userMessage: morePrompt,
-          botResponse: formattedResponse,
-        },
-      ];
+      const newChat = {
+        userMessage: morePrompt,
+        botResponse: formattedResponse,
+      };
 
-      console.log("Updated Chat History:", updatedChatHistory);
+      setChatHistory((prevChats) => [...prevChats, newChat]);
 
-      const updateRes = await fetch(
-        `https://chatbot-2vqr.onrender.com/chatbot/update-by/${id}`,
+      await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ userSearch: updatedChatHistory }),
+          body: JSON.stringify({ userSearch: [...chatHistory, newChat] }),
         }
       );
 
-      if (!updateRes.ok) {
-        throw new Error("Failed to update chat.");
-      }
-
-      console.log("Chat updated, refetching...");
-
-      fetchBotResponse();
-
+      setLoading(false);
       setMorePrompt("");
       setMoreResponse("");
     } catch (error) {
-      console.error("Update Error:", error);
       setError(error.message);
+      setLoading(false);
     }
   };
 
@@ -130,8 +120,6 @@ const ChatPage = ({ params }) => {
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      console.log("enter key pressed");
-
       e.preventDefault();
       handleAddChat();
     }
@@ -446,14 +434,14 @@ const ChatPage = ({ params }) => {
               <li>
                 <Link
                   href="/explore"
-                  className="flex block p-2 hover:bg-gray-100 rounded text-sm "
+                  className="flex items-center p-2 hover:bg-gray-200 rounded-lg text-sm font-medium transition duration-200"
                 >
-                  <div className="w-7 h-6 p-1 ">
+                  <div className="w-7 h-7 flex items-center justify-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 18 18"
-                      className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--tiny___trsDz"
+                      className="w-5 h-5 text-gray-600"
                     >
                       <g
                         stroke="currentColor"
@@ -465,20 +453,20 @@ const ChatPage = ({ params }) => {
                       </g>
                     </svg>
                   </div>
-                  Explore botes
+                  <span className="ml-2 text-gray-700">Explore Bots</span>
                 </Link>
               </li>
               <li>
                 <Link
                   href="/upload"
-                  className="flex block p-2 hover:bg-gray-100 rounded text-sm "
+                  className="flex items-center p-2 hover:bg-gray-200 rounded-lg text-sm font-medium transition duration-200"
                 >
-                  <div className="w-5 h-5">
+                  <div className="w-7 h-7 flex items-center justify-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 18 18"
-                      className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+                      className="w-5 h-5 text-gray-600"
                     >
                       <path
                         stroke="currentColor"
@@ -489,19 +477,22 @@ const ChatPage = ({ params }) => {
                       ></path>
                     </svg>
                   </div>
-                  Go Pro
+                  <span className="ml-2 text-gray-700">Go Pro</span>
                 </Link>
               </li>
-              <li className="mt-4 flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
+              <li className="mt-4 flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-sm cursor-pointer border-t border-gray-400 relative before:absolute before:top-0 before:left-0 before:w-full before:h-[5px] before:bg-gradient-to-b before:from-gray-100 before:to-transparent before:rounded-t-sm">
                 <div className="w-5 h-5 p-5 flex items-center justify-center rounded-full text-white font-bold bg-green-700">
                   {email ? email[0].toUpperCase() : "?"}
                 </div>
 
-                <div className="flex flex-col">
+                <div className="flex flex-col ">
                   <span className="font-medium text-gray-900">
                     {name ? name : "User"}
                   </span>
-                  <Link href="/profile" className="text-xs text-gray-500">
+                  <Link
+                    href="/profile"
+                    className="text-xs overflow-hidden text-gray-500"
+                  >
                     {email}
                   </Link>
                 </div>
@@ -511,7 +502,7 @@ const ChatPage = ({ params }) => {
         </div>
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center ml-auto w-4/5">
           <div className="max-w-4xl w-full rounded-md p-6 text-center">
-            <div className="flex flex-col gap-2 overflow-y-scroll h-[400px] p-4">
+            <div className="flex flex-col gap-2 sticky overflow-y-scroll h-[400px] p-4">
               {chatHistory.map((chat, index) => (
                 <div key={index} className="flex flex-col gap-1">
                   <div className="self-end bg-blue-500 text-white px-3 py-2 rounded-xl max-w-[70%]">
@@ -523,6 +514,20 @@ const ChatPage = ({ params }) => {
                   </div>
                 </div>
               ))}
+
+              {morePrompt !== "" && (
+                <div className="flex flex-col gap-1">
+                  <div className="self-end bg-blue-500 text-white px-3 py-2 rounded-xl max-w-[70%]">
+                    {morePrompt}
+                  </div>
+
+                  {loading && (
+                    <div className="self-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[70%] flex items-center gap-2">
+                      <span className="animate-pulse">...</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="mb-5 ml-20 w-2/5 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
