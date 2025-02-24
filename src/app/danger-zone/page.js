@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { signOut } from "next-auth/react";
 import Sidebar from "../Sidebar";
 import { toast, Toaster } from "sonner";
+import Link from "next/link";
 
 export default function DangerZonePage() {
   const [loadingChats, setLoadingChats] = useState(false);
@@ -156,13 +157,21 @@ export default function DangerZonePage() {
         <div className="flex gap-7 p-6">
           <Sidebar />
           <div className="flex-1 mr-64">
-            <div className="mb-6">
-              <h1 className="text-lg font-semibold text-gray-700">
-                Danger Zone
-              </h1>
+            <div className="mb-6 flex justify-between items-center">
+              <div>
+              <h1 className="text-lg font-semibold text-gray-600">Danger Zone</h1>
               <p className="text-sm text-gray-500">
-                Delete account and other critical settings
+              Delete account and other critical settings
               </p>
+
+              </div>
+              
+              <Link
+                href="/model"
+                className="px-4 py-2 text-gray-500 border border-rounded rounded-md"
+              >
+                Back to Chat
+              </Link>
             </div>
 
             <div className="rounded-lg border p-6 space-y-6">

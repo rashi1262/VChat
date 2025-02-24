@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Sidebar from "../Sidebar";
+import Link from "next/link";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { MONTH, MONTHS, YEARLY } from "@/constants";
 
@@ -26,11 +27,21 @@ export default function PlansPage() {
           <Sidebar />
 
           <div className="flex-1 mr-64">
-            <div className="mb-6">
+            <div className="mb-6 flex justify-between items-center">
+              <div>
               <h1 className="text-lg font-semibold text-gray-600">Plans</h1>
               <p className="text-sm text-gray-500">
                 View and manage your subscription plans
               </p>
+
+              </div>
+              
+              <Link
+                href="/model"
+                className="px-4 py-2 text-gray-500 border border-rounded rounded-md"
+              >
+                Back to Chat
+              </Link>
             </div>
 
             <div className="mb-3">

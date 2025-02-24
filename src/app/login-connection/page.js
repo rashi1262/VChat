@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../Sidebar";
 import Link from "next/link";
-import { signIn, signOut } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { CONNECT, DISCONNECT } from "@/constants";
 
 export default function LoginConnectionPage() {
+  const { data: session } = useSession();
   const [user, setUser] = useState(null);
   const [isGmailUser, setIsGmailUser] = useState(false);
 
@@ -23,6 +24,18 @@ export default function LoginConnectionPage() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (session) {
+      setUser(session.user);
+      setIsGmailUser(session.user.email.endsWith("@gmail.com"));
+      localStorage.setItem("user", JSON.stringify(session.user));
+    } else {
+      setUser(null);
+      setIsGmailUser(false);
+      localStorage.removeItem("user");
+    }
+  }, [session]);
 
   return (
     <div className="flex w-full justify-between bg-gray-50 text-sm">
@@ -51,8 +64,8 @@ export default function LoginConnectionPage() {
             <div className="bg-white rounded-lg shadow p-6 space-y-6">
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="flex items-center gap-3">
-                  <div className="w-6 h-6 bg-black rounded-full flex  justify-center">
-                    <svg
+                  <div className="w-6 h-6 bg-black rounded-full flex justify-center">
+                  <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 20 16"
@@ -69,14 +82,15 @@ export default function LoginConnectionPage() {
                     <p className="text-sm text-gray-500">Connect with Apple</p>
                   </div>
                 </div>
-                <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2">
                   Connect
                 </button>
               </div>
+
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="flex items-center gap-3">
                   <div className="w-6 h-6 rounded-full flex border items-center justify-center">
-                    <svg
+                  <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 20 16"
@@ -116,6 +130,7 @@ export default function LoginConnectionPage() {
                     </p>
                   </div>
                 </div>
+
                 <button
                   className={`px-4 py-2 border text-sm font-medium ${
                     isGmailUser
@@ -124,7 +139,6 @@ export default function LoginConnectionPage() {
                   } bg-white rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2`}
                   onClick={() => {
                     if (isGmailUser) {
-                      localStorage.removeItem("user");
                       signOut();
                     } else {
                       signIn("google");

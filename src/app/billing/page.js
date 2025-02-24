@@ -1,5 +1,5 @@
 import Sidebar from "../Sidebar";
-
+import Link from "next/link";
 export default function BillingPage() {
   return (
     <div className="flex w-full justify-between bg-gray-50 text-sm">
@@ -8,13 +8,21 @@ export default function BillingPage() {
           <Sidebar />
 
           <div className="flex-1 mr-64">
-            <div className="mb-6">
-              <h1 className="text-lg font-semibold text-gray-600">
-                Billing Details
-              </h1>
+            <div className="mb-6 flex justify-between items-center">
+              <div>
+              <h1 className="text-lg font-semibold text-gray-600">Billing Details</h1>
               <p className="text-sm text-gray-500">
-                Update your billing information and payment methods
+              Update your billing information and payment methods
               </p>
+
+              </div>
+              
+              <Link
+                href="/model"
+                className="px-4 py-2 text-gray-500 border border-rounded rounded-md"
+              >
+                Back to Chat
+              </Link>
             </div>
             <div className=" rounded-lg  p-6 space-y-6">
               <div className="p-8 flex items-center justify-center min-h-[400px]">
