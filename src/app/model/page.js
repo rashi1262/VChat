@@ -17,10 +17,9 @@ const page = () => {
       try {
         const storedUser = localStorage.getItem("user");
         if (!storedUser) {
-          router.push("/login"); 
+          router.push("/login");
           return;
-        }
-        else{
+        } else {
           const user = JSON.parse(storedUser);
           setEmail(user?.email || "No Email");
           setName(user?.name || "No Name");
@@ -93,7 +92,7 @@ const page = () => {
         <div className="h-screen w-64 bg-white text-black fixed left-0 top-0 flex flex-col items-center p-4">
           <nav className="w-full flex flex-col justify-between flex-grow">
             <ul>
-              <li className=" flex  rounded">
+              {/* <li className=" flex  rounded">
                 <Link
                   href="/model"
                   className="block p-0.5 border hover:bg-gray-100 rounded mr-2 pl-3  pr-20"
@@ -366,7 +365,7 @@ const page = () => {
                   </div>
                   Upload & Ask PDF
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   href="/model"
