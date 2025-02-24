@@ -61,7 +61,7 @@ export default function LoginConnectionPage() {
               </Link>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6 space-y-6">
+            <div className=" rounded-lg p-6 space-y-6">
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="flex items-center gap-3">
                   <div className="w-6 h-6 bg-black rounded-full flex justify-center">
