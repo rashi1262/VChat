@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Sidebar from "../Sidebar";
 import Link from "next/link";
 import axios from "axios";
+import { toast, Toaster } from "sonner";
 
 export default function ProfilePage() {
   const [displayName, setDisplayName] = useState("");
@@ -30,21 +31,23 @@ export default function ProfilePage() {
       const updatedUser = {
         name: displayName,
         email: email,
-        image: profileImage, // URL or Base64 depending on your backend
-        password: "rahultest12", // If needed
+        image: profileImage,
+        password: "rahultest12",
       };
 
       const response = await axios.put(
-        `https://chatbot-2vqr.onrender.com/update/${userId}`,
+        `${process.env.NEXT_PUBLIC_VCHAT_API_URL}/update/${userId}`,
         updatedUser
       );
 
-      localStorage.setItem("user", JSON.stringify({ ...updatedUser, id: userId }));
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ ...updatedUser, id: userId })
+      );
 
-      alert("Profile updated successfully!");
+      toast.success("Profile updated successfully!");
     } catch (error) {
-      console.error("Error updating profile:", error);
-      alert("Failed to update profile. Check the console for more info.");
+      toast.error("Failed to update profile. Check the console for more info.");
     }
   };
 
@@ -53,13 +56,8 @@ export default function ProfilePage() {
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setProfileImage(imageUrl);
-
-      // OPTIONAL: Upload image to server if backend requires image URL
-      // uploadImage(file);
     }
   };
-
-  /* OPTIONAL: Upload Image to server */
   const uploadImage = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -69,15 +67,15 @@ export default function ProfilePage() {
         "https://your-image-upload-endpoint.com/upload",
         formData
       );
-      setProfileImage(response.data.imageUrl); // Assuming imageUrl is returned
-    } catch (error) {
-      console.error("Image upload failed:", error);
-    }
+      setProfileImage(response.data.imageUrl);
+    } catch (error) {}
   };
 
   return (
     <div className="flex w-full justify-between bg-gray-50 text-sm">
       <div className="min-h-screen bg-gray-50 flex flex-col ml-auto w-4/5">
+        <Toaster position="buttom-right" richColors />
+
         <div className="flex gap-7 pt-6">
           <Sidebar />
 
@@ -85,7 +83,9 @@ export default function ProfilePage() {
             <div className="mb-6 flex justify-between items-center">
               <div>
                 <h1 className="text-lg font-semibold text-gray-700">Profile</h1>
-                <p className="text-sm text-gray-500">Manage your personal information</p>
+                <p className="text-sm text-gray-500">
+                  Manage your personal information
+                </p>
               </div>
               <Link
                 href="/model"
@@ -97,18 +97,22 @@ export default function ProfilePage() {
 
             <div className="rounded-lg border p-6 space-y-6">
               <div>
-                <h3 className="text-sm font-medium text-gray-600 mb-1">Profile Photo</h3>
-                <p className="text-sm text-gray-500 mb-4">Click on the avatar to upload a custom one from your files.</p>
+                <h3 className="text-sm font-medium text-gray-600 mb-1">
+                  Profile Photo
+                </h3>
+                <p className="text-sm text-gray-500 mb-4">
+                  Click on the avatar to upload a custom one from your files.
+                </p>
                 <div className="flex items-center gap-4">
                   <div className="relative">
                     {profileImage ? (
                       <img
                         src={profileImage}
                         alt="Profile"
-                        className="w-24 h-24 rounded-full object-cover"
+                        className="w-20 h-20 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="w-24 h-24 rounded-full bg-green-700 flex items-center justify-center text-white text-3xl font-medium">
+                      <div className="w-20 h-20 rounded-full bg-green-700 flex items-center justify-center text-white text-3xl font-medium">
                         {email.charAt(0).toUpperCase()}
                       </div>
                     )}
@@ -132,7 +136,9 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 mt-8">Display Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2 mt-8">
+                  Display Name
+                </label>
                 <input
                   type="text"
                   value={displayName}
@@ -142,11 +148,13 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
                 <input
                   type="email"
                   value={email}
-                  disabled   
+                  disabled
                   className="w-2/5 max-w-md px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed text-gray-500"
                 />
               </div>
@@ -155,7 +163,7 @@ export default function ProfilePage() {
             <div className="flex justify-end">
               <button
                 onClick={handleSave}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 mt-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 mt-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 Save
               </button>

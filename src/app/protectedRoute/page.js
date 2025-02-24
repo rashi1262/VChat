@@ -7,10 +7,9 @@ const page = (WrappedComponent) => {
     const router = useRouter();
 
     useEffect(() => {
-      const token = localStorage.getItem("token"); // Get auth token from localStorage
-
+      const token = localStorage.getItem("token");
       if (!token) {
-        router.push("/login"); // Redirect to login if token doesn't exist
+        router.push("/login");
       }
     }, []);
 
