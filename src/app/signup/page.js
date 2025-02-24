@@ -10,6 +10,7 @@ import { toast, Toaster } from "sonner";
 
 const Signup = () => {
   const { data: session } = useSession();
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -24,6 +25,7 @@ const Signup = () => {
   }, [session, router]);
 
   const [formData, setFormData] = useState({
+    name: "",
     email: "",
     password: "",
   });
@@ -38,6 +40,7 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/signup-verification`,
@@ -68,11 +71,13 @@ const Signup = () => {
       }
 
       toast.success("Signup successful!");
-      router.push("/login");
+      router.push("/verify");
       setFormData({ email: "", password: "" });
     } catch (error) {
       console.error("Signup error:", error.message);
       toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -99,6 +104,21 @@ const Signup = () => {
         </h1>
 
         <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-sm text-gray-800" htmlFor="name">
+              Name
+            </label>
+            <input
+              type="text"
+              className="w-full p-2 text-gray-800 text-base border border-gray-300 rounded mt-1"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
           <div className="mb-4">
             <label className="block text-sm text-gray-800" htmlFor="email">
               Email address
@@ -131,9 +151,16 @@ const Signup = () => {
 
           <button
             type="submit"
-            className="w-full p-2 text-base bg-gray-800 text-white border-none rounded cursor-pointer mt-2 hover:bg-gray-900"
+            disabled={isLoading}
+            className="w-full p-2 text-base bg-gray-800 text-white border-none  rounded cursor-pointer mt-2 hover:bg-gray-900"
           >
-            Sign Up
+            {isLoading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent items-center rounded-full animate-spin"></div>
+              </>
+            ) : (
+              "Sign up"
+            )}
           </button>
         </form>
 

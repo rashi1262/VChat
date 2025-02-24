@@ -16,7 +16,11 @@ const page = () => {
     if (typeof window !== "undefined") {
       try {
         const storedUser = localStorage.getItem("user");
-        if (storedUser) {
+        if (!storedUser) {
+          router.push("/login"); 
+          return;
+        }
+        else{
           const user = JSON.parse(storedUser);
           setEmail(user?.email || "No Email");
           setName(user?.name || "No Name");
