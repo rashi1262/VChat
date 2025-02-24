@@ -26,16 +26,42 @@ export default function ProfilePage() {
     }
   }, []);
 
+  const uploadImage = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_VCHAT_API_URL}/upload`,
+        formData
+      );
+      return response.data.imageUrl; 
+    } catch (error) {
+      toast.error("Failed to upload image.");
+      return null;
+    }
+  };
+
   const handleSave = async () => {
     try {
+      let finalImageUrl = profileImage;
+
+      if (fileInputRef.current.files[0]) {
+        const uploadedUrl = await uploadImage(fileInputRef.current.files[0]);
+        if (uploadedUrl) {
+          finalImageUrl = uploadedUrl;
+        } else {
+          return;
+        }
+      }
+
       const updatedUser = {
         name: displayName,
         email: email,
-        image: profileImage,
-        password: "rahultest12",
+        image: finalImageUrl,
       };
 
-      const response = await axios.put(
+      await axios.put(
         `${process.env.NEXT_PUBLIC_VCHAT_API_URL}/update/${userId}`,
         updatedUser
       );
@@ -45,36 +71,25 @@ export default function ProfilePage() {
         JSON.stringify({ ...updatedUser, id: userId })
       );
 
+      setProfileImage(finalImageUrl);
       toast.success("Profile updated successfully!");
     } catch (error) {
-      toast.error("Failed to update profile. Check the console for more info.");
+      toast.error("Failed to update profile.");
     }
   };
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setProfileImage(imageUrl);
+      const previewUrl = URL.createObjectURL(file);
+      setProfileImage(previewUrl);
     }
-  };
-  const uploadImage = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await axios.post(
-        "https://your-image-upload-endpoint.com/upload",
-        formData
-      );
-      setProfileImage(response.data.imageUrl);
-    } catch (error) {}
   };
 
   return (
     <div className="flex w-full justify-between bg-gray-50 text-sm">
       <div className="min-h-screen bg-gray-50 flex flex-col ml-auto w-4/5">
-        <Toaster position="buttom-right" richColors />
+        <Toaster position="bottom-right" richColors />
 
         <div className="flex gap-7 pt-6">
           <Sidebar />
