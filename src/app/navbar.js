@@ -56,7 +56,7 @@ const page = () => {
                 <li className=" flex  rounded">
                   <Link
                     href="/model"
-                    className="block p-0.5 border hover:bg-gray-100 rounded mr-2 pl-3  pr-20"
+                    className="block p-0.5 mt-2 border text-2/3xl hover:bg-gray-100 rounded mr-2 pl-3  pr-20"
                   >
                     + New Chat
                   </Link>
