@@ -1,8 +1,6 @@
 "use client";
 import { useEffect, useState, use, useRef } from "react";
 import Link from "next/link";
-
-
 const ChatPage = ({ params }) => {
   const { id } = use(params);
   const [name, setName] = useState("");
@@ -17,13 +15,6 @@ const ChatPage = ({ params }) => {
   const [chatHistory, setChatHistory] = useState([]);
 
   const chatContainerRef = useRef(null);
-
-  
-
-useEffect(() => {
-  const storedChats = JSON.parse(localStorage.getItem("chatHistory")) || [];
-  setChatHistory(storedChats);
-}, []);
 
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
@@ -439,22 +430,6 @@ useEffect(() => {
                 </Link>
               </li>
             </ul>
-
-
-            {chatHistory.length > 0 && (
-        <div className="mt-4 border-t border-gray-300 pt-2">
-          <h3 className="text-sm text-gray-500 pl-3">Recent Chats</h3>
-          {chatHistory.map((chat, index) => (
-            <li key={index} className="flex items-center p-2 hover:bg-gray-100 rounded text-sm">
-              <Link href={`/chat/${chat.id}`} className="text-gray-700 truncate">
-                {chat.userMessage.length > 30
-                  ? chat.userMessage.substring(0, 30) + "..."
-                  : chat.userMessage}
-              </Link>
-            </li>
-          ))}
-        </div>
-      )}
             <ul>
               <li>
                 <Link
@@ -481,7 +456,7 @@ useEffect(() => {
                   <span className="ml-2 text-gray-700">Explore Bots</span>
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/upload"
                   className="flex items-center p-2 hover:bg-gray-200 rounded-lg text-sm font-medium transition duration-200"
@@ -504,7 +479,7 @@ useEffect(() => {
                   </div>
                   <span className="ml-2 text-gray-700">Go Pro</span>
                 </Link>
-              </li>
+              </li> */}
               <li className="mt-4 flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-sm cursor-pointer border-t border-gray-400 relative before:absolute before:top-0 before:left-0 before:w-full before:h-[5px] before:bg-gradient-to-b before:from-gray-100 before:to-transparent before:rounded-t-sm">
                 <div className="w-5 h-5 p-5 flex items-center justify-center rounded-full text-white font-bold bg-green-700">
                   {email ? email[0].toUpperCase() : "?"}
@@ -627,7 +602,7 @@ useEffect(() => {
       </div>
 
       <div className="fixed top-3 right-5 flex items-center ">
-        <button className="flex items-center text-black border rounded-l-full rounded-r-full p-1 bg-yellow-200">
+        {/* <button className="flex items-center text-black border rounded-l-full rounded-r-full p-1 bg-yellow-200">
           <div className="w-5 h-5 m1-2 mr-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -645,7 +620,7 @@ useEffect(() => {
             </svg>
           </div>
           Go Pro
-        </button>
+        </button> */}
         <button className="flex items-center">
           <Link
             href="/model"
@@ -699,23 +674,3 @@ useEffect(() => {
 };
 
 export default ChatPage;
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
