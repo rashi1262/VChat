@@ -1,14 +1,34 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import React from "react";
 import Link from "next/link";
 
 const page = () => {
+   const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    useEffect(() => {
+      if (typeof window !== "undefined") {
+        try {
+          const storedUser = localStorage.getItem("user");
+          if (!storedUser) {
+            router.push("/login");
+            return;
+          } else {
+            const user = JSON.parse(storedUser);
+            setEmail(user?.email || "No Email");
+            setName(user?.name || "No Name");
+          }
+        } catch (error) {}
+      }
+    }, []);
   return (
     <>
       <div className="flex w-full justify-between bg-gray-50">
         <div className="h-screen w-64 bg-white text-black fixed left-0 top-0 flex flex-col items-center p-4">
           <nav className="w-full flex flex-col justify-between flex-grow">
             <ul>
-              <li className=" flex  rounded">
+              <li className=" flex  items-center justify-evenly rounded">
                 <Link
                   href="/model"
                   className="block p-0.5 border hover:bg-gray-100 rounded mr-2 pl-3  pr-20"
@@ -244,7 +264,7 @@ const page = () => {
                   Image Generation
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/upload"
                   className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
@@ -281,7 +301,7 @@ const page = () => {
                   </div>
                   Upload & Ask PDF
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   href="/model"
@@ -308,17 +328,17 @@ const page = () => {
               </li>
             </ul>
             <ul className=" mt-auto">
-              <li>
+            <li>
                 <Link
                   href="/explore"
-                  className="flex block p-2 hover:bg-gray-100 rounded text-sm "
+                  className="flex items-center p-2 hover:bg-gray-200 rounded-lg text-sm font-medium transition duration-200"
                 >
-                  <div className="w-7 h-6 p-1 ">
+                  <div className="w-7 h-7 flex items-center justify-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 18 18"
-                      className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--tiny___trsDz"
+                      className="w-5 h-5 text-gray-600"
                     >
                       <g
                         stroke="currentColor"
@@ -330,20 +350,20 @@ const page = () => {
                       </g>
                     </svg>
                   </div>
-                  Explore botes
+                  <span className="ml-2 text-gray-700">Explore Bots</span>
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/upload"
-                  className="flex block p-2 hover:bg-gray-100 rounded text-sm "
+                  className="flex items-center p-2 hover:bg-gray-200 rounded-lg text-sm font-medium transition duration-200"
                 >
-                  <div className="w-5 h-5">
+                  <div className="w-7 h-7 flex items-center justify-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 18 18"
-                      className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+                      className="w-5 h-5 text-gray-600"
                     >
                       <path
                         stroke="currentColor"
@@ -354,16 +374,28 @@ const page = () => {
                       ></path>
                     </svg>
                   </div>
-                  Go Pro
+                  <span className="ml-2 text-gray-700">Go Pro</span>
                 </Link>
-              </li>
+              </li> */}
               <li className="mt-4 ">
-                <Link
-                  href="/model"
-                  className="block pt-5 border-t hover:bg-gray-100 rounded text-lg"
-                >
-                  Email
-                </Link>
+              <Link
+                    href="/profile"
+                    className="text-xs overflow-hidden text-gray-500"
+                  >
+              <li className="mt-4 flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-sm cursor-pointer border-t border-gray-400 relative before:absolute before:top-0 before:left-0 before:w-full before:h-[5px] before:bg-gradient-to-b before:from-gray-100 before:to-transparent before:rounded-t-sm">
+                <div className="w-5 h-5 p-5 flex items-center justify-center rounded-full text-white font-bold bg-green-700">
+                  {email ? email[0].toUpperCase() : "?"}
+                </div>
+
+                <div className="flex flex-col ">
+                  <span className="font-medium text-gray-900">
+                    {name ? name : "User"}
+                  </span>
+                  
+                    {email}
+                  
+                </div>
+              </li></Link>
               </li>
             </ul>
           </nav>

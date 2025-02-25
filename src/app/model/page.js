@@ -4,14 +4,17 @@ import { useState, useEffect } from "react";
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
+import { useSearchParams } from "next/navigation";
 const page = () => {
+  const searchParams = useSearchParams();
+  const model = searchParams.get("model");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState("");
-
+  const [loading,setLoading]=useState(false)
+ 
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
@@ -30,6 +33,7 @@ const page = () => {
 
   const router = useRouter();
   const handleResponse = async () => {
+    setLoading(true);
     try {
       const searchRes = await fetch(
         `${
@@ -48,6 +52,7 @@ const page = () => {
         .join(" ");
 
       setResponse(formattedResponse);
+      setLoading(false);
 
       const createChatRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/create`,
@@ -75,6 +80,7 @@ const page = () => {
 
       router.push(`/chat/${chatData.id}`);
     } catch (error) {
+      setLoading(false);
       setError(error.message);
     }
   };
@@ -92,7 +98,7 @@ const page = () => {
         <div className="h-screen w-64 bg-white text-black fixed left-0 top-0 flex flex-col items-center p-4">
           <nav className="w-full flex flex-col justify-between flex-grow">
             <ul>
-              {/* <li className=" flex  rounded">
+              <li className=" flex items-center justify-evenly  rounded">
                 <Link
                   href="/model"
                   className="block p-0.5 border hover:bg-gray-100 rounded mr-2 pl-3  pr-20"
@@ -126,7 +132,7 @@ const page = () => {
                   href="/mybot"
                   className="flex block p-2 hover:bg-gray-100 rounded text-sm mt-6"
                 >
-                  <div className="w-7 h-6 p-1 ">
+                  <div className="w-7 h-6 p-1 flex items-center ">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -248,6 +254,7 @@ const page = () => {
               <li>
                 <Link
                   href="/deepSeek"
+
                   className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
                 >
                   <div className="w-7 h-6 p-1 ">
@@ -328,7 +335,7 @@ const page = () => {
                   Image Generation
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/upload"
                   className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
@@ -417,7 +424,7 @@ const page = () => {
                   <span className="ml-2 text-gray-700">Explore Bots</span>
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/upload"
                   className="flex items-center p-2 hover:bg-gray-200 rounded-lg text-sm font-medium transition duration-200"
@@ -440,8 +447,11 @@ const page = () => {
                   </div>
                   <span className="ml-2 text-gray-700">Go Pro</span>
                 </Link>
-              </li>
-
+              </li>  */}
+              <Link
+                    href="/profile"
+                    className="text-xs overflow-hidden text-gray-500"
+                  >
               <li className="mt-4 flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-sm cursor-pointer border-t border-gray-400 relative before:absolute before:top-0 before:left-0 before:w-full before:h-[5px] before:bg-gradient-to-b before:from-gray-100 before:to-transparent before:rounded-t-sm">
                 <div className="w-5 h-5 p-5 flex items-center justify-center rounded-full text-white font-bold bg-green-700">
                   {email ? email[0].toUpperCase() : "?"}
@@ -451,14 +461,12 @@ const page = () => {
                   <span className="font-medium text-gray-900">
                     {name ? name : "User"}
                   </span>
-                  <Link
-                    href="/profile"
-                    className="text-xs overflow-hidden text-gray-500"
-                  >
+                  
                     {email}
-                  </Link>
+                  
                 </div>
               </li>
+              </Link>
             </ul>
           </nav>
         </div>
@@ -696,25 +704,29 @@ const page = () => {
                 </div>
               </button>
               <button
-                onClick={handleResponse}
-                className="p-1 mr-2 rounded-full bg-gray-200"
-              >
-                <div className="w-7 h-6 p-1 ">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 18 18"
-                    className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
-                  >
-                    <path
-                      fill="currentColor"
-                      fillRule="evenodd"
-                      d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
-                </div>
-              </button>
+  onClick={handleResponse}
+  className="p-1 mr-2 rounded-full bg-gray-200 flex items-center justify-center"
+>
+  {loading ? (
+    <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+  ) : (
+    <div className="w-7 h-6 p-1">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 18 18"
+        className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+      >
+        <path
+          fill="currentColor"
+          fillRule="evenodd"
+          d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
+          clipRule="evenodd"
+        ></path>
+      </svg>
+    </div>
+  )}
+</button>
             </div>
           </div>
         </div>

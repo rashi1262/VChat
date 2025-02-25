@@ -577,25 +577,30 @@ const ChatPage = ({ params }) => {
                 </div>
               </button>
               <button
-                onClick={handleAddChat}
-                className="p-1 mr-2 rounded-full bg-gray-200"
-              >
-                <div className="w-7 h-6 p-1 ">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 18 18"
-                    className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
-                  >
-                    <path
-                      fill="currentColor"
-                      fillRule="evenodd"
-                      d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
-                </div>
-              </button>
+  onClick={handleAddChat}
+  className="p-1 mr-2 rounded-full bg-gray-200 flex items-center justify-center"
+>
+  {loading ? (
+    <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+  ) : (
+    <div className="w-7 h-6 p-1">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 18 18"
+        className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+      >
+        <path
+          fill="currentColor"
+          fillRule="evenodd"
+          d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
+          clipRule="evenodd"
+        ></path>
+      </svg>
+    </div>
+  )}
+</button>
+
             </div>
           </div>
         </div>

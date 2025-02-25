@@ -1,7 +1,28 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import React from "react";
 import Link from "next/link";
 const page = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  useEffect(() => {
+      if (typeof window !== "undefined") {
+        try {
+          const storedUser = localStorage.getItem("user");
+          if (!storedUser) {
+            router.push("/login");
+            return;
+          } else {
+            const user = JSON.parse(storedUser);
+            setEmail(user?.email || "No Email");
+            setName(user?.name || "No Name");
+          }
+        } catch (error) {}
+      }
+    }, []);
   return (
+    
     <>
       <div className="flex w-full justify-between bg-gray-50 text-sm">
         <div className="h-screen w-64 bg-white text-black fixed left-0 top-0 flex flex-col items-center p-4">
@@ -120,7 +141,7 @@ const page = () => {
               <li>
                 <Link
                   href="/openAIGPT-4o"
-                  className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
+                  className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-xs"
                 >
                   <div className="w-7 h-6 p-1 ">
                     <svg
@@ -166,7 +187,7 @@ const page = () => {
               <li>
                 <Link
                   href="/deepSeek"
-                  className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
+                  className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-xs"
                 >
                   <div className="w-7 h-6 p-1 ">
                     <svg
@@ -246,7 +267,7 @@ const page = () => {
                   Image Generation
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/upload"
                   className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
@@ -283,7 +304,7 @@ const page = () => {
                   </div>
                   Upload & Ask PDF
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   href="/model"
@@ -310,17 +331,17 @@ const page = () => {
               </li>
             </ul>
             <ul>
-              <li>
+            <li>
                 <Link
-                  href="/image"
-                  className="flex block p-2 hover:bg-gray-100 rounded text-sm "
+                  href="/explore"
+                  className="flex items-center p-2 hover:bg-gray-200 rounded-lg text-sm font-medium transition duration-200"
                 >
-                  <div className="w-7 h-6 p-1 ">
+                  <div className="w-7 h-7 flex items-center justify-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 18 18"
-                      className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--tiny___trsDz"
+                      className="w-5 h-5 text-gray-600"
                     >
                       <g
                         stroke="currentColor"
@@ -332,20 +353,20 @@ const page = () => {
                       </g>
                     </svg>
                   </div>
-                  Explore botes
+                  <span className="ml-2 text-gray-700">Explore Bots</span>
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/upload"
-                  className="flex block p-2 hover:bg-gray-100 rounded text-sm "
+                  className="flex items-center p-2 hover:bg-gray-200 rounded-lg text-sm font-medium transition duration-200"
                 >
-                  <div className="w-5 h-5">
+                  <div className="w-7 h-7 flex items-center justify-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 18 18"
-                      className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+                      className="w-5 h-5 text-gray-600"
                     >
                       <path
                         stroke="currentColor"
@@ -356,26 +377,39 @@ const page = () => {
                       ></path>
                     </svg>
                   </div>
-                  Go Pro
+                  <span className="ml-2 text-gray-700">Go Pro</span>
                 </Link>
-              </li>
+              </li>  */}
               <li className="mt-4 ">
-                <Link
-                  href="/model"
-                  className="block pt-5 border-t hover:bg-gray-100 rounded text-lg "
-                >
-                  Email
-                </Link>
+              <Link
+                    href="/profile"
+                    className="text-xs overflow-hidden text-gray-500"
+                  >
+              <li className="mt-4 flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-sm cursor-pointer border-t border-gray-400 relative before:absolute before:top-0 before:left-0 before:w-full before:h-[5px] before:bg-gradient-to-b before:from-gray-100 before:to-transparent before:rounded-t-sm">
+                <div className="w-5 h-5 p-5 flex items-center justify-center rounded-full text-white font-bold bg-green-700">
+                  {email ? email[0].toUpperCase() : "?"}
+                </div>
+
+                <div className="flex flex-col ">
+                  <span className="font-medium text-gray-900">
+                    {name ? name : "User"}
+                  </span>
+                  
+                    {email}
+                  
+                </div>
+              </li>
+              </Link>
               </li>
             </ul>
           </nav>
         </div>
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center mt-4 ml-auto w-4/5">
+        <div className="min-h-screen bg-gray-50 flex flex-col items-center mt-4 ml-auto w-4/5 mx-auto ml-2">
           <div className="max-w-4xl w-full rounded-md p-6 mt-10">
             <strong className="text-xl text-gray-600  ml-20  text-lg">
               My Bots
             </strong>
-            <button className="flex absolute top-20 right-56 text-gray-400 px-4 py-2 rounded-md border  rounded-l-full rounded-r-full hover:border-black">
+            {/* <button className="flex absolute top-20 right-56 text-gray-400 px-4 py-2 rounded-md border  rounded-l-full rounded-r-full hover:border-black">
               <div className="w-4 h-4 mr-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -393,15 +427,15 @@ const page = () => {
                 </svg>
               </div>
               Customize
-            </button>
+            </button> */}
 
             <h1 className="text-gray-400 mt-1 mb-5 ml-20 text-sm">
               Manage your favorite bots.
             </h1>
             <div className="grid grid-cols-1 gap-6 items-center mr-20 ml-20 ">
               <div className="relative border text-center  rounded-3xl p-4 hover:bg-white ">
-                <h1 className=" flex items-center text-center justify-center text-black mt-1 mb-1 ml-10 text-sm">
-                  <div className="w-4 h-4 mr-2">
+                <h1 className=" flex items-center text-center justify-center text-black mt-1 mb-1 ml-15 mx-auto text-sm">
+                  <div className="w-4 h-4 mr-2 ">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="var(--fill-color, none)"
@@ -420,8 +454,8 @@ const page = () => {
                   Favorite Bots
                 </h1>
                 <div className="grid grid-cols-1 ">
-                  <div className="flex   rounded-md p-4 hover:bg-white ">
-                    <h1 className="text-gray-300  mb-5  text-sm mr-36 ml-36">
+                  <div className="flex rounded-md p-4 hover:bg-white ">
+                    <h1 className="text-gray-600  w-[300]  mb-5  text-sm mx-auto">
                       Your favorite bots will appear on the left. Drag and drop
                       them to customize the order to suit your preferences.
                     </h1>
@@ -442,7 +476,7 @@ const page = () => {
                                 viewBox="0 0 42 42"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
+                                className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG w-10 h-10"
                               >
                                 <g clipPath="url(#clip0_11185_26182)">
                                   <path
@@ -485,19 +519,19 @@ const page = () => {
                         OpenAI GPT-4o mini
                       </Link>
                     </div>
-                    <div className="mr-3">
+                    <div className="mr-3  flex items-center  ">
                       <Link
                         href="/openAIGPT-4o"
                         className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm  "
                       >
-                        <div className="grid grid-cols-1  items-center  mr-4 mb-2">
+                        <div className=" mx-auto ml-2">
                           <div className="flex  border rounded-md p-1 hover:bg-white ">
                             <div className="w-10 h-10 m-3">
                               <svg
                                 viewBox="0 0 42 42"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
+                                className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG w-10 h-10"
                               >
                                 <g clipPath="url(#clip0_11185_26182)">
                                   <path
@@ -540,19 +574,20 @@ const page = () => {
                         OpenAI GPT-4o
                       </Link>
                     </div>
-                    <div className="mr-3">
+                    <div className="mr-3  flex items-center ">
                       <Link
                         href="/deepSeek"
                         className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm  "
                       >
-                        <div className="grid grid-cols-1  items-center  mr-4 mb-2">
+                        <div className="mx-auto ml-2">
                           <div className="flex  border rounded-md p-1 hover:bg-white ">
                             <div className="w-10 h-10 m-3">
                               <svg
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 42 42"
-                                className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
+                                
+                                className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG w-10 h-10"
                               >
                                 <path
                                   d="M.5 21C.5 9.678 9.678.5 21 .5S41.5 9.678 41.5 21 32.322 41.5 21 41.5.5 32.322.5 21Z"
@@ -605,7 +640,7 @@ const page = () => {
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 42 42"
-                                className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
+                                className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG w-10 h-10"
                               >
                                 <path
                                   d="M.5 21C.5 9.678 9.678.5 21 .5S41.5 9.678 41.5 21 32.322 41.5 21 41.5.5 32.322.5 21Z"
@@ -632,7 +667,7 @@ const page = () => {
                       </Link>
                     </div>
 
-                    <div>
+                    {/* <div>
                       <Link
                         href="/upload"
                         className="items-center  text-gray-600 hover:bg-gray-100 rounded text-sm "
@@ -673,15 +708,15 @@ const page = () => {
                         </div>
                         Upload & Ask PDF
                       </Link>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
                 <div className="grid grid-cols-1  items-center mr-20 ml-20 ">
                   <div className="mt-5  border-t rounded-md p-4 hover:bg-white ">
-                    <h1 className="text-black mt-1 mb-1 ml-10 text-sm">
+                    <h1 className="text-black   mt-1 mb-1 ml-15 text-sm">
                       Recent
                     </h1>
-                    <h1 className="text-gray-300  mb-2  text-sm ">
+                    <h1 className="text-gray-600 mx-auto  mb-2  text-sm ">
                       Review your recently used bots below. You can easily
                       change your favorite bots by drag and drop between the
                       Recent and Favorite sections for a personalized
