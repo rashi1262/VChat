@@ -39,7 +39,7 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // ✅ Start loading
+    setLoading(true); 
 
     try {
       const response = await fetch(
