@@ -11,6 +11,7 @@ import { toast, Toaster } from "sonner";
 const Signup = () => {
   const { data: session } = useSession();
   const router = useRouter();
+  const [loading, setLoading] = useState(false); // ✅ Loading state
 
   useEffect(() => {
     if (session?.user) {
@@ -38,6 +39,8 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // ✅ Start loading
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/signup-verification`,
@@ -71,17 +74,11 @@ const Signup = () => {
       router.push("/login");
       setFormData({ email: "", password: "" });
     } catch (error) {
-      console.error("Signup error:", error.message);
+     
       toast.error(error.message);
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8080/auth/google/callback";
-  };
-
-  const handleAppleLogin = () => {
-    console.log("Apple login");
   };
 
   return (
@@ -131,9 +128,22 @@ const Signup = () => {
 
           <button
             type="submit"
-            className="w-full p-2 text-base bg-gray-800 text-white border-none rounded cursor-pointer mt-2 hover:bg-gray-900"
+            className={`w-full p-2 text-base text-white border-none rounded cursor-pointer mt-2 ${
+              loading ? "bg-gray-500 cursor-not-allowed" : "bg-gray-800 hover:bg-gray-900"
+            }`}
+            disabled={loading} 
           >
-            Sign Up
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 border-t-2 border-white rounded-full"
+                  viewBox="0 0 24 24"
+                ></svg>
+                Signing Up...
+              </div>
+            ) : (
+              "Sign Up"
+            )}
           </button>
         </form>
 
@@ -158,7 +168,7 @@ const Signup = () => {
           </button>
 
           <button
-            onClick={handleAppleLogin}
+            onClick={() => "Apple login"}
             className="flex items-center justify-center gap-2 p-2 border border-gray-300 rounded bg-white text-gray-600"
           >
             <Image

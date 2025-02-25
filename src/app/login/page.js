@@ -179,12 +179,25 @@ const Login = () => {
             />
           </div>
 
+          
           <button
             type="submit"
-            className="w-full p-2 text-base bg-gray-800 text-white border-none rounded cursor-pointer mt-2 hover:bg-gray-900 disabled:bg-gray-500"
-            disabled={isLoading}
+            className={`w-full p-2 text-base text-white border-none rounded cursor-pointer mt-2 ${
+              isLoading ? "bg-gray-500 cursor-not-allowed" : "bg-gray-800 hover:bg-gray-900"
+            }`}
+            disabled={isLoading} 
           >
-            {isLoading ? "Logging in..." : "Log In"}
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 border-t-2 border-white rounded-full"
+                  viewBox="0 0 24 24"
+                ></svg>
+               Logging in...
+              </div>
+            ) : (
+              "Log In"
+            )}
           </button>
         </form>
 

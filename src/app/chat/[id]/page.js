@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState, use, useRef } from "react";
 import Link from "next/link";
+
+
 const ChatPage = ({ params }) => {
   const { id } = use(params);
   const [name, setName] = useState("");
@@ -15,6 +17,13 @@ const ChatPage = ({ params }) => {
   const [chatHistory, setChatHistory] = useState([]);
 
   const chatContainerRef = useRef(null);
+
+  
+
+useEffect(() => {
+  const storedChats = JSON.parse(localStorage.getItem("chatHistory")) || [];
+  setChatHistory(storedChats);
+}, []);
 
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
@@ -430,6 +439,22 @@ const ChatPage = ({ params }) => {
                 </Link>
               </li>
             </ul>
+
+
+            {chatHistory.length > 0 && (
+        <div className="mt-4 border-t border-gray-300 pt-2">
+          <h3 className="text-sm text-gray-500 pl-3">Recent Chats</h3>
+          {chatHistory.map((chat, index) => (
+            <li key={index} className="flex items-center p-2 hover:bg-gray-100 rounded text-sm">
+              <Link href={`/chat/${chat.id}`} className="text-gray-700 truncate">
+                {chat.userMessage.length > 30
+                  ? chat.userMessage.substring(0, 30) + "..."
+                  : chat.userMessage}
+              </Link>
+            </li>
+          ))}
+        </div>
+      )}
             <ul>
               <li>
                 <Link
@@ -674,3 +699,23 @@ const ChatPage = ({ params }) => {
 };
 
 export default ChatPage;
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
