@@ -11,6 +11,7 @@ export default function DangerZonePage() {
   const [loadingAccount, setLoadingAccount] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const[id,setId] = useState(null)
   useEffect(() => {
        if (typeof window !== "undefined") {
          try {
@@ -21,6 +22,9 @@ export default function DangerZonePage() {
            } else {
              const u = JSON.parse(storedUser);
              setUser(u)
+             const id = u.id
+             setId(id)
+
            }
          } catch (error) {}
        }
@@ -135,7 +139,7 @@ export default function DangerZonePage() {
     setLoadingAccount(true);
     setLoading(true); 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/user-delete/${userId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/user-delete/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -147,7 +151,8 @@ export default function DangerZonePage() {
       if (!response.ok) {
         throw new Error(data.message || "Failed to delete account");
       }
-     
+       
+       
       toast.success("Your account has been deleted successfully.");
       localStorage.removeItem("user");
       setLoading(false); 

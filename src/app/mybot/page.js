@@ -64,7 +64,7 @@ const page = () => {
                   className="flex block p-2 hover:bg-gray-100 rounded text-sm mt-6"
                 >
                   {/* <Image src={op} className="w-4 h-4 mr-2 rounded" alt="logo" /> */}
-                  <div className="w-7 h-6 p-1 ">
+                  <div className="w-7 h-6 p-1 flex items-center ">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"

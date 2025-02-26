@@ -80,6 +80,7 @@ const Login = () => {
       const userData = {
         email: data.email,
         name: data.name || "Guest",
+        id: data.id
       };
 
       localStorage.setItem("user", JSON.stringify(userData));

@@ -99,7 +99,7 @@ const ChatPage = ({ params }) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ userSearch: [...chatHistory, newChat] }),
+          body: JSON.stringify({ userSearch: [ newChat] }),
         }
       );
 
@@ -124,7 +124,6 @@ const ChatPage = ({ params }) => {
       handleAddChat();
     }
   };
-
   return (
     <>
       <div className="flex w-full justify-between bg-gray-50 text-sm">
@@ -428,6 +427,11 @@ const ChatPage = ({ params }) => {
                   </div>
                   Chats
                 </Link>
+                {/* <ul className="overflow-y-scrollable">
+                  {
+                    chatThread.map((chat)=><li className="hover:bg-gray-200 p-2 mt-2 cursor-pointer truncate w-full overflow-hidden text-ellipsis whitespace-nowrap"  key={chat.chatId}>{chat.message}</li>)
+                  }
+                </ul> */}
               </li>
             </ul>
             <ul>

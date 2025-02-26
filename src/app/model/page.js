@@ -3,18 +3,25 @@
 import { useState, useEffect } from "react";
 import React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
-const page = () => {
+import { useRouter, useSearchParams } from "next/navigation";
+import { useChat } from ".././chatContext";
+
+const page = ({ params }) => {
   const searchParams = useSearchParams();
+  const { chatThread, setChatThread } = useChat();
   const model = searchParams.get("model");
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState("");
-  const [loading,setLoading]=useState(false)
- 
+  const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState(null);
+
+  const router = useRouter();
+
+  // 🔹 **Get Logged-in User Data**
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
@@ -26,24 +33,49 @@ const page = () => {
           const user = JSON.parse(storedUser);
           setEmail(user?.email || "No Email");
           setName(user?.name || "No Name");
+          setUserId(user?.id);
         }
-      } catch (error) {}
+      } catch (error) {
+        console.error("Error reading user data:", error);
+      }
     }
   }, []);
 
-  const router = useRouter();
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchUserChats = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-by-userid/${userId}`
+        );
+        if (!response.ok) throw new Error("Failed to fetch chats");
+
+        const data = await response.json();
+
+        // Map and store only first messages
+        setChatThread(
+          data.map((chat) => ({
+            chatId: chat.id,
+            message: chat.userSearch[0]?.userMessage,
+          }))
+        );
+      } catch (error) {
+        console.error("Error fetching user chats:", error);
+      }
+    };
+
+    fetchUserChats();
+  }, [userId]);
+
   const handleResponse = async () => {
     setLoading(true);
     try {
       const searchRes = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_BASE_URL
-        }/chatbot/search?message=${encodeURIComponent(prompt)}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/search?message=${encodeURIComponent(prompt)}`
       );
 
-      if (!searchRes.ok) {
-        throw new Error("Error fetching bot response");
-      }
+      if (!searchRes.ok) throw new Error("Error fetching bot response");
 
       const data = await searchRes.text();
       const formattedResponse = data
@@ -58,25 +90,37 @@ const page = () => {
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/create`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            userSearch: [
-              {
-                userMessage: prompt,
-                botResponse: formattedResponse,
-              },
-            ],
+            userSearch: [{ userMessage: prompt, botResponse: formattedResponse }],
+            userId,
           }),
         }
       );
 
-      if (!createChatRes.ok) {
-        throw new Error("Failed to create chat");
-      }
+      if (!createChatRes.ok) throw new Error("Failed to create chat");
 
       const chatData = await createChatRes.json();
+
+      const chatHistoryRes = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${chatData.id}`
+      );
+
+      if (!chatHistoryRes.ok) throw new Error("Failed to fetch chat history");
+
+      const chatHistory = await chatHistoryRes.json();
+
+      if (chatHistory.userSearch?.length > 0 && chatHistory.userId === userId) {
+        const firstMessage = chatHistory.userSearch[0];
+
+        setChatThread((prev) => {
+          const chatExists = prev.some((chat) => chat.chatId === chatData.id);
+          if (!chatExists) {
+            return [...prev, { chatId: chatData.id, message: firstMessage.userMessage }];
+          }
+          return prev;
+        });
+      }
 
       router.push(`/chat/${chatData.id}`);
     } catch (error) {
@@ -85,12 +129,18 @@ const page = () => {
     }
   };
 
+
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleResponse();
-    }
-  };
+        if (e.key === "Enter") {
+          e.preventDefault();
+          handleResponse();
+        }
+      };
+  const getChatById = (c)=>{
+  
+   router.push(`/chat/${c}`);
+   
+  }
 
   return (
     <>
@@ -103,7 +153,7 @@ const page = () => {
                   href="/model"
                   className="block p-0.5 border hover:bg-gray-100 rounded mr-2 pl-3  pr-20"
                 >
-                  + New Chat
+                  + New Chat 
                 </Link>
                 <Link
                   href="/model"
@@ -396,8 +446,14 @@ const page = () => {
                   </div>
                   Chats
                 </Link>
+                <div className="overflow-y-scroll h-64 text-black">
+                  {
+                    chatThread.map((chat)=><li onClick={()=>getChatById(chat.chatId)} className="hover:bg-gray-200 p-2 mt-2 cursor-pointer truncate w-full overflow-hidden text-ellipsis whitespace-nowrap"  key={chat.chatId}>{chat.message}</li>)
+                  }
+                </div>
               </li>
             </ul>
+           
             <ul>
               <li>
                 <Link
