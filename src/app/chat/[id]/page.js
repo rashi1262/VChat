@@ -521,11 +521,7 @@ const ChatPage = ({ params }) => {
 
               {morePrompt !== "" && (
                 <div className="flex flex-col gap-1">
-                  <div className="self-end bg-blue-500 text-white px-3 py-2 rounded-xl max-w-[70%]">
-                    {morePrompt}
-                  </div>
-
-                  {loading && (
+       {loading && (
                     <div className="self-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[70%] flex items-center gap-2">
                       <span className="animate-pulse">...</span>
                     </div>
