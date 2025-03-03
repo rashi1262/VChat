@@ -2,11 +2,41 @@
 import { useState, useEffect } from "react";
 import React from "react";
 import Link from "next/link";
+import { useChat } from "./chatContext";
 
 const page = () => {
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+    const { chatThread, setChatThread } = useChat();
+     const [userId, setUserId] = useState(null);
+     useEffect(() => {
+        if (!userId) return;
+    
+        const fetchUserChats = async () => {
+          try {
+            const response = await fetch(
+              `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-by-userid/${userId}`
+            );
+            if (!response.ok) throw new Error("Failed to fetch chats");
+    
+            const data = await response.json();
+    
+            // Map and store only first messages
+            setChatThread(
+              data.map((chat) => ({
+                chatId: chat.id,
+                message: chat.userSearch[0]?.userMessage,
+              }))
+            );
+          } catch (error) {
+            console.error("Error fetching user chats:", error);
+          }
+        };
+    
+        fetchUserChats();
+      }, [userId]);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
@@ -328,29 +358,40 @@ const page = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/model"
-                    className="flex block p-2 hover:bg-gray-100 rounded text-sm mt-4"
-                  >
-                    <div className="w-5 h-3 p-1 ">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 18 18"
-                        className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--tiny___trsDz"
-                      >
-                        <path
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="1.5"
-                          d="m1.5 5.25 6.124 4.287c.496.347.744.52 1.013.587.238.06.488.06.726 0 .27-.067.517-.24 1.013-.587L16.5 5.25M5.1 15h7.8c1.26 0 1.89 0 2.371-.245a2.25 2.25 0 0 0 .984-.984c.245-.48.245-1.11.245-2.371V6.6c0-1.26 0-1.89-.245-2.371a2.25 2.25 0 0 0-.983-.984C14.79 3 14.16 3 12.9 3H5.1c-1.26 0-1.89 0-2.371.245a2.25 2.25 0 0 0-.984.984C1.5 4.709 1.5 5.339 1.5 6.6v4.8c0 1.26 0 1.89.245 2.371.216.424.56.768.984.984C3.209 15 3.839 15 5.1 15"
-                        ></path>
-                      </svg>
-                    </div>
-                    Chats
-                  </Link>
-                </li>
+                <Link
+                  href="/model"
+                  className="flex block p-2 hover:bg-gray-100 rounded text-sm mt-4"
+                >
+                  <div className="w-5 h-3 p-1 ">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 18 18"
+                      className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--tiny___trsDz"
+                    >
+                      <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="1.5"
+                        d="m1.5 5.25 6.124 4.287c.496.347.744.52 1.013.587.238.06.488.06.726 0 .27-.067.517-.24 1.013-.587L16.5 5.25M5.1 15h7.8c1.26 0 1.89 0 2.371-.245a2.25 2.25 0 0 0 .984-.984c.245-.48.245-1.11.245-2.371V6.6c0-1.26 0-1.89-.245-2.371a2.25 2.25 0 0 0-.983-.984C14.79 3 14.16 3 12.9 3H5.1c-1.26 0-1.89 0-2.371.245a2.25 2.25 0 0 0-.984.984C1.5 4.709 1.5 5.339 1.5 6.6v4.8c0 1.26 0 1.89.245 2.371.216.424.56.768.984.984C3.209 15 3.839 15 5.1 15"
+                      ></path>
+                    </svg>
+                  </div>
+                  Chats
+                </Link>
+                <div className="overflow-y-scroll h-64 text-black">
+                  {chatThread.map((chat) => (
+                    <li
+                      onClick={() => getChatById(chat.chatId)}
+                      className="hover:bg-gray-200 p-2 mt-2 cursor-pointer truncate w-full overflow-hidden text-ellipsis whitespace-nowrap"
+                      key={chat.chatId}
+                    >
+                      {chat.message}
+                    </li>
+                  ))}
+                </div>
+              </li>
               </ul>
               <ul>
                 <li>
