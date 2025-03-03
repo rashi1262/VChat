@@ -86,17 +86,16 @@ const page = () => {
                     </h1>
                   </div>
                 </div>
-
-                <div className="grid grid-cols-1 rounded-4xl items-center mr-20 ml-20 ">
+                 <div className="grid grid-cols-1 rounded-4xl items-center mr-20 ml-20 ">
                   <div className="flex  border rounded-md p-4 hover:bg-white">
-                    <div className="mr-2">
+                    <div className="mr-3 ml-5">
                       <Link
                         href="/model"
                         className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm  "
                       >
-                        <div className="grid grid-cols-1  items-center  mb-2">
+                        <div  className=" mx-auto ">
                           <div className="flex  border rounded-md p-1 hover:bg-white ">
-                            <div className="w-10 h-10 m-3 ml-5">
+                            <div className="w-10 h-10 m-4 ">
                               <svg
                                 viewBox="0 0 42 42"
                                 fill="none"
@@ -141,17 +140,17 @@ const page = () => {
                             </div>
                           </div>
                         </div>
-                        OpenAI GPT-4o mini
+                        Gemini
                       </Link>
                     </div>
-                    <div className="mr-3  flex items-center  ">
+                    <div className="mr-3 ml-5">
                       <Link
                         href="/openAIGPT-4o"
                         className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm  "
                       >
-                        <div className=" mx-auto ml-2">
+                        <div className=" mx-auto ">
                           <div className="flex  border rounded-md p-1 hover:bg-white ">
-                            <div className="w-10 h-10 m-3">
+                            <div className="w-10 h-10 m-4">
                               <svg
                                 viewBox="0 0 42 42"
                                 fill="none"
@@ -199,14 +198,14 @@ const page = () => {
                         OpenAI GPT-4o
                       </Link>
                     </div>
-                    <div className="mr-3  flex items-center ">
+                    <div className="mr-3 ml-5">
                       <Link
                         href="/deepSeek"
                         className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm  "
                       >
-                        <div className="mx-auto ml-2">
+                        <div className="mx-auto ">
                           <div className="flex  border rounded-md p-1 hover:bg-white ">
-                            <div className="w-10 h-10 m-3">
+                            <div className="w-10 h-10 m-4">
                               <svg
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -253,19 +252,19 @@ const page = () => {
                         DeepSeek
                       </Link>
                     </div>
-                    <div className="mr-3">
+                    <div className="mr-3 ml-5">
                       <Link
                         href="/image"
                         className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm "
                       >
                         <div className="grid grid-cols-1  items-center   mb-2">
                           <div className="flex  border rounded-md p-1 hover:bg-white ">
-                            <div className="w-10 h-10 m-3">
+                            <div className="w-10 h-10 m-4 ">
                               <svg
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 42 42"
-                                className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG w-10 h-10"
+                                className=" ml-1 CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG w-10 h-10"
                               >
                                 <path
                                   d="M.5 21C.5 9.678 9.678.5 21 .5S41.5 9.678 41.5 21 32.322 41.5 21 41.5.5 32.322.5 21Z"
@@ -291,8 +290,7 @@ const page = () => {
                         Image Generation
                       </Link>
                     </div>
-
-                    {/* <div>
+                   {/* <div>
                       <Link
                         href="/upload"
                         className="items-center  text-gray-600 hover:bg-gray-100 rounded text-sm "
@@ -336,6 +334,8 @@ const page = () => {
                     </div> */}
                   </div>
                 </div>
+
+               
                 <div className="grid grid-cols-1  items-center mr-20 ml-20 ">
                   <div className="mt-5  border-t rounded-md p-4 hover:bg-white ">
                     <h1 className="text-black   mt-1 mb-1 ml-15 text-sm">
@@ -382,3 +382,87 @@ const page = () => {
 };
 
 export default page;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div className="flex  border rounded-md p-4 hover:bg-white">
+<div className="mr-2">
+  <Link
+    href="/model"
+    className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm  "
+  >
+    <div className="grid grid-cols-1  items-center  mb-2">
+      <div className="flex  border rounded-md p-1 hover:bg-white ">
+        <div className="w-10 h-10 m-3 ml-5">
+          
+        </div>
+      </div>
+    </div>
+    OpenAI GPT-4o mini
+  </Link>
+</div>
+<div className="mr-3  flex items-center  ">
+  <Link
+    href="/openAIGPT-4o"
+    className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm  "
+  >
+    <div className=" mx-auto ml-2">
+      <div className="flex  border rounded-md p-1 hover:bg-white ">
+        <div className="w-10 h-10 m-3">
+        
+        </div>
+      </div>
+    </div>
+    OpenAI GPT-4o
+  </Link>
+</div>
+<div className="mr-3  flex items-center ">
+  <Link
+    href="/deepSeek"
+    className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm  "
+  >
+    <div className="mx-auto ml-2">
+      <div className="flex  border rounded-md p-1 hover:bg-white ">
+        <div className="w-10 h-10 m-3">
+          {" "}
+        </div>
+      </div>
+    </div>
+    DeepSeek
+  </Link>
+</div>
+<div className="mr-3">
+  <Link
+    href="/image"
+    className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm "
+  >
+    <div className="grid grid-cols-1  items-center   mb-2">
+      <div className="flex  border rounded-md p-1 hover:bg-white ">
+        <div className="w-10 h-10 m-3">
+          
+        </div>{" "}
+      </div>
+    </div>{" "}
+    Image Generation
+  </Link>
+</div>
+
+
+</div>

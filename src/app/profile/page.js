@@ -26,39 +26,70 @@ export default function ProfilePage() {
     }
   }, []);
 
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file); 
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   const uploadImage = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
+    if (!file) {
+     
+      toast.error("Please select a file.");
+      return null;
+    }
 
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_VCHAT_API_URL}/upload`,
-        formData
+      const base64String = await fileToBase64(file); 
+
+      const requestData = {
+        file: base64String, 
+      };
+
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_VCHAT_API_URL}/update/${userId}`,
+        requestData,
+        {
+          headers: {
+            "Content-Type": "application/json", 
+          },
+        }
       );
-      return response.data.imageUrl; 
+
+     
+
+      if (response.data && response.data.imageUrl) {
+        return response.data.imageUrl;
+      }
     } catch (error) {
-      toast.error("Failed to upload image.");
+      
+      toast.error(error.response?.data?.message || "Image upload failed.");
       return null;
+    }
+  };
+
+  const handleImageChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const previewUrl = URL.createObjectURL(file);
+    setProfileImage(previewUrl);
+
+    const uploadedUrl = await uploadImage(file);
+    if (uploadedUrl) {
+      setProfileImage(uploadedUrl);
     }
   };
 
   const handleSave = async () => {
     try {
-      let finalImageUrl = profileImage;
-
-      if (fileInputRef.current.files[0]) {
-        const uploadedUrl = await uploadImage(fileInputRef.current.files[0]);
-        if (uploadedUrl) {
-          finalImageUrl = uploadedUrl;
-        } else {
-          return;
-        }
-      }
-
       const updatedUser = {
         name: displayName,
         email: email,
-        image: finalImageUrl,
+        image: profileImage,
       };
 
       await axios.put(
@@ -71,18 +102,10 @@ export default function ProfilePage() {
         JSON.stringify({ ...updatedUser, id: userId })
       );
 
-      setProfileImage(finalImageUrl);
       toast.success("Profile updated successfully!");
     } catch (error) {
+      console.error("Profile update error:", error);
       toast.error("Failed to update profile.");
-    }
-  };
-
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      setProfileImage(previewUrl);
     }
   };
 

@@ -24,7 +24,7 @@ const page = () => {
           setUserId(user?.id);
         }
       } catch (error) {
-        console.error("Error reading user data:", error);
+       
       }
     }
   }, []);
@@ -48,7 +48,7 @@ const page = () => {
           }))
         );
       } catch (error) {
-        console.error("Error fetching user chats:", error);
+      
       }
     };
 
@@ -204,7 +204,7 @@ const page = () => {
                       </defs>
                     </svg>
                   </div>
-                  OpenAI GPT-4o mini
+                  Gemini
                 </Link>
               </li>
               <li>
