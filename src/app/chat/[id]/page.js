@@ -1,12 +1,16 @@
 "use client";
 import { useEffect, useState, use, useRef } from "react";
 import Link from "next/link";
+import { useChat } from "../../chatContext";
+import { useRouter } from "next/navigation";
+
 const ChatPage = ({ params }) => {
   const { id } = use(params);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
-
+  const { chatThread, setChatThread } = useChat();
+  const router = useRouter()
   const [botResponse, setBotResponse] = useState("");
   const [loading, setLoading] = useState(true);
   const [morePrompt, setMorePrompt] = useState("");
@@ -37,6 +41,10 @@ const ChatPage = ({ params }) => {
       }
     }
   }, []);
+
+  const getChatById = (c) => {
+    router.push(`/chat/${c}`);
+  };
 
   useEffect(() => {
     scrollToBottom();
@@ -427,11 +435,17 @@ const ChatPage = ({ params }) => {
                   </div>
                   Chats
                 </Link>
-                {/* <ul className="overflow-y-scrollable">
-                  {
-                    chatThread.map((chat)=><li className="hover:bg-gray-200 p-2 mt-2 cursor-pointer truncate w-full overflow-hidden text-ellipsis whitespace-nowrap"  key={chat.chatId}>{chat.message}</li>)
-                  }
-                </ul> */}
+                <div className="overflow-y-scroll h-64 text-black">
+                  {chatThread.map((chat) => (
+                    <li
+                      onClick={() => getChatById(chat.chatId)}
+                      className="hover:bg-gray-200 p-2 mt-2 cursor-pointer truncate w-full overflow-hidden text-ellipsis whitespace-nowrap"
+                      key={chat.chatId}
+                    >
+                      {chat.message}
+                    </li>
+                  ))}
+                </div>
               </li>
             </ul>
             <ul>
