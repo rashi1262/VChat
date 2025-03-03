@@ -10,6 +10,7 @@ import { toast, Toaster } from "sonner";
 
 const Signup = () => {
   const { data: session } = useSession();
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const [loading, setLoading] = useState(false); // ✅ Loading state
 
@@ -25,6 +26,7 @@ const Signup = () => {
   }, [session, router]);
 
   const [formData, setFormData] = useState({
+    name: "",
     email: "",
     password: "",
   });
@@ -39,8 +41,7 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); 
-
+    setIsLoading(true);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/signup-verification`,
@@ -71,13 +72,13 @@ const Signup = () => {
       }
 
       toast.success("Signup successful!");
-      router.push("/login");
+      router.push("/verify");
       setFormData({ email: "", password: "" });
     } catch (error) {
      
       toast.error(error.message);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -96,6 +97,21 @@ const Signup = () => {
         </h1>
 
         <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-sm text-gray-800" htmlFor="name">
+              Name
+            </label>
+            <input
+              type="text"
+              className="w-full p-2 text-gray-800 text-base border border-gray-300 rounded mt-1"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
           <div className="mb-4">
             <label className="block text-sm text-gray-800" htmlFor="email">
               Email address
@@ -128,21 +144,15 @@ const Signup = () => {
 
           <button
             type="submit"
-            className={`w-full p-2 text-base text-white border-none rounded cursor-pointer mt-2 ${
-              loading ? "bg-gray-500 cursor-not-allowed" : "bg-gray-800 hover:bg-gray-900"
-            }`}
-            disabled={loading} 
+            disabled={isLoading}
+            className="w-full p-2 text-base bg-gray-800 text-white border-none  rounded cursor-pointer mt-2 hover:bg-gray-900"
           >
-            {loading ? (
-              <div className="flex items-center justify-center">
-                <svg
-                  className="animate-spin h-5 w-5 mr-2 border-t-2 border-white rounded-full"
-                  viewBox="0 0 24 24"
-                ></svg>
-                Signing Up...
-              </div>
+            {isLoading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent items-center rounded-full animate-spin"></div>
+              </>
             ) : (
-              "Sign Up"
+              "Sign up"
             )}
           </button>
         </form>

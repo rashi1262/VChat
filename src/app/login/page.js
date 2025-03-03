@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import logo from "../../../public/assests/logo.jpg";
-
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
@@ -39,6 +38,10 @@ const Login = () => {
     }));
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:8080/auth/google/callback";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -61,7 +64,7 @@ const Login = () => {
           response.status === 401 &&
           data.message.includes("verify your email")
         ) {
-          router.push("/verify"); 
+          router.push("/verify");
           return;
         } else if (response.status === 401) {
           throw new Error("Invalid email or password.");
@@ -77,6 +80,7 @@ const Login = () => {
       const userData = {
         email: data.email,
         name: data.name || "Guest",
+        id: data.id
       };
 
       localStorage.setItem("user", JSON.stringify(userData));

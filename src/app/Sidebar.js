@@ -40,10 +40,10 @@ export default function Sidebar() {
             <User size={13} />
               Profile
             </Link>
-            <Link className="flex items-center gap-2 px-4 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-md" href="/change-password" >
+            {/* <Link className="flex items-center gap-2 px-4 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-md" href="/change-password" >
             <Key size={13} />
               Change Password
-            </Link>
+            </Link> */}
             <Link className="flex items-center gap-2 px-4 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-md" href="/login-connection" >
           <Cuboid size={13}/>
               Login Connection

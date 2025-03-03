@@ -9,15 +9,26 @@ import Link from "next/link";
 export default function DangerZonePage() {
   const [loadingChats, setLoadingChats] = useState(false);
   const [loadingAccount, setLoadingAccount] = useState(false);
-  const [userId, setUserId] = useState(null);
-
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const[id,setId] = useState(null)
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-      setUserId(user.id || user._id);
-    }
-  }, []);
+       if (typeof window !== "undefined") {
+         try {
+           const storedUser = localStorage.getItem("user");
+           if (!storedUser) {
+             router.push("/login");
+             return;
+           } else {
+             const u = JSON.parse(storedUser);
+             setUser(u)
+             const id = u.id
+             setId(id)
+
+           }
+         } catch (error) {}
+       }
+     }, []);
 
   const handleDeleteChats = async () => {
     toast(
@@ -56,11 +67,12 @@ export default function DangerZonePage() {
   
   
   const confirmDeleteChats = async () => {
-    setLoadingChats(true);
+    setLoadingChats(true); 
     try {
-      console.log("process.env.NEXT_PUBLIC_VCHAT_API_URL", process.env.NEXT_PUBLIC_VCHAT_API_URL);
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_VCHAT_API_URL}/chatbot/delete-all`, {
+      console.log("process.env.NEXT_PUBLIC_VCHAT_API_URL", process.env.NEXT_PUBLIC_BASE_URL);
+      
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/delete-all`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -74,6 +86,7 @@ export default function DangerZonePage() {
       }
   
       toast.success("All chats deleted successfully!");
+      setLoadingChats(false)
     } catch (error) {
       toast.error(`Error: ${error.message}`);
     } finally {
@@ -83,7 +96,7 @@ export default function DangerZonePage() {
   
 
   const handleDeleteAccount = async () => {
-    if (!userId) {
+    if (!user) {
       toast.error("Error: No user found. Please log in again.");
       return;
     }
@@ -124,8 +137,9 @@ export default function DangerZonePage() {
   
   const confirmDeleteAccount = async () => {
     setLoadingAccount(true);
+    setLoading(true); 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_VCHAT_API_URL}/user-delete/${userId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/user-delete/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -137,9 +151,11 @@ export default function DangerZonePage() {
       if (!response.ok) {
         throw new Error(data.message || "Failed to delete account");
       }
-  
+       
+       
       toast.success("Your account has been deleted successfully.");
       localStorage.removeItem("user");
+      setLoading(false); 
       signOut();
     } catch (error) {
       toast.error(`Error: ${error.message}`);
@@ -185,11 +201,15 @@ export default function DangerZonePage() {
                   </p>
                 </div>
                 <button
-                  className="px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                  className="px-4 py-2 text-sm bg-white border border-red-300 text-red-600 rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center"
                   onClick={handleDeleteChats}
                   disabled={loadingChats}
-                >
-                  {loadingChats ? "Deleting..." : "Delete All Chats"}
+                > 
+                {loadingChats ? (
+        <span className="animate-spin h-4 w-4 border-2 border-t-transparent border-red-600 rounded-full"></span>
+      ) : (
+        "Delete Chats"
+      )}
                 </button>
               </div>
 
@@ -203,11 +223,15 @@ export default function DangerZonePage() {
                   </p>
                 </div>
                 <button
-                  className="px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                  className="px-4 py-2 text-sm bg-white border border-red-300 text-red-600 rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center"
                   onClick={handleDeleteAccount}
-                  disabled={loadingAccount}
-                >
-                  {loadingAccount ? "Deleting..." : "Delete Account"}
+                  disabled={loading}
+                > 
+                {loading ? (
+        <span className="animate-spin h-4 w-4 border-2 border-t-transparent border-red-600 rounded-full"></span>
+      ) : (
+        "Delete Account"
+      )}
                 </button>
               </div>
             </div>

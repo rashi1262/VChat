@@ -10,6 +10,9 @@ const authOptions = {
         params: { prompt: "select_account" },
       },
     }),
+
+    
+
   ],
   callbacks: {
     async signIn({ user }) {
