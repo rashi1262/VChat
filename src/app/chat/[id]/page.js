@@ -15,7 +15,8 @@ const ChatPage = ({ params }) => {
   const [loading, setLoading] = useState(true);
   const [morePrompt, setMorePrompt] = useState("");
   const [moreResponse, setMoreResponse] = useState("");
-
+    const [userId, setUserId] = useState(null);
+  
   const [chatHistory, setChatHistory] = useState([]);
 
   const chatContainerRef = useRef(null);
@@ -35,12 +36,41 @@ const ChatPage = ({ params }) => {
           const user = JSON.parse(storedUser);
           setEmail(user?.email || "No Email");
           setName(user?.name || "No Name");
+          setUserId(user?.id);
         }
       } catch (error) {
         console.error("Error parsing user data:", error);
       }
     }
   }, []);
+
+  useEffect(() => {
+      if (!userId) return;
+  
+      const fetchUserChats = async () => {
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-by-userid/${userId}`
+          );
+          if (!response.ok) throw new Error("Failed to fetch chats");
+  
+          const data = await response.json();
+  
+          // Map and store only first messages
+          setChatThread(
+            data.map((chat) => ({
+              chatId: chat.id,
+              message: chat.userSearch[0]?.userMessage,
+            }))
+          );
+        } catch (error) {
+          console.error("Error fetching user chats:", error);
+        }
+      };
+  
+      fetchUserChats();
+    }, [userId]);
+  
 
   const getChatById = (c) => {
     router.push(`/chat/${c}`);
@@ -498,23 +528,24 @@ const ChatPage = ({ params }) => {
                   <span className="ml-2 text-gray-700">Go Pro</span>
                 </Link>
               </li> */}
-              <li className="mt-4 flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-sm cursor-pointer border-t border-gray-400 relative before:absolute before:top-0 before:left-0 before:w-full before:h-[5px] before:bg-gradient-to-b before:from-gray-100 before:to-transparent before:rounded-t-sm">
-                <div className="w-5 h-5 p-5 flex items-center justify-center rounded-full text-white font-bold bg-green-700">
-                  {email ? email[0].toUpperCase() : "?"}
-                </div>
+               <Link
+                href="/profile"
+                className="text-xs overflow-hidden text-gray-500"
+              >
+                <li className="mt-4 flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-sm cursor-pointer border-t border-gray-400 relative before:absolute before:top-0 before:left-0 before:w-full before:h-[5px] before:bg-gradient-to-b before:from-gray-100 before:to-transparent before:rounded-t-sm">
+                  <div className="w-5 h-5 p-5 flex items-center justify-center rounded-full text-white font-bold bg-green-700">
+                    {email ? email[0].toUpperCase() : "?"}
+                  </div>
 
-                <div className="flex flex-col ">
-                  <span className="font-medium text-gray-900">
-                    {name ? name : "User"}
-                  </span>
-                  <Link
-                    href="/profile"
-                    className="text-xs overflow-hidden text-gray-500"
-                  >
+                  <div className="flex flex-col ">
+                    <span className="font-medium text-gray-900">
+                      {name ? name : "User"}
+                    </span>
+
                     {email}
-                  </Link>
-                </div>
-              </li>
+                  </div>
+                </li>
+              </Link>
             </ul>
           </nav>
         </div>

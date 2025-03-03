@@ -22,7 +22,6 @@ const page = ({ params }) => {
 
   const router = useRouter();
 
-  // 🔹 **Get Logged-in User Data**
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
@@ -54,7 +53,7 @@ const page = ({ params }) => {
 
         const data = await response.json();
 
-        // Map and store only first messages
+        
         setChatThread(
           data.map((chat) => ({
             chatId: chat.id,

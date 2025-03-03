@@ -32,7 +32,7 @@ export default function ProfilePage() {
 
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_VCHAT_API_URL}/upload`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/upload`,
         formData
       );
       return response.data.imageUrl; 
@@ -62,7 +62,7 @@ export default function ProfilePage() {
       };
 
       await axios.put(
-        `${process.env.NEXT_PUBLIC_VCHAT_API_URL}/update/${userId}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/update/${userId}`,
         updatedUser
       );
 
