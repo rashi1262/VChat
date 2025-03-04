@@ -50,14 +50,14 @@ const page = ({ params }) => {
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-by-userid/${userId}`
-        );
+        ); 
         if (!response.ok) throw new Error("Failed to fetch chats");
 
         const data = await response.json();
 
         
         setChatThread(
-          data.map((chat) => ({
+          data.chatMessages.map((chat) => ({
             chatId: chat.id,
             message: chat.userSearch[0]?.userMessage,
           }))
@@ -493,7 +493,7 @@ const page = ({ params }) => {
                   <span className="ml-2 text-gray-700">Explore Bots</span>
                 </Link>
               </li>
-              {/* <li>
+              <li>
                 <Link
                   href="/upload"
                   className="flex items-center p-2 hover:bg-gray-200 rounded-lg text-sm font-medium transition duration-200"
@@ -516,7 +516,7 @@ const page = ({ params }) => {
                   </div>
                   <span className="ml-2 text-gray-700">Go Pro</span>
                 </Link>
-              </li>  */}
+              </li> 
               <Link
                 href="/profile"
                 className="text-xs overflow-hidden text-gray-500"

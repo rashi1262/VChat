@@ -11,7 +11,7 @@ const authOptions = {
       },
     }),
   ],
- 
+
   callbacks: {
     async signIn({ user }) {
       try {
@@ -22,8 +22,6 @@ const authOptions = {
             headers: { "Content-Type": "application/json" },
           }
         );
-     
-
 
         let userId;
 
@@ -43,36 +41,49 @@ const authOptions = {
               }),
             }
           );
-         
-          
+
           if (!signupResponse.ok) {
             console.error("Signup failed:", signupResponse.statusText);
             return false;
           }
+
           const signupData = await signupResponse.json();
-console.log("Signup API Response:", signupData);
-
-userId = signupData.id; 
-console.log("Extracted User ID:", userId);
-        }
-
-        const data = await checkUserResponse.json();
-        if (data.exists) {
-          const loginResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: user.email,  googleLogin: true, }),
-          });
-
-          if (!loginResponse.ok) {
-            console.error("Login failed:", loginResponse.statusText);
-            return false;
-          }
-          userId = loginResponse.id;
+          userId = signupData.id;
+          console.log("New User ID:", userId);
         } else {
-         
+          // Extract user data from response
+          const { user: existingUser, status } = await checkUserResponse.json();
+          
+          if (status === "success" && existingUser) {
+            userId = existingUser.id;
+
+            // Store user details in localStorage
+            if (typeof window !== "undefined") {
+              localStorage.setItem("user", JSON.stringify(existingUser));
+            }
+
+            console.log("User exists, logging in...");
+
+            const loginResponse = await fetch(
+              `${process.env.NEXT_PUBLIC_BASE_URL}/login`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: user.email, googleLogin: true }),
+              }
+            );
+
+            if (!loginResponse.ok) {
+              console.error("Login failed:", loginResponse.statusText);
+              return false;
+            }
+
+            const loginData = await loginResponse.json();
+            console.log("Login Data:", loginData);
+          }
         }
-        user.id = userId
+
+        user.id = userId;
         return true;
       } catch (error) {
         console.error("Error in signIn callback:", error);
@@ -82,16 +93,13 @@ console.log("Extracted User ID:", userId);
 
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id ; 
-        console.log(user.id);
-        
+        token.id = user.id;
       }
       return token;
     },
 
     async session({ session, token }) {
       session.user.id = token.id;
-      console.log("Session Callback - User ID:", session.user.id);
       return session;
     },
   },
@@ -99,7 +107,3 @@ console.log("Extracted User ID:", userId);
 
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
-
-
-
-

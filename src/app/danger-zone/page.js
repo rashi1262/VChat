@@ -6,6 +6,7 @@ import Sidebar from "../Sidebar";
 import { toast, Toaster } from "sonner";
 import Link from "next/link";
 import { useChat } from "../chatContext";
+import { useRouter} from "next/navigation";
 
 export default function DangerZonePage() {
   const [loadingChats, setLoadingChats] = useState(false);
@@ -14,6 +15,7 @@ export default function DangerZonePage() {
   const [loading, setLoading] = useState(false);
   const[id,setId] = useState(null)
   const { chatThread, setChatThread } = useChat();
+    const router = useRouter();
   
   useEffect(() => {
        if (typeof window !== "undefined") {
@@ -29,6 +31,11 @@ export default function DangerZonePage() {
              setId(id)
 
            }
+           if (!user) {
+            const u = JSON.parse(storedUser);
+            setUser(u);
+            setId(u.id);
+          }
          } catch (error) {}
        }
      }, []);
@@ -146,6 +153,7 @@ export default function DangerZonePage() {
   const confirmDeleteAccount = async () => {
     setLoadingAccount(true);
     setLoading(true); 
+    await signOut({ redirect: false});
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/user-delete/${id}`, {
         method: "DELETE",
@@ -164,7 +172,10 @@ export default function DangerZonePage() {
       toast.success("Your account has been deleted successfully.");
       localStorage.removeItem("user");
       setLoading(false); 
-      signOut();
+      
+      router.push("/login");
+      
+      
     } catch (error) {
       toast.error(`Error: ${error.message}`);
     } finally {

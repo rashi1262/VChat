@@ -58,7 +58,7 @@ const ChatPage = ({ params }) => {
   
           // Map and store only first messages
           setChatThread(
-            data.map((chat) => ({
+            data.chatMessages.map((chat) => ({
               chatId: chat.id,
               message: chat.userSearch[0]?.userMessage,
             }))
