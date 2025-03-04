@@ -27,13 +27,27 @@ export default function ProfilePage() {
   }, []);
 
   const uploadImage = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
+    if (!file) {
+     
+      toast.error("Please select a file.");
+      return null;
+    }
 
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/upload`,
-        formData
+      const base64String = await fileToBase64(file); 
+
+      const requestData = {
+        file: base64String, 
+      };
+
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_VCHAT_API_URL}/update/${userId}`,
+        requestData,
+        {
+          headers: {
+            "Content-Type": "application/json", 
+          },
+        }
       );
       return response.data.imageUrl; 
     } catch (error) {
