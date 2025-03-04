@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-const VerifyEmail = () => {
+const VerifyEmailContent = () => {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [message, setMessage] = useState("Verifying...");
@@ -25,15 +25,13 @@ const VerifyEmail = () => {
           console.log("Raw API Response:", text);
 
           if (text.includes("Email verified successfully!")) {
-            setMessage(
-              "Your email has been successfully verified! You can now login."
-            );
+            setMessage("Your email has been successfully verified! You can now login.");
             setVerified(true);
           } else {
             setMessage("Verification failed. Invalid or expired token.");
           }
         })
-        .catch((error) => {
+        .catch(() => {
           setMessage("Something went wrong.");
         });
     }
@@ -51,4 +49,13 @@ const VerifyEmail = () => {
   );
 };
 
+const VerifyEmail = () => {
+  return (
+    <Suspense fallback={<h2>Loading...</h2>}>
+      <VerifyEmailContent />
+    </Suspense>
+  );
+};
+
 export default VerifyEmail;
+

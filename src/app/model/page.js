@@ -3,15 +3,13 @@
 import { useState, useEffect } from "react";
 import React from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useChat } from ".././chatContext";
 import Navbar from "../navbar";
 
 
 const page = ({ params }) => {
-  const searchParams = useSearchParams();
   const { chatThread, setChatThread } = useChat();
-  const model = searchParams.get("model");
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
