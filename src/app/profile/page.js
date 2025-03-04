@@ -60,7 +60,6 @@ export default function ProfilePage() {
         throw new Error("Invalid response from server.");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Image upload failed.");
       return null;
     }
   };
