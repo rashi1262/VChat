@@ -20,59 +20,74 @@ export default function ProfilePage() {
         const user = JSON.parse(storedUser);
         setDisplayName(user.name || "No Name");
         setEmail(user.email || "No Email");
-        setProfileImage(user.image);
+        setProfileImage(user.image || "");
         setUserId(user.id);
       }
     }
   }, []);
 
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   const uploadImage = async (file) => {
     if (!file) {
-     
       toast.error("Please select a file.");
       return null;
     }
 
     try {
-      const base64String = await fileToBase64(file); 
-
-      const requestData = {
-        file: base64String, 
-      };
+      const base64String = await fileToBase64(file);
 
       const response = await axios.put(
         `${process.env.NEXT_PUBLIC_VCHAT_API_URL}/update/${userId}`,
-        requestData,
+        { file: base64String },
         {
           headers: {
-            "Content-Type": "application/json", 
+            "Content-Type": "application/json",
           },
         }
       );
-      return response.data.imageUrl; 
+
+      if (response.data?.imageUrl) {
+        return response.data.imageUrl;
+      } else {
+        throw new Error("Invalid response from server.");
+      }
     } catch (error) {
-      toast.error("Failed to upload image.");
       return null;
     }
   };
 
+  const handleImageChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const previewUrl = URL.createObjectURL(file);
+    setProfileImage(previewUrl);
+
+    const uploadedUrl = await uploadImage(file);
+    if (uploadedUrl) {
+      setProfileImage(uploadedUrl);
+    }
+  };
+
   const handleSave = async () => {
+    if (!userId) {
+      toast.error("User not found.");
+      return;
+    }
+
     try {
-      let finalImageUrl = profileImage;
-
-      if (fileInputRef.current.files[0]) {
-        const uploadedUrl = await uploadImage(fileInputRef.current.files[0]);
-        if (uploadedUrl) {
-          finalImageUrl = uploadedUrl;
-        } else {
-          return;
-        }
-      }
-
       const updatedUser = {
         name: displayName,
         email: email,
-        image: finalImageUrl,
+        image: profileImage,
       };
 
       await axios.put(
@@ -85,18 +100,9 @@ export default function ProfilePage() {
         JSON.stringify({ ...updatedUser, id: userId })
       );
 
-      setProfileImage(finalImageUrl);
       toast.success("Profile updated successfully!");
     } catch (error) {
       toast.error("Failed to update profile.");
-    }
-  };
-
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      setProfileImage(previewUrl);
     }
   };
 
@@ -118,7 +124,7 @@ export default function ProfilePage() {
               </div>
               <Link
                 href="/model"
-                className="px-4 py-2 text-gray-500 border border-rounded rounded-md"
+                className="px-4 py-2 text-gray-500 border rounded-md"
               >
                 Back to Chat
               </Link>
