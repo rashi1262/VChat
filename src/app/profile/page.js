@@ -20,7 +20,7 @@ export default function ProfilePage() {
         const user = JSON.parse(storedUser);
         setDisplayName(user.name || "No Name");
         setEmail(user.email || "No Email");
-        setProfileImage(user.image);
+        setProfileImage(user.image || "");
         setUserId(user.id);
       }
     }
@@ -29,7 +29,7 @@ export default function ProfilePage() {
   const fileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.readAsDataURL(file); 
+      reader.readAsDataURL(file);
       reader.onload = () => resolve(reader.result);
       reader.onerror = (error) => reject(error);
     });
@@ -37,35 +37,29 @@ export default function ProfilePage() {
 
   const uploadImage = async (file) => {
     if (!file) {
-     
       toast.error("Please select a file.");
       return null;
     }
 
     try {
-      const base64String = await fileToBase64(file); 
-
-      const requestData = {
-        file: base64String, 
-      };
+      const base64String = await fileToBase64(file);
 
       const response = await axios.put(
         `${process.env.NEXT_PUBLIC_VCHAT_API_URL}/update/${userId}`,
-        requestData,
+        { file: base64String },
         {
           headers: {
-            "Content-Type": "application/json", 
+            "Content-Type": "application/json",
           },
         }
       );
 
-     
-
-      if (response.data && response.data.imageUrl) {
+      if (response.data?.imageUrl) {
         return response.data.imageUrl;
+      } else {
+        throw new Error("Invalid response from server.");
       }
     } catch (error) {
-      
       toast.error(error.response?.data?.message || "Image upload failed.");
       return null;
     }
@@ -85,6 +79,11 @@ export default function ProfilePage() {
   };
 
   const handleSave = async () => {
+    if (!userId) {
+      toast.error("User not found.");
+      return;
+    }
+
     try {
       const updatedUser = {
         name: displayName,
@@ -104,7 +103,6 @@ export default function ProfilePage() {
 
       toast.success("Profile updated successfully!");
     } catch (error) {
-      console.error("Profile update error:", error);
       toast.error("Failed to update profile.");
     }
   };
@@ -127,7 +125,7 @@ export default function ProfilePage() {
               </div>
               <Link
                 href="/model"
-                className="px-4 py-2 text-gray-500 border border-rounded rounded-md"
+                className="px-4 py-2 text-gray-500 border rounded-md"
               >
                 Back to Chat
               </Link>
