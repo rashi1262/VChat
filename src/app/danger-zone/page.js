@@ -185,7 +185,7 @@ export default function DangerZonePage() {
               <div>
               <h1 className="text-lg font-semibold text-gray-600">Danger Zone</h1>
               <p className="text-sm text-gray-500">
-              Delete account and other critical settings userId{id}
+              Delete account and other critical settings userId
               </p>
 
               </div>

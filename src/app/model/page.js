@@ -41,6 +41,8 @@ const page = ({ params }) => {
     }
   }, []);
 
+
+
   useEffect(() => {
     if (!userId) return;
 
@@ -135,7 +137,8 @@ const page = ({ params }) => {
       setError(error.message);
     }
   };
-
+  
+  
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -146,6 +149,7 @@ const page = ({ params }) => {
     router.push(`/chat/${c}`);
   };
 
+ 
   return (
     <>
       <div className="flex w-full justify-between bg-gray-50 text-sm">
