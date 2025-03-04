@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import React from "react";
 import Link from "next/link";
 import { useChat } from "./chatContext";
+import { useRouter } from "next/navigation";
 
 const page = () => {
   const [isNavVisible, setIsNavVisible] = useState(true);
@@ -10,6 +11,8 @@ const page = () => {
   const [email, setEmail] = useState("");
   const { chatThread, setChatThread } = useChat();
   const [userId, setUserId] = useState(null);
+  const router = useRouter()
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {

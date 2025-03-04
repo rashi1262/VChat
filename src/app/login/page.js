@@ -40,6 +40,8 @@ const Login = () => {
 
   const handleGoogleLogin = () => {
     window.location.href = "http://localhost:8080/auth/google/callback";
+
+    
   };
 
   const handleSubmit = async (e) => {

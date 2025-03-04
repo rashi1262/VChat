@@ -10,36 +10,97 @@ const authOptions = {
         params: { prompt: "select_account" },
       },
     }),
-
-    
-
   ],
+
   callbacks: {
     async signIn({ user }) {
-      if (typeof window !== "undefined") {
-        const storedUser = localStorage.getItem("user");
+      try {
+        const checkUserResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/user-by-email?email=${encodeURIComponent(user.email)}`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
 
-        if (!storedUser) {
-          localStorage.setItem("user", JSON.stringify(user));
+        let userId;
+
+        if (!checkUserResponse.ok) {
+          console.log("User does not exist, creating new account...");
+
+          const signupResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/create-user`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                name: user.name,
+                email: user.email,
+                image: user.image,
+                googleLogin: true,
+              }),
+            }
+          );
+
+          if (!signupResponse.ok) {
+            console.error("Signup failed:", signupResponse.statusText);
+            return false;
+          }
+
+          const signupData = await signupResponse.json();
+          userId = signupData.id;
+          console.log("New User ID:", userId);
+        } else {
+          // Extract user data from response
+          const { user: existingUser, status } = await checkUserResponse.json();
+          
+          if (status === "success" && existingUser) {
+            userId = existingUser.id;
+
+            // Store user details in localStorage
+            if (typeof window !== "undefined") {
+              localStorage.setItem("user", JSON.stringify(existingUser));
+            }
+
+            console.log("User exists, logging in...");
+
+            const loginResponse = await fetch(
+              `${process.env.NEXT_PUBLIC_BASE_URL}/login`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: user.email, googleLogin: true }),
+              }
+            );
+
+            if (!loginResponse.ok) {
+              console.error("Login failed:", loginResponse.statusText);
+              return false;
+            }
+
+            const loginData = await loginResponse.json();
+            console.log("Login Data:", loginData);
+          }
         }
-      }
 
-      return true;
-    },
-    async redirect({ url, baseUrl }) {
-      return url.startsWith(baseUrl) ? url : `${baseUrl}/model`;
-    },
-    async session({ session }) {
-      if (typeof window !== "undefined") {
-        localStorage.setItem("user", JSON.stringify(session.user));
+        user.id = userId;
+        return true;
+      } catch (error) {
+        console.error("Error in signIn callback:", error);
+        return false;
       }
-      return session;
     },
+
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
       }
       return token;
+    },
+
+    async session({ session, token }) {
+      session.user.id = token.id;
+      return session;
     },
   },
 };

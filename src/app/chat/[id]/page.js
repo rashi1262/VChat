@@ -2,17 +2,22 @@
 import { useEffect, useState, use, useRef } from "react";
 import Link from "next/link";
 import Navbar from "../../navbar";
+import { useChat } from "../../chatContext";
+import { useRouter } from "next/navigation";
+
 const ChatPage = ({ params }) => {
   const { id } = use(params);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
-
+  const { chatThread, setChatThread } = useChat();
+  const router = useRouter()
   const [botResponse, setBotResponse] = useState("");
   const [loading, setLoading] = useState(true);
   const [morePrompt, setMorePrompt] = useState("");
   const [moreResponse, setMoreResponse] = useState("");
-
+    const [userId, setUserId] = useState(null);
+  
   const [chatHistory, setChatHistory] = useState([]);
 
   const chatContainerRef = useRef(null);
@@ -32,12 +37,45 @@ const ChatPage = ({ params }) => {
           const user = JSON.parse(storedUser);
           setEmail(user?.email || "No Email");
           setName(user?.name || "No Name");
+          setUserId(user?.id);
         }
       } catch (error) {
         console.error("Error parsing user data:", error);
       }
     }
   }, []);
+
+  useEffect(() => {
+      if (!userId) return;
+  
+      const fetchUserChats = async () => {
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-by-userid/${userId}`
+          );
+          if (!response.ok) throw new Error("Failed to fetch chats");
+  
+          const data = await response.json();
+  
+          // Map and store only first messages
+          setChatThread(
+            data.chatMessages.map((chat) => ({
+              chatId: chat.id,
+              message: chat.userSearch[0]?.userMessage,
+            }))
+          );
+        } catch (error) {
+          console.error("Error fetching user chats:", error);
+        }
+      };
+  
+      fetchUserChats();
+    }, [userId]);
+  
+
+  const getChatById = (c) => {
+    router.push(`/chat/${c}`);
+  };
 
   useEffect(() => {
     scrollToBottom();
@@ -146,11 +184,7 @@ const ChatPage = ({ params }) => {
 
               {morePrompt !== "" && (
                 <div className="flex flex-col gap-1">
-                  <div className="self-end bg-blue-500 text-white px-3 py-2 rounded-xl max-w-[70%]">
-                    {morePrompt}
-                  </div>
-
-                  {loading && (
+       {loading && (
                     <div className="self-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[70%] flex items-center gap-2">
                       <span className="animate-pulse">...</span>
                     </div>

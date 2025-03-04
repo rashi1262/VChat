@@ -93,7 +93,7 @@ export default function ProfilePage() {
       };
 
       await axios.put(
-        `${process.env.NEXT_PUBLIC_VCHAT_API_URL}/update/${userId}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/update/${userId}`,
         updatedUser
       );
 

@@ -22,34 +22,63 @@ const page = ({ params }) => {
 
   const router = useRouter();
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (!storedUser) {
+          router.push("/login");
+          return;
+        } else {
+          const user = JSON.parse(storedUser);
+          setEmail(user?.email || "No Email");
+          setName(user?.name || "No Name");
+          setUserId(user?.id);
+        }
+      } catch (error) {
+        console.error("Error reading user data:", error);
+      }
+    }
+  }, []);
+
+
 
   useEffect(() => {
     if (!userId) return;
 
-    const fetchUserChats = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-by-userid/${userId}`
-        );
-        if (!response.ok) throw new Error("Failed to fetch chats");
-
-        const data = await response.json();
-
-        // Map and store only first messages
-        setChatThread(
-          data.map((chat) => ({
-            chatId: chat.id,
-            message: chat.userSearch[0]?.userMessage,
-          }))
-        );
-      } catch (error) {
-        console.error("Error fetching user chats:", error);
-      }
-    };
-
-    fetchUserChats();
-  }, [userId]);
-
+   
+    
+      const fetchUserChats = async () => {
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-by-userid/${userId}`
+          ); 
+    
+          if (!response.ok) {
+            throw new Error("Failed to fetch chats");
+          }
+    
+          const data = await response.json();
+          console.log("Fetched data:", data); // Debugging log
+    
+          // Ensure chatMessages is an array before mapping
+          setChatThread(
+            Array.isArray(data?.chatMessages)
+              ? data.chatMessages.map((chat) => ({
+                  chatId: chat.id,
+                  message: chat.userSearch?.[0]?.userMessage || "No message",
+                }))
+              : []
+          );
+        } catch (error) {
+          console.error("Error fetching user chats:", error);
+          setChatThread([]); // Set empty array on error
+        }
+      };
+    
+      fetchUserChats();
+    }, [userId]);
+    
   const handleResponse = async () => {
     setLoading(true);
     try {
@@ -117,7 +146,8 @@ const page = ({ params }) => {
       setError(error.message);
     }
   };
-
+  
+  
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -128,6 +158,7 @@ const page = ({ params }) => {
     router.push(`/chat/${c}`);
   };
 
+ 
   return (
     <>
       <div className="flex w-full justify-between bg-gray-50 text-sm">

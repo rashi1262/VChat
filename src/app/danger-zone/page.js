@@ -5,6 +5,8 @@ import { signOut } from "next-auth/react";
 import Sidebar from "../Sidebar";
 import { toast, Toaster } from "sonner";
 import Link from "next/link";
+import { useChat } from "../chatContext";
+import { useRouter} from "next/navigation";
 
 export default function DangerZonePage() {
   const [loadingChats, setLoadingChats] = useState(false);
@@ -12,6 +14,9 @@ export default function DangerZonePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const[id,setId] = useState(null)
+  const { chatThread, setChatThread } = useChat();
+    const router = useRouter();
+  
   useEffect(() => {
        if (typeof window !== "undefined") {
          try {
@@ -26,6 +31,11 @@ export default function DangerZonePage() {
              setId(id)
 
            }
+           if (!user) {
+            const u = JSON.parse(storedUser);
+            setUser(u);
+            setId(u.id);
+          }
          } catch (error) {}
        }
      }, []);
@@ -72,7 +82,8 @@ export default function DangerZonePage() {
       
       console.log("process.env.NEXT_PUBLIC_VCHAT_API_URL", process.env.NEXT_PUBLIC_BASE_URL);
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/delete-all`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/delete-ByUserId/${id}`,
+         {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -83,15 +94,19 @@ export default function DangerZonePage() {
   
       if (!response.ok) {
         throw new Error(data.message || "Failed to delete chats");
+       
+        
       }
   
       toast.success("All chats deleted successfully!");
+      setChatThread([])
       setLoadingChats(false)
     } catch (error) {
       toast.error(`Error: ${error.message}`);
     } finally {
       setLoadingChats(false);
     }
+   
   };
   
 
@@ -138,6 +153,7 @@ export default function DangerZonePage() {
   const confirmDeleteAccount = async () => {
     setLoadingAccount(true);
     setLoading(true); 
+    await signOut({ redirect: false});
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/user-delete/${id}`, {
         method: "DELETE",
@@ -156,7 +172,10 @@ export default function DangerZonePage() {
       toast.success("Your account has been deleted successfully.");
       localStorage.removeItem("user");
       setLoading(false); 
-      signOut();
+      
+      router.push("/login");
+      
+      
     } catch (error) {
       toast.error(`Error: ${error.message}`);
     } finally {
@@ -177,7 +196,7 @@ export default function DangerZonePage() {
               <div>
               <h1 className="text-lg font-semibold text-gray-600">Danger Zone</h1>
               <p className="text-sm text-gray-500">
-              Delete account and other critical settings
+              Delete account and other critical settings userId
               </p>
 
               </div>
