@@ -56,9 +56,11 @@ export const ChatProvider = ({ children }) => {
 
     const fetchChats = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By-User/${userId}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-by-userid/${userId}`);
         if (!res.ok) throw new Error("Failed to fetch chats");
+
         const data = await res.json();
+        console.log(data);
         setChatThread(data);
       } catch (error) {
         console.error("Error fetching chat threads:", error);
