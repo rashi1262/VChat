@@ -280,7 +280,7 @@ const page = ({ params }) => {
           </div>
           Go Pro
         </button> */}
-        <button className="flex items-center">
+        {/* <button className="flex items-center">
           <Link
             href="/model"
             className="flex items-center hover:bg-gray-200 rounded text-black p-2"
@@ -326,7 +326,7 @@ const page = ({ params }) => {
             </div>
             OpenAI GPT-4o mini
           </Link>
-        </button>
+        </button> */}
       </div></>):       
  (
   <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center ml-auto w-4/5">
