@@ -29,8 +29,8 @@ const page = () => {
      
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center ml-auto w-4/5">
           <div className="flex justify-center items-center h-screen">
-            <div className="max-w-4xl w-full rounded-md p-6 text-center  w-4/5">
-              <div className="w-16 h-16 rounded-full ml-72 mb-10 ">
+            <div className="max-w-4xl w-full rounded-md p-6 text-center">
+              <div className="w-16 h-16 rounded-full ml-[240px] mb-10 ">
                 <svg
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -56,8 +56,8 @@ const page = () => {
                   ></path>
                 </svg>
               </div>
-              <h1 className="text-3xl text-gray-900">Image Generation</h1>
-              <h1 className="text-xl mt-5 text-gray-400">
+              <h1 className="text-2xl text-gray-900">Image Generation</h1>
+              <h1 className="text-[18px] mt-5 text-gray-400">
                 Bring your ideas to life—create stunning images from just a few
                 words!
               </h1>
@@ -126,7 +126,7 @@ const page = () => {
         </div>
       </div>
       <div className="fixed top-3 right-5 flex items-center ">
-        <button className="flex items-center text-black border rounded-l-full rounded-r-full p-1 bg-yellow-200">
+        {/* <button className="flex items-center text-black border rounded-l-full rounded-r-full p-1 bg-yellow-200">
           <div className="w-5 h-5 m1-2 mr-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -144,11 +144,11 @@ const page = () => {
             </svg>
           </div>
           Go Pro
-        </button>
+        </button> */}
         <button className="flex items-center">
           <Link
             href="/image"
-            className="flex items-center hover:bg-gray-200 rounded text-black p-2"
+            className="flex hover:bg-gray-200 rounded text-black text-base p-2"
           >
             <div className="w-8 h-7 pl-1 pr-1 ">
               <svg
