@@ -4,7 +4,9 @@ import React from "react";
 import Link from "next/link";
 import { useChat } from "./chatContext";
 import { useRouter } from "next/navigation";
+import { toast, Toaster } from "sonner";
 
+import {EllipsisVertical} from 'lucide-react'
 const page = () => {
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [name, setName] = useState("");
@@ -12,6 +14,9 @@ const page = () => {
   const { chatThread, setChatThread } = useChat();
   const [userId, setUserId] = useState(null);
   const router = useRouter()
+  const [openMenu, setOpenMenu] = useState(null);
+  const [shareLink, setShareLink] = useState(""); 
+  
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -72,6 +77,8 @@ const page = () => {
   return (
     <>
       <div className="relative">
+              <Toaster position="top-center" richColors />
+        
         {!isNavVisible && (
           <button
             className="block p-0.5 border text-black mt-5 ml-3 hover:bg-gray-100 rounded"
@@ -402,14 +409,60 @@ const page = () => {
                 </Link>
                 <div className="overflow-y-scroll h-64 text-black">
                   {chatThread.map((chat) => (
+                            <div key={chat.chatId} className="relative flex justify-between items-center p-2 hover:bg-gray-200">
+
                     <ul
                       onClick={() => getChatById(chat.chatId)}
-                      className="hover:bg-gray-200 p-2 mt-2 cursor-pointer truncate w-full overflow-hidden text-ellipsis whitespace-nowrap"
+                      className="hover:bg-gray-200 p-2 mt-2 cursor-pointer truncate w-full overflow-hidden  text-ellipsis whitespace-nowrap"
                       key={chat.chatId}
                     >
-                      {chat.message}
+                      {chat.message} 
+
+
+                      <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenMenu(openMenu === chat.chatId ? null : chat.chatId);
+            }}
+            className="absolute right-2 font-bold rounded-full  top-1 p-1"
+          >
+            <EllipsisVertical />
+          </button>  
+
+
+          {openMenu === chat.chatId && (
+            <div className="absolute right-2 z-50 top-8 bg-white shadow-md rounded-lg w-32">
+              <button
+                onClick={() => {
+                  deleteChat(chat.chatId);
+                  setOpenMenu(null);
+                }}
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+              >
+                Delete
+              </button>
+              <button
+                 onClick={(e) => {
+                  e.preventDefault()
+                  const generatedLink = `${window.location.origin}/share/chat/${chat.chatId}`;
+                  setShareLink(generatedLink);
+                  navigator.clipboard.writeText(generatedLink);
+                  toast.success("Link copied: " + generatedLink);
+                }}
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+              >
+                Share
+              </button>
+              
+            </div>
+          )}
+        
+
+                      
                     </ul>
+                    </div>
                   ))}
+                   
                 </div>
               </li>
             </ul>
