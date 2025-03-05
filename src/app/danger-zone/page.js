@@ -170,6 +170,7 @@ export default function DangerZonePage() {
        
        
       toast.success("Your account has been deleted successfully.");
+      confirmDeleteChats()
       localStorage.removeItem("user");
       setLoading(false); 
       
