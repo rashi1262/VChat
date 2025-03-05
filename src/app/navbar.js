@@ -444,6 +444,7 @@ const page = () => {
               <button
                  onClick={(e) => {
                   e.preventDefault()
+                  e.stopPropagation();
                   const generatedLink = `${window.location.origin}/share/chat/${chat.chatId}`;
                   setShareLink(generatedLink);
                   navigator.clipboard.writeText(generatedLink);
