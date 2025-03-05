@@ -291,7 +291,7 @@ const ChatPage = ({ params }) => {
         <button className="flex items-center">
           <Link
             href="/model"
-            className="flex items-center hover:bg-gray-200 rounded text-black p-2"
+            className="flex items-center hover:bg-gray-200 rounded text-black text-base p-2"
           >
             <div className="w-7 h-6 p-1 ">
               <svg

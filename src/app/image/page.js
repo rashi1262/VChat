@@ -148,7 +148,7 @@ const page = () => {
         <button className="flex items-center">
           <Link
             href="/image"
-            className="flex items-center hover:bg-gray-200 rounded text-black p-2"
+            className="flex hover:bg-gray-200 rounded text-black text-base p-2"
           >
             <div className="w-8 h-7 pl-1 pr-1 ">
               <svg
