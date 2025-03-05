@@ -401,8 +401,8 @@ const page = () => {
           </nav>
         </div> */}
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  ml-auto w-4/5">
-          <div className="max-w-4xl w-full   rounded-md p-6 text-center ">
-            <h1 className="text-4xl  text-gray-600 mb-16">
+          <div className="max-w-4xl w-full rounded-md p-6 text-center ">
+            <h1 className="text-3xl  text-gray-600 mb-16">
               How can I help you today?
             </h1>
             <div className="grid grid-cols-4 gap-6">
@@ -629,11 +629,29 @@ const page = () => {
         </div>
       </div>
       <div className="fixed top-3 right-5 flex items-center ">
-      
+        {/* <button className="flex items-center text-black border rounded-l-full rounded-r-full p-1 bg-yellow-200">
+          <div className="w-5 h-5 m1-2 mr-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 18 18"
+              className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.552"
+                d="M1.628 6.906h14.744M7.448 2.25 5.896 6.906 9 15.83l3.104-8.924-1.552-4.656M9.477 15.646l6.952-8.343c.118-.14.177-.212.2-.29a.4.4 0 0 0 0-.213c-.023-.08-.082-.15-.2-.291l-3.363-4.036c-.068-.082-.102-.123-.144-.152a.4.4 0 0 0-.123-.058c-.05-.013-.103-.013-.21-.013H5.411c-.107 0-.16 0-.21.013a.4.4 0 0 0-.122.058c-.042.03-.077.07-.145.152L1.571 6.51c-.118.141-.176.212-.199.29a.4.4 0 0 0 0 .213c.023.08.081.15.2.291l6.951 8.343c.164.196.246.295.344.33.086.032.18.032.266 0 .098-.035.18-.134.344-.33"
+              ></path>
+            </svg>
+          </div>
+          Go Pro
+        </button> */}
         <button className="flex items-center">
           <Link
             href="/openAIGPT-4o "
-            className="flex items-center hover:bg-gray-200 rounded text-black p-2"
+            className="flex items-center hover:bg-gray-200 rounded text-black text-base p-2"
           >
             <div className="w-8 h-7 pl-1 pr-1  ">
               <svg
