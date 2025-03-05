@@ -1,31 +1,3 @@
-// "use client";
-// import { createContext, useContext, useEffect, useState } from "react";
-
-// const ChatContext = createContext();
-
-// export const ChatProvider = ({ children }) => {
-//   const [chatThread, setChatThread] = useState(() => {
-//     if (typeof window !== "undefined") {
-//       return JSON.parse(localStorage.getItem("chatThread")) || [];
-//     }
-//     return [];
-//   });
-
-//   // Save chatThread to localStorage when it updates
-//   useEffect(() => {
-//     if (typeof window !== "undefined") {
-//       localStorage.setItem("chatThread", JSON.stringify(chatThread));
-//     }
-//   }, [chatThread]);
-
-//   return (
-//     <ChatContext.Provider value={{ chatThread, setChatThread }}>
-//       {children}
-//     </ChatContext.Provider>
-//   );
-// };
-
-// export const useChat = () => useContext(ChatContext);
 
 "use client";
 import { createContext, useState, useEffect, useContext } from "react";
