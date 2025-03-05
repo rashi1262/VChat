@@ -12,7 +12,7 @@ const Signup = () => {
   const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const [loading, setLoading] = useState(false); // ✅ Loading state
+  const [loading, setLoading] = useState(false); 
 
   useEffect(() => {
     if (session?.user) {

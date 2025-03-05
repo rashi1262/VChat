@@ -50,7 +50,7 @@ const Login = () => {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/login`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/user-login`,
         {
           method: "POST",
           headers: {

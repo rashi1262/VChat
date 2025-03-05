@@ -17,14 +17,14 @@ export default function LoginConnectionPage() {
   useEffect(() => {
     if (session) {
       setUser(session.user);
-      setIsGmailUser(session.user.email.endsWith("@gmail.com"));
+      setIsGmailUser(session.user.email);
       localStorage.setItem("user", JSON.stringify(session.user));
     } else {
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
-        setIsGmailUser(parsedUser.email.endsWith("@gmail.com"));
+        setIsGmailUser(parsedUser.email);
       } else {
         router.push("/login");
       }

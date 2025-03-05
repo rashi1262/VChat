@@ -4,14 +4,18 @@ import React from "react";
 import Link from "next/link";
 import { useChat } from "./chatContext";
 import { useRouter } from "next/navigation";
-
+import { toast, Toaster } from "sonner";
+import { Plus } from "lucide-react";
+import { EllipsisVertical } from "lucide-react";
 const page = () => {
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const { chatThread, setChatThread } = useChat();
   const [userId, setUserId] = useState(null);
-  const router = useRouter()
+  const router = useRouter();
+  const [openMenu, setOpenMenu] = useState(null);
+  const [shareLink, setShareLink] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -26,9 +30,7 @@ const page = () => {
           setName(user?.name || "No Name");
           setUserId(user?.id);
         }
-      } catch (error) {
-       
-      }
+      } catch (error) {}
     }
   }, []);
 
@@ -45,14 +47,15 @@ const page = () => {
         const data = await response.json();
 
         setChatThread(
-          data.map((chat) => ({
-            chatId: chat.id,
-            message: chat.userSearch[0]?.userMessage,
-          }))
+          Array.isArray(data)
+            ? data.map((chat) => ({
+                chatId: chat.id,
+                message: chat.userSearch[0]?.userMessage,
+              }))
+            : []
         );
-      } catch (error) {
-      
-      }
+        
+      } catch (error) {}
     };
 
     fetchUserChats();
@@ -67,11 +70,14 @@ const page = () => {
       handleResponse();
     }
   };
- 
+
+  
 
   return (
-    <>
+    <div>
       <div className="relative">
+        <Toaster position="top-center" richColors />
+
         {!isNavVisible && (
           <button
             className="block p-0.5 border text-black mt-5 ml-3 hover:bg-gray-100 rounded"
@@ -103,12 +109,13 @@ const page = () => {
         >
           <nav className="w-full flex flex-col justify-between flex-grow">
             <ul>
-              <li className=" flex  rounded ">
+              <li className=" flex rounded items-center  ">
                 <Link
                   href="/model"
-                  className=" block p-1 border text-2/3xl hover:bg-gray-100 rounded mr-2 pl-3  pr-20"
+                  className="flex block p-1 border text-2/3sm text-gray-700 hover:bg-gray-100 rounded mr-2 pl-2 pr-20 "
                 >
-                  + New Chat
+                  <Plus size={12} className="mt-1" />
+                  <div className="ml-2 text-sm ">New Chat</div>
                 </Link>
                 <button
                   onClick={() => setIsNavVisible(false)}
@@ -137,7 +144,7 @@ const page = () => {
                   href="/mybot"
                   className="flex block p-2 hover:bg-gray-100 rounded text-sm mt-6"
                 >
-                  <div className="w-7 h-6 p-1 ">
+                  <div className="w-5 h-7 p-1 ">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -160,7 +167,7 @@ const page = () => {
                       </defs>
                     </svg>
                   </div>
-                  My Bot
+                  <div className="ml-1">My Bot</div>
                 </Link>
               </li>
               <li>
@@ -168,7 +175,7 @@ const page = () => {
                   href="/model"
                   className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded text-sm"
                 >
-                  <div className="w-7 h-6 p-1 ">
+                  <div className="w-8 h-7 p-1 ">
                     <svg
                       viewBox="0 0 42 42"
                       fill="none"
@@ -207,7 +214,7 @@ const page = () => {
                       </defs>
                     </svg>
                   </div>
-                  Gemini
+                  <div className="ml-1 mt-1">Gemini</div>
                 </Link>
               </li>
               <li>
@@ -215,7 +222,7 @@ const page = () => {
                   href="/openAIGPT-4o"
                   className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
                 >
-                  <div className="w-7 h-6 p-1 ">
+                  <div className="w-8 h-7 p-1 ">
                     <svg
                       viewBox="0 0 42 42"
                       fill="none"
@@ -253,7 +260,7 @@ const page = () => {
                       </defs>
                     </svg>
                   </div>
-                  OpenAI GPT-4o
+                  <div className="ml-1 mt-1">OpenAI GPT-4o</div>
                 </Link>
               </li>
               <li>
@@ -261,7 +268,7 @@ const page = () => {
                   href="/deepSeek"
                   className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
                 >
-                  <div className="w-7 h-6 p-1 ">
+                  <div className="w-8 h-7 p-1 ">
                     <svg
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -302,7 +309,7 @@ const page = () => {
                       </defs>
                     </svg>
                   </div>
-                  DeepSeek
+                  <div className="ml-1 mt-1">DeepSeek</div>
                 </Link>
               </li>
               <li>
@@ -310,7 +317,7 @@ const page = () => {
                   href="/image"
                   className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
                 >
-                  <div className="w-7 h-6 p-1 ">
+                  <div className="w-8 h-7 p-1 ">
                     <svg
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -336,7 +343,7 @@ const page = () => {
                       ></path>
                     </svg>
                   </div>
-                  Image Generation
+                  <div className="ml-1 mt-1">Image Generation</div>
                 </Link>
               </li>
               <li>
@@ -344,7 +351,7 @@ const page = () => {
                   href="/upload"
                   className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
                 >
-                  <div className="w-7 h-6 p-1 ">
+                  <div className="w-8 h-7 p-1 ">
                     <svg
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -374,7 +381,7 @@ const page = () => {
                       ></path>
                     </svg>
                   </div>
-                  Upload & Ask PDF
+                  <div className="ml-1 mt-1">Upload & Ask PDF</div>
                 </Link>
               </li>
               <li>
@@ -382,7 +389,7 @@ const page = () => {
                   href="/model"
                   className="flex block p-2 hover:bg-gray-100 rounded text-sm mt-4"
                 >
-                  <div className="w-5 h-3 p-1 ">
+                  <div className="w-6 h-4 p-1 mt-1 ">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -398,19 +405,66 @@ const page = () => {
                       ></path>
                     </svg>
                   </div>
-                  Chats
+                  <div className="ml-1 mt-1">Chats</div>
                 </Link>
-                <div className="overflow-y-scroll h-64 text-black">
-                  {chatThread.map((chat) => (
-                    <ul
-                      onClick={() => getChatById(chat.chatId)}
-                      className="hover:bg-gray-200 p-2 mt-2 cursor-pointer truncate w-full overflow-hidden text-ellipsis whitespace-nowrap"
-                      key={chat.chatId}
-                    >
-                      {chat.message}
-                    </ul>
-                  ))}
-                </div>
+                <div className="h-64 overflow-y-scroll scrollbar-thin text-black">
+                {Array.isArray(chatThread) && chatThread.map((chat) => (
+  <div
+    key={chat.chatId}
+    className="relative flex items-center justify-between p-2 hover:bg-gray-200"
+  >
+    {/* Message Content in a flex row */}
+    <div
+      onClick={() => getChatById(chat.chatId)}
+      className="flex-1 cursor-pointer truncate text-ellipsis whitespace-nowrap p-2"
+    >
+      {chat.message}
+    </div>
+
+    {/* Options Button */}
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        setOpenMenu(openMenu === chat.chatId ? null : chat.chatId);
+      }}
+      className="font-bold rounded-full p-1"
+    >
+      <EllipsisVertical />
+    </button>
+
+    {/* Dropdown Menu */}
+    {openMenu === chat.chatId && (
+      <div className="absolute right-2 z-50 top-8 bg-white shadow-md rounded-lg w-32">
+        <button
+          onClick={() => {
+            // deleteChat(chat.chatId);
+            setOpenMenu(null);
+          }}
+          className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+        >
+          Delete
+        </button>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const generatedLink = `${window.location.origin}/share/chat/${chat.chatId}`;
+            setShareLink(generatedLink);
+            navigator.clipboard.writeText(generatedLink);
+            toast.success("Link copied: " + generatedLink);
+          }}
+          className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+        >
+          Share
+        </button>
+      </div>
+    )}
+  </div>
+))}
+
+</div>
+
+
               </li>
             </ul>
             <ul>
@@ -440,28 +494,27 @@ const page = () => {
                 </Link>
               </li>
 
-              <li className="mt-4 flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-sm cursor-pointer border-t border-gray-400 relative before:absolute before:top-0 before:left-0 before:w-full before:h-[5px] before:bg-gradient-to-b before:from-gray-100 before:to-transparent before:rounded-t-sm">
-                <div className="w-5 h-5 p-5 flex items-center justify-center rounded-full text-white font-bold bg-green-700">
-                  {email ? email[0].toUpperCase() : "?"}
-                </div>
+              <li className="mt-4 flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-sm cursor-pointer border-t border-gray-400 relative">
+                <Link href="/profile" className="flex">
+                  <div className="w-5 h-5 p-5 flex items-center justify-center rounded-full text-white font-bold bg-green-700">
+                    {email ? email[0].toUpperCase() : "?"}
+                  </div>
 
-                <div className="flex flex-col ">
-                  <span className="font-medium text-gray-900">
-                    {name ? name : "User"}
-                  </span>
-                  <Link
-                    href="/profile"
-                    className="text-xs overflow-hidden text-gray-500"
-                  >
-                    {email}
-                  </Link>
-                </div>
+                  <div className="flex flex-col ml-3">
+                    <span className="font-medium text-gray-900">
+                      {name ? name : "User"}
+                    </span>
+                    <div className="text-xs overflow-hidden text-gray-500">
+                      {email}
+                    </div>
+                  </div>
+                </Link>
               </li>
             </ul>
           </nav>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
