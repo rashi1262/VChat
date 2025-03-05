@@ -167,16 +167,16 @@ const ChatPage = ({ params }) => {
     <>
       <div className="flex w-full justify-between bg-gray-50 text-sm">
       <Navbar/>
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center ml-auto w-4/5">
-          <div className="max-w-4xl w-full rounded-md p-6 text-center">
-            <div className="flex flex-col gap-2 sticky overflow-y-scroll h-[400px] p-4">
+        <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center ml-auto w-4/5">
+          <div className="max-w-4xl  absolute top-4  w-full rounded-md h-[700px] p-4 text-center ">
+            <div className="flex flex-col gap-2 sticky overflow-y-scroll h-full w-full  ">
               {chatHistory.map((chat, index) => (
                 <div key={index} className="flex flex-col gap-1">
                   <div className="self-end bg-blue-500 text-white px-3 py-2 rounded-xl max-w-[70%]">
                     {chat.userMessage}
                   </div>
 
-                  <div className="self-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[70%]">
+                  <div className="self-start bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%]">
                     {chat.botResponse}
                   </div>
                 </div>
