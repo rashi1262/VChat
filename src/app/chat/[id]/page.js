@@ -176,7 +176,7 @@ const ChatPage = ({ params }) => {
       <Navbar/>
    
         <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center  w-4/5">
-          <div className="max-w absolute top-4  w-full rounded-md h-[680px] p-4 text-center  ">
+          <div className="max-w absolute top-4  w-full rounded-md h-[650px] p-4 text-center  ">
           <div
       ref={chatContainerRef}
       className="flex flex-col sticky overflow-y-scroll h-full w-full mt-20 mr-36"

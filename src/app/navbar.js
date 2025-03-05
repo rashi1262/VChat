@@ -4,9 +4,9 @@ import React from "react";
 import Link from "next/link";
 import { useChat } from "./chatContext";
 import { useRouter } from "next/navigation";
-import { toast, Toaster } from "sonner";
 import { Plus } from "lucide-react";
 import { EllipsisVertical } from "lucide-react";
+import { toast, Toaster } from "sonner";
 const page = () => {
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [name, setName] = useState("");
@@ -34,29 +34,32 @@ const page = () => {
     }
   }, []);
 
+
+  const fetchUserChats = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-by-userid/${userId}`
+      );
+      if (!response.ok) throw new Error("Failed to fetch chats");
+
+      const data = await response.json();
+
+      setChatThread(
+        Array.isArray(data)
+          ? data.map((chat) => ({
+              chatId: chat.id,
+              message: chat.userSearch[0]?.userMessage,
+            }))
+          : []
+      );
+      
+    } catch (error) {}
+  };
+
   useEffect(() => {
     if (!userId) return;
 
-    const fetchUserChats = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-by-userid/${userId}`
-        );
-        if (!response.ok) throw new Error("Failed to fetch chats");
-
-        const data = await response.json();
-
-        setChatThread(
-          Array.isArray(data)
-            ? data.map((chat) => ({
-                chatId: chat.id,
-                message: chat.userSearch[0]?.userMessage,
-              }))
-            : []
-        );
-        
-      } catch (error) {}
-    };
+  
 
     fetchUserChats();
   }, [userId]);
@@ -70,6 +73,35 @@ const page = () => {
       handleResponse();
     }
   };
+
+
+  const deleteChat = async(id)=>{
+     
+        
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/delete-by/${id}`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+      
+          const data = await response.json();
+      
+          if (!response.ok) {
+            throw new Error(data.message || "Failed to delete chats");
+          }
+          toast.success(" Chat deleted successfully!");
+          fetchUserChats();
+          router.push("/model")
+          
+           
+        } catch (error) {
+          toast.error(`Error: ${error.message}`);
+           
+        } 
+        { duration: Infinity } 
+  }
 
   
 
@@ -437,7 +469,7 @@ const page = () => {
       <div className="absolute right-2 z-50 top-8 bg-white shadow-md rounded-lg w-32">
         <button
           onClick={() => {
-            // deleteChat(chat.chatId);
+            deleteChat(chat.chatId);
             setOpenMenu(null);
           }}
           className="block w-full text-left px-4 py-2 hover:bg-gray-100"
