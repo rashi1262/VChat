@@ -401,8 +401,8 @@ const page = () => {
           </nav>
         </div> */}
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  ml-auto w-4/5">
-          <div className="max-w-4xl w-full   rounded-md p-6 text-center ">
-            <h1 className="text-4xl  text-gray-600 mb-16">
+          <div className="max-w-4xl w-full rounded-md p-6 text-center ">
+            <h1 className="text-3xl  text-gray-600 mb-16">
               How can I help you today?
             </h1>
             <div className="grid grid-cols-4 gap-6">
@@ -629,7 +629,7 @@ const page = () => {
         </div>
       </div>
       <div className="fixed top-3 right-5 flex items-center ">
-        <button className="flex items-center text-black border rounded-l-full rounded-r-full p-1 bg-yellow-200">
+        {/* <button className="flex items-center text-black border rounded-l-full rounded-r-full p-1 bg-yellow-200">
           <div className="w-5 h-5 m1-2 mr-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -647,7 +647,7 @@ const page = () => {
             </svg>
           </div>
           Go Pro
-        </button>
+        </button> */}
         <button className="flex items-center">
           <Link
             href="/openAIGPT-4o "

@@ -402,7 +402,7 @@ const page = () => {
         </div>
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  ml-auto w-4/5">
           <div className="max-w-4xl w-full   rounded-md p-6 text-center ">
-            <h1 className="text-4xl  text-gray-600 mb-16">
+            <h1 className="text-3xl  text-gray-600 mb-16">
               How can I help you today?
             </h1>
             <div className="grid grid-cols-4 gap-6">
@@ -441,7 +441,7 @@ const page = () => {
                     </defs>
                   </svg>
                 </div>
-                <p className="text-gray-500">
+                <p className="text-gray-500 text-sm">
                   "Solve a debate: is a tamato a fruit or a vegetable?"
                 </p>
               </div>
@@ -480,7 +480,7 @@ const page = () => {
                     </defs>
                   </svg>
                 </div>
-                <p className="text-gray-500">
+                <p className="text-gray-500 text-sm">
                   "Help me write a cover letter.Ask me about my education to get
                   started"
                 </p>
@@ -520,7 +520,7 @@ const page = () => {
                     </defs>
                   </svg>
                 </div>
-                <p className="text-gray-500">
+                <p className="text-gray-500 text-sm">
                   "Help me plan meals for the week."
                 </p>
               </div>
@@ -560,7 +560,7 @@ const page = () => {
                     </defs>
                   </svg>
                 </div>
-                <p className="text-gray-500">
+                <p className="text-gray-500 text-sm">
                   "Can you help me write a function?"
                 </p>
               </div>
