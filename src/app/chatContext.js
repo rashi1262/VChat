@@ -30,8 +30,7 @@ export const ChatProvider = ({ children }) => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-by-userid/${userId}`);
         if (!res.ok) throw new Error("Failed to fetch chats");
-        console.log(res.json());
-        
+       
         const data = await res.json();
         setChatThread(data);
       } catch (error) {
@@ -40,9 +39,7 @@ export const ChatProvider = ({ children }) => {
     };
 
     fetchChats();
-  }, [userId]); // Re-fetch chats whenever userId changes
-
-  // Listen for login changes across tabs
+  }, [userId]); 
   useEffect(() => {
     window.addEventListener("storage", syncUserId);
     return () => {

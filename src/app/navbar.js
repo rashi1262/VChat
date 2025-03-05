@@ -47,11 +47,14 @@ const page = () => {
         const data = await response.json();
 
         setChatThread(
-          data.map((chat) => ({
-            chatId: chat.id,
-            message: chat.userSearch[0]?.userMessage,
-          }))
+          Array.isArray(data)
+            ? data.map((chat) => ({
+                chatId: chat.id,
+                message: chat.userSearch[0]?.userMessage,
+              }))
+            : []
         );
+        
       } catch (error) {}
     };
 
@@ -405,59 +408,60 @@ const page = () => {
                   <div className="ml-1 mt-1">Chats</div>
                 </Link>
                 <div className="h-64 overflow-y-scroll scrollbar-thin text-black">
-  {chatThread.map((chat) => (
+                {Array.isArray(chatThread) && chatThread.map((chat) => (
+  <div
+    key={chat.chatId}
+    className="relative flex items-center justify-between p-2 hover:bg-gray-200"
+  >
+    {/* Message Content in a flex row */}
     <div
-      key={chat.chatId}
-      className="relative flex items-center justify-between p-2 hover:bg-gray-200"
+      onClick={() => getChatById(chat.chatId)}
+      className="flex-1 cursor-pointer truncate text-ellipsis whitespace-nowrap p-2"
     >
-      {/* Message Content in a flex row */}
-      <div
-        onClick={() => getChatById(chat.chatId)}
-        className="flex-1 cursor-pointer truncate text-ellipsis whitespace-nowrap p-2"
-      >
-        {chat.message}
-      </div>
-
-      {/* Options Button */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          setOpenMenu(openMenu === chat.chatId ? null : chat.chatId);
-        }}
-        className="font-bold rounded-full p-1"
-      >
-        <EllipsisVertical />
-      </button>
-
-      {/* Dropdown Menu */}
-      {openMenu === chat.chatId && (
-        <div className="absolute right-2 z-50 top-8 bg-white shadow-md rounded-lg w-32">
-          <button
-            onClick={() => {
-              // deleteChat(chat.chatId);
-              setOpenMenu(null);
-            }}
-            className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-          >
-            Delete
-          </button>
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              const generatedLink = `${window.location.origin}/share/chat/${chat.chatId}`;
-              setShareLink(generatedLink);
-              navigator.clipboard.writeText(generatedLink);
-              toast.success("Link copied: " + generatedLink);
-            }}
-            className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-          >
-            Share
-          </button>
-        </div>
-      )}
+      {chat.message}
     </div>
-  ))}
+
+    {/* Options Button */}
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        setOpenMenu(openMenu === chat.chatId ? null : chat.chatId);
+      }}
+      className="font-bold rounded-full p-1"
+    >
+      <EllipsisVertical />
+    </button>
+
+    {/* Dropdown Menu */}
+    {openMenu === chat.chatId && (
+      <div className="absolute right-2 z-50 top-8 bg-white shadow-md rounded-lg w-32">
+        <button
+          onClick={() => {
+            // deleteChat(chat.chatId);
+            setOpenMenu(null);
+          }}
+          className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+        >
+          Delete
+        </button>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const generatedLink = `${window.location.origin}/share/chat/${chat.chatId}`;
+            setShareLink(generatedLink);
+            navigator.clipboard.writeText(generatedLink);
+            toast.success("Link copied: " + generatedLink);
+          }}
+          className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+        >
+          Share
+        </button>
+      </div>
+    )}
+  </div>
+))}
+
 </div>
 
 
