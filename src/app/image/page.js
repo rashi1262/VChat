@@ -26,7 +26,6 @@ const page = () => {
     <>
       <div className="flex w-full justify-between bg-gray-50">
         <Navbar/>
-     
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center ml-auto w-4/5">
           <div className="flex justify-center items-center h-screen">
             <div className="max-w-4xl w-full rounded-md p-6 text-center">
@@ -63,7 +62,7 @@ const page = () => {
               </h1>
             </div>
             <div className="mb-5 ml-20 w-2/5 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
-              {/* <button className="ml-2 p-2 rounded-full bg-gray-200">
+              <button className="ml-2 p-2 rounded-full bg-gray-200">
                 <div className="w-7 h-6 p-1 ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -80,7 +79,7 @@ const page = () => {
                     ></path>
                   </svg>
                 </div>
-              </button> */}
+              </button>
               <input
                 type="text"
                 placeholder="Send a message..."

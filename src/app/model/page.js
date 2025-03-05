@@ -5,9 +5,8 @@ import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useChat } from ".././chatContext";
+
 import Navbar from "../navbar";
-
-
 const page = ({ params }) => {
   const { chatThread, setChatThread } = useChat();
 
@@ -72,7 +71,7 @@ const page = ({ params }) => {
           );
         } catch (error) {
           console.error("Error fetching user chats:", error);
-          setChatThread([]); 
+          setChatThread([]); // Set empty array on error
         }
       };
     
@@ -166,12 +165,12 @@ const page = ({ params }) => {
       <Navbar/>
 {msg?  (<>   <div className="flex w-full justify-between bg-gray-50 text-sm">
       <Navbar/>
-        <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center ml-auto w-4/5">
-          <div className="max-w-4xl  absolute top-4  w-full rounded-md h-[700px] pt-4 text-center ">
+        <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center ml-auto  w-3/5">
+          <div className="max-w  absolute top-4  w-full rounded-md h-[700px] pt-4 text-center ">
             <div className="flex flex-col gap-2 sticky overflow-y-scroll h-full w-full  ">
              
-                <div className="flex flex-col gap-1">
-                  <div className="self-end bg-blue-500 text-white px-3 py-2 rounded-xl max-w-[70%]">
+                <div className="flex flex-col gap-1 mt-20 ">
+                  <div className="mr-72  self-end bg-blue-500 text-white px-3 py-2 rounded-xl max-w-[70%]">
                     {msg}
                   </div>
                   <div className="self-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[70%]">
