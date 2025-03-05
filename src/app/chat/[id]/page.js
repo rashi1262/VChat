@@ -176,10 +176,10 @@ const ChatPage = ({ params }) => {
       <Navbar/>
    
         <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center  w-4/5">
-          <div className="max-w absolute top-4  w-full rounded-md h-[680px] p-4 text-center  ">
+          <div className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  ">
           <div
       ref={chatContainerRef}
-      className="flex flex-col sticky overflow-y-scroll h-full w-full mt-20 mr-36"
+      className="flex flex-col sticky  h-full w-full "
     >
       {chatHistory.map((chat, index) => (
         <div key={index} className="flex flex-col gap-1 mr-36">
