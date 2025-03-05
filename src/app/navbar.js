@@ -68,6 +68,8 @@ const page = () => {
     }
   };
 
+  
+
   return (
     <div>
       <div className="relative">
@@ -432,7 +434,7 @@ const page = () => {
         <div className="absolute right-2 z-50 top-8 bg-white shadow-md rounded-lg w-32">
           <button
             onClick={() => {
-              deleteChat(chat.chatId);
+              // deleteChat(chat.chatId);
               setOpenMenu(null);
             }}
             className="block w-full text-left px-4 py-2 hover:bg-gray-100"
