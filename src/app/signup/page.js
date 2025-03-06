@@ -7,6 +7,7 @@ import { signIn } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast, Toaster } from "sonner";
+import { Asset } from "next/font/google";
 
 const Signup = () => {
   const { data: session } = useSession();
@@ -86,9 +87,10 @@ const Signup = () => {
     <div className="flex justify-center items-center h-screen bg-white">
       <Toaster position="top-center" richColors />
       <div className="w-full max-w-md p-5 bg-white rounded-lg">
-        <Image
-          src={logo}
-          className="w-16 h-16 rounded-full flex justify-center items-center mx-auto mb-8"
+        <img
+        // style={globe.svg}
+        src="assests/vlogo.avif"
+        className="w-16 h-16 rounded-full flex justify-center items-center mx-auto mb-8"
           alt="logo"
         />
 
