@@ -242,7 +242,7 @@ const page = () => {
                   <div className="ml-1 mt-[2%]">Gemini</div>
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/openAIGPT-4o"
                   className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
@@ -336,7 +336,7 @@ const page = () => {
                   </div>
                   <div className="ml-1 mt-[2%]">DeepSeek</div>
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   href="/image"
@@ -412,7 +412,7 @@ const page = () => {
               <li>
                 <Link
                   href="/model"
-                  className="flex block p-2 hover:bg-gray-100 rounded text-sm mt-4"
+                  className="flex block p-2 hover:bg-gray-100 rounded text-sm"
                 >
                   <div className="w-6 h-4 p-1 mt-1 ">
                     <svg
@@ -437,12 +437,12 @@ const page = () => {
                     chatThread.map((chat) => (
                       <div
                         key={chat.chatId}
-                        className="relative flex items-center justify-between p-2 hover:bg-gray-200"
+                        className="relative flex items-center justify-between  hover:bg-gray-200 mb-3"
                       >
                         {/* Message Content in a flex row */}
                         <div
                           onClick={() => getChatById(chat.chatId)}
-                          className="flex-1 cursor-pointer truncate text-ellipsis whitespace-nowrap p-2"
+                          className="flex-1 cursor-pointer truncate text-ellipsis whitespace-nowrap "
                         >
                           {chat.message}
                         </div>
@@ -455,9 +455,10 @@ const page = () => {
                               openMenu === chat.chatId ? null : chat.chatId
                             );
                           }}
-                          className="font-bold rounded-full p-1"
+                          className=" rounded-full "
                         >
-                          <EllipsisVertical />
+                       <EllipsisVertical size={15} />
+
                         </button>
 
                         {/* Dropdown Menu */}
