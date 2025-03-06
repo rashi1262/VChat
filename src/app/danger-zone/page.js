@@ -98,7 +98,7 @@ export default function DangerZonePage() {
         
       }
   
-      // toast.success("All chats deleted successfully!");
+     toast.success("All chats deleted successfully!");
       setChatThread([])
       setLoadingChats(false)
     } catch (error) {
@@ -178,7 +178,7 @@ export default function DangerZonePage() {
       
       
     } catch (error) {
-      // toast.error(`Error: ${error.message}`);
+      // toast.error(`Error: ${error.message}`); 
     } finally {
       setLoadingAccount(false);
     }

@@ -88,56 +88,123 @@ const ChatPage = ({ params }) => {
     scrollToBottom();
   }, [chatHistory, morePrompt]);
 
+  // const fetchBotResponse = async () => {
+  //   try {
+  //     const searchRes = await fetch(
+  //       `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${id}`
+  //     );
+
+  //     if (!searchRes.ok) {
+  //       throw new Error("Error fetching bot response");
+  //     }
+
+  //     const data = await searchRes.json();
+  //     setChatHistory(data?.userSearch || []);
+  //   } catch (error) {
+  //     setError(error.message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const fetchBotResponse = async () => {
     try {
       const searchRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${id}`
       );
-
+  
       if (!searchRes.ok) {
         throw new Error("Error fetching bot response");
       }
-
+  
       const data = await searchRes.json();
-      setChatHistory(data?.userSearch || []);
+      const formattedChats = (data?.userSearch || []).map((chat) => ({
+        ...chat,
+        parsedResponse: extractCodeBlocks(chat.botResponse),
+      }));
+  
+      setChatHistory(formattedChats);
     } catch (error) {
       setError(error.message);
     } finally {
       setLoading(false);
     }
   };
+  
+  // const handleAddChat = async () => {
+  //   if (!id || !morePrompt) return;
 
+  //   setLoading(true);
+
+  //   try {
+  //     const searchRes = await fetch(
+  //       `${
+  //         process.env.NEXT_PUBLIC_BASE_URL
+  //       }/chatbot/search?message=${encodeURIComponent(morePrompt)}`
+  //     );
+
+  //     if (!searchRes.ok) {
+  //       throw new Error("Error fetching bot response");
+  //     }
+
+  //     const data = await searchRes.text();
+  //     const formattedResponse = data
+  //       .split(/[*-]\s+/)
+  //       .filter((point) => point.trim())
+  //       .join(" ");
+
+  //     setMoreResponse(formattedResponse);
+
+  //     const newChat = {
+  //       userMessage: morePrompt,
+  //       botResponse: formattedResponse,
+  //     };
+
+  //     setChatHistory((prevChats) => [...prevChats, newChat]);
+
+  //     await fetch(
+  //       `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
+  //       {
+  //         method: "PUT",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ userSearch: [newChat] }),
+  //       }
+  //     );
+
+  //     setLoading(false);
+  //     setMorePrompt("");
+  //     setMoreResponse("");
+  //   } catch (error) {
+  //     setError(error.message);
+  //     setLoading(false);
+  //   }
+  // };
   const handleAddChat = async () => {
     if (!id || !morePrompt) return;
-
+  
     setLoading(true);
-
+  
     try {
       const searchRes = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_BASE_URL
-        }/chatbot/search?message=${encodeURIComponent(morePrompt)}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/search?message=${encodeURIComponent(morePrompt)}`
       );
-
+  
       if (!searchRes.ok) {
         throw new Error("Error fetching bot response");
       }
-
+  
       const data = await searchRes.text();
-      const formattedResponse = data
-        .split(/[*-]\s+/)
-        .filter((point) => point.trim())
-        .join(" ");
-
-      setMoreResponse(formattedResponse);
-
+      const formattedResponse = extractCodeBlocks(data);
+  
       const newChat = {
         userMessage: morePrompt,
-        botResponse: formattedResponse,
+        botResponse: data,
+        parsedResponse: formattedResponse, // Ensure code blocks are separated
       };
-
+  
       setChatHistory((prevChats) => [...prevChats, newChat]);
-
+  
       await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
         {
@@ -148,7 +215,7 @@ const ChatPage = ({ params }) => {
           body: JSON.stringify({ userSearch: [newChat] }),
         }
       );
-
+  
       setLoading(false);
       setMorePrompt("");
       setMoreResponse("");
@@ -157,7 +224,7 @@ const ChatPage = ({ params }) => {
       setLoading(false);
     }
   };
-
+  
   useEffect(() => {
     if (!id) return;
 
@@ -170,6 +237,26 @@ const ChatPage = ({ params }) => {
       handleAddChat();
     }
   };
+  const extractCodeBlocks = (message) => {
+    const codeBlockRegex = /```([\s\S]*?)```/g;
+    let parts = [];
+    let lastIndex = 0;
+  
+    message.replace(codeBlockRegex, (match, code, index) => {
+      if (index > lastIndex) {
+        parts.push({ type: "text", content: message.slice(lastIndex, index) });
+      }
+      parts.push({ type: "code", content: code });
+      lastIndex = index + match.length;
+    });
+  
+    if (lastIndex < message.length) {
+      parts.push({ type: "text", content: message.slice(lastIndex) });
+    }
+  
+    return parts.length > 0 ? parts : [{ type: "text", content: message }];
+  };
+  
   return (
     <>
       <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
@@ -181,7 +268,7 @@ const ChatPage = ({ params }) => {
       ref={chatContainerRef}
       className="flex flex-col sticky  h-full w-full "
     >
-      {chatHistory.map((chat, index) => (
+      {/* {chatHistory.map((chat, index) => (
         <div key={index} className="flex flex-col gap-1 mr-36">
           <div className="mr-36 mt-2 self-end bg-blue-500 text-white px-3 py-2 rounded-xl max-w-[70%]">
             {chat.userMessage}
@@ -191,7 +278,29 @@ const ChatPage = ({ params }) => {
             {chat.botResponse}
           </div>
         </div>
-      ))}
+      ))} */}
+      {chatHistory.map((chat, index) => (
+  <div key={index} className="flex flex-col gap-1 mr-36">
+    {/* User Message */}
+    <div className="mr-36 mt-2 self-end bg-blue-500 text-white px-3 py-2 rounded-xl max-w-[70%]">
+      {chat.userMessage}
+    </div>
+
+    {/* Bot Response */}
+    <div className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
+      {chat.parsedResponse.map((part, i) =>
+        part.type === "code" ? (
+          <pre key={i} className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto">
+            <code>{part.content}</code>
+          </pre>
+        ) : (
+          <span key={i}>{part.content}</span>
+        )
+      )}
+    </div>
+  </div>
+))}
+
 
       {morePrompt !== "" && (
         <div className="flex flex-col gap-1 ml-36">
