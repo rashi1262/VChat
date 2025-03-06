@@ -32,7 +32,7 @@ const SharedChatPage = ({ params }) => {
   if (!chatHistory) return <p className="text-red-400 ">Loading chat...</p>;
 
   return (
-   <div className="p-6">
+   <div className="p-6 bg-gray-50 ">
     <div className="flex w-full justify-between bg-gray-50 text-sm">
       <Navbar/>
         <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center ml-auto w-4/5">

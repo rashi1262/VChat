@@ -32,6 +32,7 @@ export const ChatProvider = ({ children }) => {
         if (!res.ok) throw new Error("Failed to fetch chats");
        
         const data = await res.json();
+        console.log(data);
         setChatThread(data);
       } catch (error) {
         console.error("Error fetching chat threads:", error);

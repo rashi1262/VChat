@@ -34,7 +34,6 @@ const page = () => {
     }
   }, []);
 
-
   const fetchUserChats = async () => {
     try {
       const response = await fetch(
@@ -52,14 +51,11 @@ const page = () => {
             }))
           : []
       );
-      
     } catch (error) {}
   };
 
   useEffect(() => {
     if (!userId) return;
-
-  
 
     fetchUserChats();
   }, [userId]);
@@ -74,36 +70,33 @@ const page = () => {
     }
   };
 
+  const deleteChat = async (id) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/delete-by/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-  const deleteChat = async(id)=>{
-     
-        
-        try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/delete-by/${id}`, {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-      
-          const data = await response.json();
-      
-          if (!response.ok) {
-            throw new Error(data.message || "Failed to delete chats");
-          }
-          toast.success(" Chat deleted successfully!");
-          fetchUserChats();
-          router.push("/model")
-          
-           
-        } catch (error) {
-          toast.error(`Error: ${error.message}`);
-           
-        } 
-        { duration: Infinity } 
-  }
+      const data = await response.json();
 
-  
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to delete chats");
+      }
+      toast.success(" Chat deleted successfully!");
+      fetchUserChats();
+      router.push("/model");
+    } catch (error) {
+      toast.error(`Error: ${error.message}`);
+    }
+    {
+      duration: Infinity;
+    }
+  };
 
   return (
     <div>
@@ -112,10 +105,10 @@ const page = () => {
 
         {!isNavVisible && (
           <button
-            className="block p-0.5 border text-black mt-5 ml-3 hover:bg-gray-100 rounded"
+            className="block p-0.5 border text-black mt-[30%] ml-3 hover:bg-gray-100 rounded"
             onClick={() => setIsNavVisible(true)}
           >
-            <div className="w-7 h-6 p-1 ">
+            <div className="w-7 h-[2%] p-1 ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -146,14 +139,14 @@ const page = () => {
                   href="/model"
                   className="flex block p-1 border text-2/3sm text-gray-700 hover:bg-gray-100 rounded mr-2 pl-2 pr-20 "
                 >
-                  <Plus size={12} className="mt-1" />
+                  <Plus size={12} className="mt-[5%]" />
                   <div className="ml-2 text-sm ">New Chat</div>
                 </Link>
                 <button
                   onClick={() => setIsNavVisible(false)}
                   className="block p-0.5 border hover:bg-gray-100 rounded"
                 >
-                  <div className="w-7 h-6 p-1 ">
+                  <div className="w-7 h-[2%] p-1 ">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -174,9 +167,9 @@ const page = () => {
               <li>
                 <Link
                   href="/mybot"
-                  className="flex block p-2 hover:bg-gray-100 rounded text-sm mt-6"
+                  className="flex block p-2 hover:bg-gray-100 rounded text-sm mt-[10%]"
                 >
-                  <div className="w-5 h-7 p-1 ">
+                  <div className="w-5  h-[2%] p-1 ">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -207,7 +200,7 @@ const page = () => {
                   href="/model"
                   className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded text-sm"
                 >
-                  <div className="w-8 h-7 p-1 ">
+                  <div className="w-8  h-[2%] p-1 ">
                     <svg
                       viewBox="0 0 42 42"
                       fill="none"
@@ -246,7 +239,7 @@ const page = () => {
                       </defs>
                     </svg>
                   </div>
-                  <div className="ml-1 mt-1">Gemini</div>
+                  <div className="ml-1 mt-[2%]">Gemini</div>
                 </Link>
               </li>
               <li>
@@ -254,7 +247,7 @@ const page = () => {
                   href="/openAIGPT-4o"
                   className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
                 >
-                  <div className="w-8 h-7 p-1 ">
+                  <div className="w-8  h-[2%] p-1 ">
                     <svg
                       viewBox="0 0 42 42"
                       fill="none"
@@ -292,7 +285,7 @@ const page = () => {
                       </defs>
                     </svg>
                   </div>
-                  <div className="ml-1 mt-1">OpenAI GPT-4o</div>
+                  <div className="ml-1 mt-[2%]">OpenAI GPT-4o</div>
                 </Link>
               </li>
               <li>
@@ -300,7 +293,7 @@ const page = () => {
                   href="/deepSeek"
                   className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
                 >
-                  <div className="w-8 h-7 p-1 ">
+                  <div className="w-8  h-[2%] p-1 ">
                     <svg
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -341,7 +334,7 @@ const page = () => {
                       </defs>
                     </svg>
                   </div>
-                  <div className="ml-1 mt-1">DeepSeek</div>
+                  <div className="ml-1 mt-[2%]">DeepSeek</div>
                 </Link>
               </li>
               <li>
@@ -349,7 +342,7 @@ const page = () => {
                   href="/image"
                   className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
                 >
-                  <div className="w-8 h-7 p-1 ">
+                  <div className="w-8  h-[2%] p-1 ">
                     <svg
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -375,7 +368,7 @@ const page = () => {
                       ></path>
                     </svg>
                   </div>
-                  <div className="ml-1 mt-1">Image Generation</div>
+                  <div className="ml-1 mt-[2%]">Image Generation</div>
                 </Link>
               </li>
               <li>
@@ -383,7 +376,7 @@ const page = () => {
                   href="/upload"
                   className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
                 >
-                  <div className="w-8 h-7 p-1 ">
+                  <div className="w-8  h-[2%] p-1 ">
                     <svg
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -413,7 +406,7 @@ const page = () => {
                       ></path>
                     </svg>
                   </div>
-                  <div className="ml-1 mt-1">Upload & Ask PDF</div>
+                  <div className="ml-1 mt-[2%]">Upload & Ask PDF</div>
                 </Link>
               </li>
               <li>
@@ -437,66 +430,66 @@ const page = () => {
                       ></path>
                     </svg>
                   </div>
-                  <div className="ml-1 mt-1">Chats</div>
+                  <div className="ml-1 mt-[2%]">Chats</div>
                 </Link>
                 <div className="h-64 overflow-y-scroll scrollbar-thin text-black">
-                {Array.isArray(chatThread) && chatThread.map((chat) => (
-  <div
-    key={chat.chatId}
-    className="relative flex items-center justify-between p-2 hover:bg-gray-200"
-  >
-    {/* Message Content in a flex row */}
-    <div
-      onClick={() => getChatById(chat.chatId)}
-      className="flex-1 cursor-pointer truncate text-ellipsis whitespace-nowrap p-2"
-    >
-      {chat.message}
-    </div>
+                  {Array.isArray(chatThread) &&
+                    chatThread.map((chat) => (
+                      <div
+                        key={chat.chatId}
+                        className="relative flex items-center justify-between p-2 hover:bg-gray-200"
+                      >
+                        {/* Message Content in a flex row */}
+                        <div
+                          onClick={() => getChatById(chat.chatId)}
+                          className="flex-1 cursor-pointer truncate text-ellipsis whitespace-nowrap p-2"
+                        >
+                          {chat.message}
+                        </div>
 
-    {/* Options Button */}
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        setOpenMenu(openMenu === chat.chatId ? null : chat.chatId);
-      }}
-      className="font-bold rounded-full p-1"
-    >
-      <EllipsisVertical />
-    </button>
+                        {/* Options Button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenMenu(
+                              openMenu === chat.chatId ? null : chat.chatId
+                            );
+                          }}
+                          className="font-bold rounded-full p-1"
+                        >
+                          <EllipsisVertical />
+                        </button>
 
-    {/* Dropdown Menu */}
-    {openMenu === chat.chatId && (
-      <div className="absolute right-2 z-50 top-8 bg-white shadow-md rounded-lg w-32">
-        <button
-          onClick={() => {
-            deleteChat(chat.chatId);
-            setOpenMenu(null);
-          }}
-          className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-        >
-          Delete
-        </button>
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const generatedLink = `${window.location.origin}/share/chat/${chat.chatId}`;
-            setShareLink(generatedLink);
-            navigator.clipboard.writeText(generatedLink);
-            toast.success("Link copied: " + generatedLink);
-          }}
-          className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-        >
-          Share
-        </button>
-      </div>
-    )}
-  </div>
-))}
-
-</div>
-
-
+                        {/* Dropdown Menu */}
+                        {openMenu === chat.chatId && (
+                          <div className="absolute right-2 z-50 top-8 bg-white shadow-md rounded-lg w-32">
+                            <button
+                              onClick={() => {
+                                deleteChat(chat.chatId);
+                                setOpenMenu(null);
+                              }}
+                              className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                            >
+                              Delete
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const generatedLink = `${window.location.origin}/share/chat/${chat.chatId}`;
+                                setShareLink(generatedLink);
+                                navigator.clipboard.writeText(generatedLink);
+                                toast.success("Link copied: " + generatedLink);
+                              }}
+                              className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                            >
+                              Share
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                </div>
               </li>
             </ul>
             <ul>
@@ -505,7 +498,7 @@ const page = () => {
                   href="/explore"
                   className="flex items-center p-2 hover:bg-gray-200 rounded-lg text-sm font-medium transition duration-200"
                 >
-                  <div className="w-7 h-7 flex items-center justify-center">
+                  <div className="w-7  h-[2%] flex items-center justify-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -526,7 +519,7 @@ const page = () => {
                 </Link>
               </li>
 
-              <li className="mt-4 flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-sm cursor-pointer border-t border-gray-400 relative">
+              <li className="mt-[5%] flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-sm cursor-pointer border-t border-gray-400 relative">
                 <Link href="/profile" className="flex">
                   <div className="w-5 h-5 p-5 flex items-center justify-center rounded-full text-white font-bold bg-green-700">
                     {email ? email[0].toUpperCase() : "?"}
