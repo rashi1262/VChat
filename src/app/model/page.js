@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useChat } from ".././chatContext";
+import { useChat} from ".././chatContext";
 
 import Navbar from "../navbar";
 const page = ({ params }) => {
@@ -38,7 +38,12 @@ const page = ({ params }) => {
         console.error("Error reading user data:", error);
       }
     }
+   
   }, []);
+
+
+
+
 
 
 
@@ -71,7 +76,7 @@ const page = ({ params }) => {
           );
         } catch (error) {
           console.error("Error fetching user chats:", error);
-          setChatThread([]); // Set empty array on error
+          setChatThread([]); 
         }
       };
     
@@ -82,12 +87,13 @@ const page = ({ params }) => {
     setLoading(true);
     try {
       setMsg(prompt)
+      setPrompt("")
       const searchRes = await fetch(
         `${
           process.env.NEXT_PUBLIC_BASE_URL
-        }/chatbot/search?message=${encodeURIComponent(prompt)}`
+        }/chatbot/search?message=${encodeURIComponent(msg)}`
       );
-
+      
       if (!searchRes.ok) throw new Error("Error fetching bot response");
 
       const data = await searchRes.text();
@@ -138,6 +144,7 @@ const page = ({ params }) => {
           }
           return prev;
         });
+        
       }
 
       router.push(`/chat/${chatData.id}`);
@@ -152,6 +159,8 @@ const page = ({ params }) => {
     if (e.key === "Enter") {
       e.preventDefault();
       handleResponse();
+
+      
     }
   };
   const getChatById = (c) => {
