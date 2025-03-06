@@ -4,6 +4,7 @@ import Link from "next/link";
 import Navbar from "../../navbar";
 import { useChat } from "../../chatContext";
 import { useRouter } from "next/navigation";
+import { Clipboard } from "lucide-react";
 
 const ChatPage = ({ params }) => {
   const { id } = use(params);
@@ -28,6 +29,16 @@ const ChatPage = ({ params }) => {
         chatContainerRef.current.scrollHeight;
     }
   };
+
+  const [copiedIndex, setCopiedIndex] = useState(null);
+
+  const handleCopy = (code, index) => {
+    navigator.clipboard.writeText(code).then(() => {
+      setCopiedIndex(index);
+      setTimeout(() => setCopiedIndex(null), 2000);
+    });
+  };
+
 
 
   useEffect(() => {
@@ -224,6 +235,9 @@ const ChatPage = ({ params }) => {
       setLoading(false);
     }
   };
+
+
+  
   
   useEffect(() => {
     if (!id) return;
@@ -268,17 +282,7 @@ const ChatPage = ({ params }) => {
       ref={chatContainerRef}
       className="flex flex-col sticky  h-full w-full "
     >
-      {/* {chatHistory.map((chat, index) => (
-        <div key={index} className="flex flex-col gap-1 mr-36">
-          <div className="mr-36 mt-2 self-end bg-blue-500 text-white px-3 py-2 rounded-xl max-w-[70%]">
-            {chat.userMessage}
-          </div>
-
-          <div className="ml-36 self-start bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%]">
-            {chat.botResponse}
-          </div>
-        </div>
-      ))} */}
+     
       {chatHistory.map((chat, index) => (
   <div key={index} className="flex flex-col gap-1 mr-36">
     {/* User Message */}
@@ -290,9 +294,22 @@ const ChatPage = ({ params }) => {
     <div className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
       {chat.parsedResponse.map((part, i) =>
         part.type === "code" ? (
-          <pre key={i} className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto">
-            <code>{part.content}</code>
-          </pre>
+          <div key={i} className="relative">
+            <pre className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto relative">
+              <code>{part.content}</code>
+            </pre>
+            <button
+              onClick={() => handleCopy(part.content, i)}
+              className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white p-1 rounded"
+            >
+              <Clipboard size={16} />
+            </button>
+            {copiedIndex === i && (
+              <span className="absolute top-2 right-10 bg-gray-700 text-white px-2 py-1 text-xs rounded">
+                Copied!
+              </span>
+            )}
+          </div>
         ) : (
           <span key={i}>{part.content}</span>
         )

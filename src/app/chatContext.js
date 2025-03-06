@@ -8,7 +8,7 @@ export const ChatProvider = ({ children }) => {
   const [chatThread, setChatThread] = useState([]);
   const [userId, setUserId] = useState(null);
 
-  // Function to update userId when localStorage changes
+
   const syncUserId = () => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -19,28 +19,31 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
-  // Fetch chats when userId changes
+
+
+
+  
+  const fetchChats = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-by-userid/${userId}`);
+      // if (!res.ok) throw new Error("Failed to fetch chats");
+     
+      const data = await res.json();
+      console.log(data);
+      setChatThread(data);
+    } catch (error) {
+      // console.error("Error fetching chat threads:", error);
+    }
+  };
   useEffect(() => {
     if (!userId) {
-      setChatThread([]); // Clear chat if no user is logged in
+      setChatThread([]);
       return;
     }
-
-    const fetchChats = async () => {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-by-userid/${userId}`);
-        if (!res.ok) throw new Error("Failed to fetch chats");
-       
-        const data = await res.json();
-        console.log(data);
-        setChatThread(data);
-      } catch (error) {
-        console.error("Error fetching chat threads:", error);
-      }
-    };
-
-    fetchChats();
+      
+    
   }, [userId]); 
+
   useEffect(() => {
     window.addEventListener("storage", syncUserId);
     return () => {
@@ -49,7 +52,7 @@ export const ChatProvider = ({ children }) => {
   }, []);
 
   return (
-    <ChatContext.Provider value={{ chatThread, setChatThread, userId }}>
+    <ChatContext.Provider value={{ chatThread, setChatThread, userId ,fetchChats}}>
       {children}
     </ChatContext.Provider>
   );

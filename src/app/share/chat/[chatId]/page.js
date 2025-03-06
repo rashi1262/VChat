@@ -3,63 +3,217 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState ,use } from "react";
 import { useSearchParams } from "next/navigation";
 import Navbar from '../../../navbar'
+import { useChat } from "../../../chatContext";
+
 const SharedChatPage = ({ params }) => {
   const router = useRouter();
   const { chatId } = use(params);
   const [chatHistory, setChatHistory] = useState([]);
+  const [morePrompt, setMorePrompt] = useState("");
+  const [prompt, setPrompt] = useState("");
+  const [loading, setLoading] = useState(null);
+   const [response, setResponse] = useState("");
+    const { chatThread, setChatThread } = useChat();
+  const[userId,setUserId] = useState(null)
+ useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (!storedUser) {
+          router.push("/login");
+          return;
+        } else {
+          const user = JSON.parse(storedUser);
+         
+          setUserId(user?.id);
+        }
+      } catch (error) {
+        console.error("Error reading user data:", error);
+      }
+    }
+  }, []);
+
+
 
   useEffect(() => {
     if (!chatId) return;
 
     const fetchBotResponse = async () => {
-        try {
-          const searchRes = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${chatId}`
-          );
+      try {
+        const searchRes = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${chatId}`
+        );
     
-          if (!searchRes.ok) {
-            throw new Error("Error fetching bot response");
-          }
+        if (!searchRes.ok) {
+          throw new Error("Error fetching bot response");
+        }
     
-          const data = await searchRes.json();
-          setChatHistory(data?.userSearch || []);
-        } catch (error) {
-        //   setError(error.message);
-        } }
+        const data = await searchRes.json();
+        const formattedChats = (data?.userSearch || []).map((chat) => ({
+          ...chat,
+          parsedResponse: extractCodeBlocks(chat.botResponse),
+        }));
+    
+        setChatHistory(formattedChats);
+      } catch (error) {
+        // setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
         fetchBotResponse()
-  }, [chatId]);
+  }, [chatId]); 
+
+  const extractCodeBlocks = (message) => {
+    const codeBlockRegex = /```([\s\S]*?)```/g;
+    let parts = [];
+    let lastIndex = 0;
+  
+    message.replace(codeBlockRegex, (match, code, index) => {
+      if (index > lastIndex) {
+        parts.push({ type: "text", content: message.slice(lastIndex, index) });
+      }
+      parts.push({ type: "code", content: code });
+      lastIndex = index + match.length;
+    });
+  
+    if (lastIndex < message.length) {
+      parts.push({ type: "text", content: message.slice(lastIndex) });
+    }
+  
+    return parts.length > 0 ? parts : [{ type: "text", content: message }];
+  };
+
+
+  // useEffect(() => {
+  //   if (!chatId || !userId) return;
+
+  //   const fetchChat = async () => {
+  //     try {
+  //       const res = await fetch(
+  //         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${chatId}`
+  //       );
+  //       if (!res.ok) throw new Error("Failed to fetch chat");
+  //       const data = await res.json();
+
+  //       // Ensure chat belongs to logged-in user before setting history
+  //       if (data?.userId === userId || data?.isShared) {
+  //         setChatHistory(data?.userSearch || []);
+  //       } else {
+  //         console.warn("Chat does not belong to this user.");
+  //       }
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
+
+  //   fetchChat();
+  // }, [chatId, userId]);
+
+  const handleResponse = async () => {
+    if (!prompt.trim() || !userId) return;
+    setLoading(true);
+
+    try {
+      // Fetch response from bot
+      const searchRes = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/search?message=${encodeURIComponent(prompt)}`
+      );
+      if (!searchRes.ok) throw new Error("Error fetching bot response");
+      const botResponse = await searchRes.text();
+
+      // Create new chat, preserving previous chat history + new message
+      const createChatRes = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/create`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userSearch: [
+              ...chatHistory, // Keep previous messages
+              { userMessage: prompt, botResponse },
+            ],
+            userId, // Assign to the logged-in user
+          }),
+        }
+      );
+
+      if (!createChatRes.ok) throw new Error("Failed to create chat");
+      const newChatData = await createChatRes.json();
+
+      // Update chat thread only for the logged-in user
+      setChatThread((prev) => [
+        ...prev.filter((chat) => chat.userId === userId), // Keep only this user's chats
+        { chatId: newChatData.id, message: prompt, userId },
+      ]);
+
+      // Redirect to the new chat page
+      router.push(`/chat/${newChatData.id}`);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+const handleKeyDown = (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    handleResponse();
+  }
+};
+
+
 
   if (!chatHistory) return <p className="text-red-400 ">Loading chat...</p>;
 
   return (
-   <div className="p-6 bg-gray-50 ">
-    <div className="flex w-full justify-between bg-gray-50 text-sm">
+    <>
+      <div className="flex w-full justify-between bg-gray-50 text-sm ">
       <Navbar/>
-        <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center ml-auto w-4/5">
-          <div className="max-w-4xl  absolute top-4  w-full rounded-md h-[700px] p-4 text-center ">
-            <div className="flex flex-col gap-2 sticky overflow-y-scroll h-full w-full  ">
-              {chatHistory.map((chat, index) => (
-                <div key={index} className="flex flex-col gap-1">
-                  <div className="self-end bg-blue-500 text-white px-3 py-2 rounded-xl max-w-[70%]">
-                    {chat.userMessage}
-                  </div>
+   
+        <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center  w-4/5">
+          <div className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  ">
+          <div
+      // ref={chatContainerRef}
+      className="flex flex-col sticky  h-full w-full "
+    >
+      
+      {chatHistory.map((chat, index) => (
+  <div key={index} className="flex flex-col gap-1 mr-36">
+   
+    <div className="mr-36 mt-2 self-end bg-blue-500 text-white px-3 py-2 rounded-xl max-w-[70%]">
+      {chat.userMessage}
+    </div>
 
-                  <div className="self-start bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%]">
-                    {chat.botResponse}
-                  </div>
-                </div>
-              ))}
-{/* 
-              {morePrompt !== "" && (
-                <div className="flex flex-col gap-1">
-       {loading && (
-                    <div className="self-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[70%] flex items-center gap-2">
-                      <span className="animate-pulse">...</span>
-                    </div>
-                  )}
-                </div>
-              )} */}
+    {/* Bot Response */}
+    <div className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
+      {chat.parsedResponse.map((part, i) =>
+        part.type === "code" ? (
+          <pre key={i} className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto">
+            <code>{part.content}</code>
+          </pre>
+        ) : (
+          <span key={i}>{part.content}</span>
+        )
+      )}
+    </div>
+  </div>
+))}
+
+
+      {morePrompt !== "" && (
+        <div className="flex flex-col gap-1 ml-36">
+          {loading && (
+            <div className="mself-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[5%] flex items-center gap-2">
+              <span className="animate-pulse">...</span>
             </div>
+          )}
+        </div>
+      )}
+    </div>
 
             <div className="mb-5 ml-20 w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
               {/* <button className="ml-2 p-2 rounded-full bg-white">
@@ -81,14 +235,14 @@ const SharedChatPage = ({ params }) => {
                 </div>
               </button> */}
 
-              {/* <input
+              <input
                 type="text"
-                // value={morePrompt}
-                // onChange={(e) => setMorePrompt(e.target.value)}
-                // onKeyDown={handleKeyDown}
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                onKeyDown={handleKeyDown}
                 placeholder="Send a message..."
                 className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
-              /> */}
+              />
               {/* <button className="p-1 rounded-full bg-gray-200">
                 <div className="w-7 h-6 p-1 ">
                   <svg
@@ -108,10 +262,10 @@ const SharedChatPage = ({ params }) => {
                 </div>
               </button> */}
               <button
-                // onClick={handleAddChat}
+                onClick={handleResponse}
                 className=" p-1 mr-2 rounded-full bg-white flex items-center justify-center"
               >
-                {/* {loading ? (
+                {loading ? (
                   <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                 ) : (
                   <div className="w-7 h-6 p-1">
@@ -129,13 +283,83 @@ const SharedChatPage = ({ params }) => {
                       ></path>
                     </svg>
                   </div>
-                )} */}
+                )}
               </button>
             </div>
           </div>
         </div>
+      
       </div>
-    </div>
+
+      <div className="fixed top-3 right-5 flex items-center ">
+        {/* <button className="flex items-center text-black border rounded-l-full rounded-r-full p-1 bg-yellow-200">
+          <div className="w-5 h-5 m1-2 mr-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 18 18"
+              className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.552"
+                d="M1.628 6.906h14.744M7.448 2.25 5.896 6.906 9 15.83l3.104-8.924-1.552-4.656M9.477 15.646l6.952-8.343c.118-.14.177-.212.2-.29a.4.4 0 0 0 0-.213c-.023-.08-.082-.15-.2-.291l-3.363-4.036c-.068-.082-.102-.123-.144-.152a.4.4 0 0 0-.123-.058c-.05-.013-.103-.013-.21-.013H5.411c-.107 0-.16 0-.21.013a.4.4 0 0 0-.122.058c-.042.03-.077.07-.145.152L1.571 6.51c-.118.141-.176.212-.199.29a.4.4 0 0 0 0 .213c.023.08.081.15.2.291l6.951 8.343c.164.196.246.295.344.33.086.032.18.032.266 0 .098-.035.18-.134.344-.33"
+              ></path>
+            </svg>
+          </div>
+          Go Pro
+        </button> */}
+      <button className="flex items-center">
+                {/* <Link
+                  href="/model"
+                  className="flex items-center hover:bg-gray-200 rounded text-black p-2"
+                >
+                  <div className="w-7 h-6 p-1 ">
+                    <svg
+                      viewBox="0 0 42 42"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
+                    >
+                      <g clipPath="url(#clip0_11185_26182)">
+                        <path
+                          d="M0.5 21C0.5 9.678 9.678 0.5 21 0.5C32.322 0.5 41.5 9.678 41.5 21C41.5 32.322 32.322 41.5 21 41.5C9.678 41.5 0.5 32.322 0.5 21Z"
+                          fill="white"
+                        ></path>
+                        <g clipPath="url(#clip1_11185_26182)">
+                          <path
+                            d="M31.2789 18.8229C31.8234 17.1886 31.6359 15.3984 30.7652 13.9119C29.4557 11.6319 26.8232 10.4589 24.2522 11.0109C23.1084 9.72236 21.4652 8.98961 19.7424 9.00011C17.1144 8.99411 14.7827 10.6861 13.9742 13.1866C12.2859 13.5324 10.8287 14.5891 9.97594 16.0869C8.65669 18.3609 8.95744 21.2274 10.7199 23.1774C10.1754 24.8116 10.3629 26.6019 11.2337 28.0884C12.5432 30.3684 15.1757 31.5414 17.7467 30.9894C18.8897 32.2779 20.5337 33.0106 22.2564 32.9994C24.8859 33.0061 27.2184 31.3126 28.0269 28.8099C29.7152 28.4641 31.1724 27.4074 32.0252 25.9096C33.3429 23.6356 33.0414 20.7714 31.2797 18.8214L31.2789 18.8229ZM22.2579 31.4311C21.2057 31.4326 20.1864 31.0644 19.3787 30.3901C19.4154 30.3706 19.4792 30.3354 19.5204 30.3099L24.2994 27.5499C24.5439 27.4111 24.6939 27.1509 24.6924 26.8696V20.1324L26.7122 21.2986C26.7339 21.3091 26.7482 21.3301 26.7512 21.3541V26.9334C26.7482 29.4144 24.7389 31.4259 22.2579 31.4311ZM12.5949 27.3039C12.0677 26.3934 11.8779 25.3261 12.0587 24.2904C12.0939 24.3114 12.1562 24.3496 12.2004 24.3751L16.9794 27.1351C17.2217 27.2769 17.5217 27.2769 17.7647 27.1351L23.5989 23.7661V26.0986C23.6004 26.1226 23.5892 26.1459 23.5704 26.1609L18.7397 28.9501C16.5879 30.1891 13.8399 29.4526 12.5957 27.3039H12.5949ZM11.3372 16.8721C11.8622 15.9601 12.6909 15.2626 13.6779 14.9004C13.6779 14.9416 13.6757 15.0144 13.6757 15.0654V20.5861C13.6742 20.8666 13.8242 21.1269 14.0679 21.2656L19.9022 24.6339L17.8824 25.8001C17.8622 25.8136 17.8367 25.8159 17.8142 25.8061L12.9827 23.0146C10.8354 21.7711 10.0989 19.0239 11.3364 16.8729L11.3372 16.8721ZM27.9317 20.7339L22.0974 17.3649L24.1172 16.1994C24.1374 16.1859 24.1629 16.1836 24.1854 16.1934L29.0169 18.9826C31.1679 20.2254 31.9052 22.9771 30.6624 25.1281C30.1367 26.0386 29.3087 26.7361 28.3224 27.0991V21.4134C28.3247 21.1329 28.1754 20.8734 27.9324 20.7339H27.9317ZM29.9417 17.7084C29.9064 17.6866 29.8442 17.6491 29.7999 17.6236L25.0209 14.8636C24.7787 14.7219 24.4787 14.7219 24.2357 14.8636L18.4014 18.2326V15.9001C18.3999 15.8761 18.4112 15.8529 18.4299 15.8379L23.2607 13.0509C25.4124 11.8096 28.1634 12.5484 29.4039 14.7009C29.9282 15.6099 30.1179 16.6741 29.9402 17.7084H29.9417ZM17.3034 21.8656L15.2829 20.6994C15.2612 20.6889 15.2469 20.6679 15.2439 20.6439V15.0646C15.2454 12.5806 17.2607 10.5676 19.7447 10.5691C20.7954 10.5691 21.8124 10.9381 22.6202 11.6101C22.5834 11.6296 22.5204 11.6649 22.4784 11.6904L17.6994 14.4504C17.4549 14.5891 17.3049 14.8486 17.3064 15.1299L17.3034 21.8641V21.8656ZM18.4007 19.5001L20.9994 17.9994L23.5982 19.4994V22.5001L20.9994 24.0001L18.4007 22.5001V19.5001Z"
+                            fill="black"
+                          ></path>
+                        </g>
+                        <path
+                          d="M41.3443 21.0002C41.3443 9.76457 32.2359 0.65625 21.0002 0.65625C9.76457 0.65625 0.65625 9.76457 0.65625 21.0002C0.65625 32.2359 9.76457 41.3443 21.0002 41.3443C32.2359 41.3443 41.3443 32.2359 41.3443 21.0002Z"
+                          stroke="#EEEEEE"
+                          strokeWidth="1.313"
+                        ></path>
+                      </g>
+                      <defs>
+                        <clipPath id="clip0_11185_26182">
+                          <rect width="42" height="42" fill="white"></rect>
+                        </clipPath>
+                        <clipPath id="clip1_11185_26182">
+                          <rect
+                            width="24"
+                            height="24"
+                            fill="white"
+                            transform="translate(9 9)"
+                          ></rect>
+                        </clipPath>
+                      </defs>
+                    </svg>
+                  </div>
+                  OpenAI GPT-4o mini
+                </Link> */}
+              </button>
+      </div>
+    </>
   );
 };
 
