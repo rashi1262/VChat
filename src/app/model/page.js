@@ -82,10 +82,11 @@ const page = ({ params }) => {
     setLoading(true);
     try {
       setMsg(prompt)
+      setPrompt("")
       const searchRes = await fetch(
         `${
           process.env.NEXT_PUBLIC_BASE_URL
-        }/chatbot/search?message=${encodeURIComponent(prompt)}`
+        }/chatbot/search?message=${encodeURIComponent(msg)}`
       );
 
       if (!searchRes.ok) throw new Error("Error fetching bot response");
