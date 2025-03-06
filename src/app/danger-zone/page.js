@@ -178,7 +178,7 @@ export default function DangerZonePage() {
       
       
     } catch (error) {
-      toast.error(`Error: ${error.message}`);
+      // toast.error(`Error: ${error.message}`);
     } finally {
       setLoadingAccount(false);
     }
