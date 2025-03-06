@@ -133,10 +133,7 @@ const ChatPage = ({ params }) => {
     router.push(`/chat/${c}`);
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [chatHistory, morePrompt]);
-
+ 
 
   const fetchBotResponse = async () => {
     try {
@@ -226,19 +223,17 @@ const ChatPage = ({ params }) => {
   };
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
-    }
-  };
-  useEffect(() => {
-    if (chatContainerRef.current) {
       chatContainerRef.current.scrollTo({
         top: chatContainerRef.current.scrollHeight,
         behavior: "smooth",
       });
     }
-  }, [chatHistory, loading]); // Ensure the effect runs when chatHistory updates
-  
+  };
+   // Ensure the effect runs when chatHistory updates
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatHistory]);
+
 
   const extractCodeBlocks = (message) => {
     const codeBlockRegex = /```([\s\S]*?)```/g;
@@ -266,9 +261,9 @@ const ChatPage = ({ params }) => {
         <Navbar />
 
         <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center  w-4/5">
-          <div className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  ">
+          <div className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  " ref={chatContainerRef}>
             <div
-              ref={chatContainerRef}
+              
               className="flex flex-col sticky  h-full w-full "
             >
               {chatHistory.map((chat, index) => (
@@ -276,7 +271,7 @@ const ChatPage = ({ params }) => {
                
                   <div
                     className="flex flex-col overflow-y-auto max-h-[500px]"
-                    ref={chatContainerRef}
+                    
                   >
                     <div className="flex justify-end w-full pr-36">
     
