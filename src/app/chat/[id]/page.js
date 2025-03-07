@@ -18,18 +18,15 @@ const ChatPage = ({ params }) => {
   const [morePrompt, setMorePrompt] = useState("");
   const [moreResponse, setMoreResponse] = useState("");
   const [userId, setUserId] = useState(null);
- const[moreChat,setMoreChat] = useState("")
+  const [moreChat, setMoreChat] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
 
   const chatContainerRef = useRef(null);
   const [editIndex, setEditIndex] = useState(null);
   const [editMessage, setEditMessage] = useState("");
-;
-
   const handleSaveEdit = async (index) => {
-    if (!editMessage.trim()) return; 
+    if (!editMessage.trim()) return;
     try {
-      
       const response = await fetch(
         `${
           process.env.NEXT_PUBLIC_BASE_URL
@@ -43,7 +40,6 @@ const ChatPage = ({ params }) => {
       const newBotResponse = await response.text();
       const newParsedResponse = extractCodeBlocks(newBotResponse);
 
-      
       setChatHistory((prevChats) => {
         return prevChats.map((chat, i) =>
           i === index
@@ -57,7 +53,6 @@ const ChatPage = ({ params }) => {
         );
       });
 
-     
       await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
         {
@@ -93,7 +88,6 @@ const ChatPage = ({ params }) => {
     });
   };
 
-  
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
@@ -140,8 +134,6 @@ const ChatPage = ({ params }) => {
     router.push(`/chat/${c}`);
   };
 
- 
-
   const fetchBotResponse = async () => {
     try {
       const searchRes = await fetch(
@@ -166,46 +158,49 @@ const ChatPage = ({ params }) => {
     }
   };
 
-  
   const handleAddChat = async () => {
     if (!id || !moreChat) return;
-  
+
     const currentPrompt = moreChat;
-  
+
     setMorePrompt(currentPrompt);
-    setMoreChat(""); 
+    setMoreChat("");
     setLoading(true);
-  
+
     try {
       const searchRes = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/search?message=${encodeURIComponent(currentPrompt)}`
+        `${
+          process.env.NEXT_PUBLIC_BASE_URL
+        }/chatbot/search?message=${encodeURIComponent(currentPrompt)}`
       );
-  
+
       if (!searchRes.ok) {
         throw new Error("Error fetching bot response");
       }
-  
+
       const data = await searchRes.text();
       const formattedResponse = extractCodeBlocks(data);
-  
+
       const newChat = {
-        userMessage: currentPrompt, 
+        userMessage: currentPrompt,
         botResponse: data,
         parsedResponse: formattedResponse,
       };
-  
+
       setChatHistory((prevChats) => [...prevChats, newChat]);
-    
-  
-      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userSearch: [newChat] }),
-      });
-  
       setLoading(false);
+      await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userSearch: [newChat] }),
+        }
+      );
+
+     
       scrollToBottom();
       setMorePrompt("");
       setMoreResponse("");
@@ -214,7 +209,6 @@ const ChatPage = ({ params }) => {
       setLoading(false);
     }
   };
-  
 
   useEffect(() => {
     if (!id) return;
@@ -236,11 +230,10 @@ const ChatPage = ({ params }) => {
       });
     }
   };
-  
+
   useEffect(() => {
     scrollToBottom();
   }, [chatHistory]);
-
 
   const extractCodeBlocks = (message) => {
     const codeBlockRegex = /```([\s\S]*?)```/g;
@@ -268,20 +261,15 @@ const ChatPage = ({ params }) => {
         <Navbar />
 
         <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center  w-4/5">
-          <div className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  " ref={chatContainerRef}>
-            <div
-              
-              className="flex flex-col sticky  h-full w-full "
-            >
+          <div
+            className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  "
+            ref={chatContainerRef}
+          >
+            <div className="flex flex-col sticky  h-full w-full ">
               {chatHistory.map((chat, index) => (
                 <div key={index} className="flex flex-col gap-1 mr-36">
-               
-                  <div
-                    className="flex flex-col overflow-y-auto max-h-[500px]"
-                    
-                  >
+                  <div className="flex flex-col overflow-y-auto max-h-[500px]">
                     <div className="flex justify-end w-full pr-36">
-    
                       {editIndex !== index && (
                         <button
                           onClick={() => {
@@ -294,7 +282,6 @@ const ChatPage = ({ params }) => {
                         </button>
                       )}
 
-                  
                       <div
                         className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${
                           editIndex === index
@@ -302,7 +289,6 @@ const ChatPage = ({ params }) => {
                             : "bg-gray-500"
                         }`}
                       >
-                      
                         {editIndex === index ? (
                           <div className="flex flex-col w-full">
                             <input
@@ -312,7 +298,7 @@ const ChatPage = ({ params }) => {
                               onKeyDown={(e) => {
                                 if (e.key === "Enter") {
                                   handleSaveEdit(index);
-                                  handleAddChat(); 
+                                  handleAddChat();
                                   setEditIndex(null);
                                 }
                               }}
@@ -320,9 +306,7 @@ const ChatPage = ({ params }) => {
                               autoFocus
                             />
 
-                         
                             <div className="flex justify-end gap-2 mt-2">
-                            
                               <button
                                 onClick={() => setEditIndex(null)}
                                 className="px-3 py-1 bg-gray-400 text-white rounded-md"
@@ -343,7 +327,6 @@ const ChatPage = ({ params }) => {
                             </div>
                           </div>
                         ) : (
-                       
                           <span className="break-words w-full">
                             {chat.userMessage}
                           </span>
@@ -352,31 +335,30 @@ const ChatPage = ({ params }) => {
                     </div>
                   </div>
 
-                
                   <div className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
-      {chat.parsedResponse.map((part, i) =>
-        part.type === "code" ? (
-          <div key={i} className="relative">
-            <pre className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto relative">
-              <code>{part.content}</code>
-            </pre>
-            <button
-              onClick={() => handleCopy(part.content, i)}
-              className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white p-1 rounded"
-            >
-              <Clipboard size={16} />
-            </button>
-            {copiedIndex === i && (
-              <span className="absolute top-2 right-10 bg-gray-700 text-white px-2 py-1 text-xs rounded">
-                Copied!
-              </span>
-            )}
-          </div>
-        ) : (
-          <span key={i}>{part.content}</span>
-        )
-      )}
-    </div>
+                    {chat.parsedResponse.map((part, i) =>
+                      part.type === "code" ? (
+                        <div key={i} className="relative">
+                          <pre className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto relative">
+                            <code>{part.content}</code>
+                          </pre>
+                          <button
+                            onClick={() => handleCopy(part.content, i)}
+                            className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white p-1 rounded"
+                          >
+                            <Clipboard size={16} />
+                          </button>
+                          {copiedIndex === i && (
+                            <span className="absolute top-2 right-10 bg-gray-700 text-white px-2 py-1 text-xs rounded">
+                              Copied!
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span key={i}>{part.content}</span>
+                      )
+                    )}
+                  </div>
                 </div>
               ))}
 
@@ -392,8 +374,6 @@ const ChatPage = ({ params }) => {
             </div>
 
             <div className="mb-5 ml-20 w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
-          
-
               <input
                 type="text"
                 value={moreChat}
@@ -402,7 +382,7 @@ const ChatPage = ({ params }) => {
                 placeholder="Send a message..."
                 className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
               />
-            
+
               <button
                 onClick={handleAddChat}
                 className=" p-1 mr-2 rounded-full bg-white flex items-center justify-center"
@@ -433,7 +413,6 @@ const ChatPage = ({ params }) => {
       </div>
 
       <div className="fixed top-3 right-5 flex items-center ">
-       
         <button className="flex items-center">
           <Link
             href="/model"

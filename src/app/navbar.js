@@ -412,7 +412,7 @@ const page = () => {
               <li>
                 <Link
                   href="/model"
-                  className="flex block p-2 hover:bg-gray-100 rounded text-sm"
+                  className="flex  mb-2 block p-2 hover:bg-gray-100 rounded text-sm"
                 >
                   <div className="w-6 h-4 p-1 mt-1 ">
                     <svg
@@ -432,17 +432,17 @@ const page = () => {
                   </div>
                   <div className="ml-1 mt-[2%]">Chats</div>
                 </Link>
-                <div className="h-64 overflow-y-scroll scrollbar-thin text-black">
+                <div className="h-64 overflow-y-scroll scrollbar-thin  text-gray-600">
                   {Array.isArray(chatThread) &&
                     chatThread.map((chat) => (
                       <div
                         key={chat.chatId}
-                        className="relative flex items-center justify-between  hover:bg-gray-200 mb-3"
+                        className="relative rounded-lg pl-5 flex items-center justify-between  hover:bg-gray-200 mb-3"
                       >
                         {/* Message Content in a flex row */}
                         <div
                           onClick={() => getChatById(chat.chatId)}
-                          className="flex-1 cursor-pointer truncate text-ellipsis whitespace-nowrap "
+                          className="flex-1  cursor-pointer truncate text-ellipsis whitespace-nowrap p-1"
                         >
                           {chat.message}
                         </div>
