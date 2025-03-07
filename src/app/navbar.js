@@ -11,7 +11,7 @@ const page = () => {
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const { chatThread, setChatThread } = useChat();
+  const { chatThread, setChatThread ,fetchChats } = useChat();
   const [userId, setUserId] = useState(null);
   const router = useRouter();
   const [openMenu, setOpenMenu] = useState(null);
@@ -34,31 +34,7 @@ const page = () => {
     }
   }, []);
 
-  const fetchUserChats = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-by-userid/${userId}`
-      );
-      if (!response.ok) throw new Error("Failed to fetch chats");
 
-      const data = await response.json();
-
-      setChatThread(
-        Array.isArray(data)
-          ? data.map((chat) => ({
-              chatId: chat.id,
-              message: chat.userSearch[0]?.userMessage,
-            }))
-          : []
-      );
-    } catch (error) {}
-  };
-
-  useEffect(() => {
-    if (!userId) return;
-
-    fetchUserChats();
-  }, [userId]);
 
   const getChatById = (c) => {
     router.push(`/chat/${c}`);
@@ -88,7 +64,7 @@ const page = () => {
         throw new Error(data.message || "Failed to delete chats");
       }
       toast.success(" Chat deleted successfully!");
-      fetchUserChats();
+      setChatThread((prevChats) => prevChats.filter((chat) => chat.chatId !== id));
       router.push("/model");
     } catch (error) {
       toast.error(`Error: ${error.message}`);
