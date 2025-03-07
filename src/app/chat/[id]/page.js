@@ -20,10 +20,12 @@ const ChatPage = ({ params }) => {
   const [userId, setUserId] = useState(null);
   const [moreChat, setMoreChat] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
-
+  const[isloading,setisLoading] = useState(false)
   const chatContainerRef = useRef(null);
   const [editIndex, setEditIndex] = useState(null);
   const [editMessage, setEditMessage] = useState("");
+
+
   const handleSaveEdit = async (index) => {
     if (!editMessage.trim()) return;
     try {
@@ -52,6 +54,8 @@ const ChatPage = ({ params }) => {
             : chat
         );
       });
+
+
 
       await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
@@ -88,6 +92,13 @@ const ChatPage = ({ params }) => {
     });
   };
 
+
+  useEffect(()=>{
+    setisLoading(true)
+  },[id])
+
+  
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
@@ -105,6 +116,7 @@ const ChatPage = ({ params }) => {
   }, []);
 
   useEffect(() => {
+  
     if (!userId) return;
 
     const fetchUserChats = async () => {
@@ -135,6 +147,7 @@ const ChatPage = ({ params }) => {
   };
 
   const fetchBotResponse = async () => {
+    
     try {
       const searchRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${id}`
@@ -142,7 +155,8 @@ const ChatPage = ({ params }) => {
 
       if (!searchRes.ok) {
         throw new Error("Error fetching bot response");
-      }
+      } 
+      setisLoading(false)
 
       const data = await searchRes.json();
       const formattedChats = (data?.userSearch || []).map((chat) => ({
@@ -188,6 +202,7 @@ const ChatPage = ({ params }) => {
       };
 
       setChatHistory((prevChats) => [...prevChats, newChat]);
+      
       setLoading(false);
       await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
@@ -211,6 +226,9 @@ const ChatPage = ({ params }) => {
   };
 
   useEffect(() => {
+   
+    
+     
     if (!id) return;
 
     fetchBotResponse();
@@ -266,101 +284,120 @@ const ChatPage = ({ params }) => {
             ref={chatContainerRef}
           >
             <div className="flex flex-col sticky  h-full w-full ">
-              {chatHistory.map((chat, index) => (
-                <div key={index} className="flex flex-col gap-1 mr-36">
-                  <div className="flex flex-col overflow-y-auto max-h-[500px]">
-                    <div className="flex justify-end w-full pr-36">
-                      {editIndex !== index && (
-                        <button
-                          onClick={() => {
-                            setEditIndex(index);
-                            setEditMessage(chat.userMessage);
-                          }}
-                          className="text-black rounded-md text-sm mr-3"
-                        >
-                          <Pencil size={15} />
-                        </button>
-                      )}
+            {isloading ? (
+  
+  <div className="flex flex-col gap-1 mr-36">
+    {Array(1)
+      .fill(0)
+      .map((_, index) => (
+        <div key={index} className="animate-pulse flex flex-col gap-1 mr-36">
+          {/* User Message Skeleton */}
+          <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
 
-                      <div
-                        className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${
-                          editIndex === index
-                            ? "bg-gray-400 w-[70%]"
-                            : "bg-gray-500"
-                        }`}
-                      >
-                        {editIndex === index ? (
-                          <div className="flex flex-col w-full">
-                            <input
-                              type="text"
-                              value={editMessage}
-                              onChange={(e) => setEditMessage(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                  handleSaveEdit(index);
-                                  handleAddChat();
-                                  setEditIndex(null);
-                                }
-                              }}
-                              className="w-full bg-transparent text-white p-2 rounded-md outline-none border border-white"
-                              autoFocus
-                            />
+          {/* Response Skeleton */}
+          <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
+        </div>
+      ))}
+  </div>
+) : (
+  // 🔵 Actual Chat Data
+  chatHistory.map((chat, index) => (
+    <div key={index} className="flex flex-col gap-1 mr-36">
+      <div className="flex flex-col overflow-y-auto max-h-[500px]">
+        <div className="flex justify-end w-full pr-36">
+          {editIndex !== index && (
+            <button
+              onClick={() => {
+                setEditIndex(index);
+                setEditMessage(chat.userMessage);
+              }}
+              className="text-black rounded-md text-sm mr-3"
+            >
+              <Pencil size={15} />
+            </button>
+          )}
 
-                            <div className="flex justify-end gap-2 mt-2">
-                              <button
-                                onClick={() => setEditIndex(null)}
-                                className="px-3 py-1 bg-gray-400 text-white rounded-md"
-                              >
-                                Cancel
-                              </button>
+          <div
+            className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${
+              editIndex === index
+                ? "bg-gray-500 w-[70%]"
+                : "bg-gray-600"
+            }`}
+          >
+            {editIndex === index ? (
+              <div className="flex flex-col w-full">
+                <input
+                  type="text"
+                  value={editMessage}
+                  onChange={(e) => setEditMessage(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSaveEdit(index);
+                      handleAddChat();
+                      setEditIndex(null);
+                    }
+                  }}
+                  className="w-full bg-transparent text-white p-2 rounded-md outline-none "
+                  autoFocus
+                />
 
-                              <button
-                                onClick={() => {
-                                  handleSaveEdit(index);
-                                  handleAddChat();
-                                  setEditIndex(null);
-                                }}
-                                className="px-3 py-1 bg-green-500 text-white rounded-md"
-                              >
-                                Send
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <span className="break-words w-full">
-                            {chat.userMessage}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                <div className="flex justify-end gap-2 mt-2">
+                  <button
+                    onClick={() => setEditIndex(null)}
+                    className="px-3 py-1 bg-gray-400 text-white rounded-md"
+                  >
+                    Cancel
+                  </button>
 
-                  <div className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
-                    {chat.parsedResponse.map((part, i) =>
-                      part.type === "code" ? (
-                        <div key={i} className="relative">
-                          <pre className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto relative">
-                            <code>{part.content}</code>
-                          </pre>
-                          <button
-                            onClick={() => handleCopy(part.content, i)}
-                            className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white p-1 rounded"
-                          >
-                            <Clipboard size={16} />
-                          </button>
-                          {copiedIndex === i && (
-                            <span className="absolute top-2 right-10 bg-gray-700 text-white px-2 py-1 text-xs rounded">
-                              Copied!
-                            </span>
-                          )}
-                        </div>
-                      ) : (
-                        <span key={i}>{part.content}</span>
-                      )
-                    )}
-                  </div>
+                  <button
+                    onClick={() => {
+                      handleSaveEdit(index);
+                      handleAddChat();
+                      setEditIndex(null);
+                    }}
+                    className="px-3 py-1 bg-green-500 text-white rounded-md"
+                  >
+                    Send
+                  </button>
                 </div>
-              ))}
+              </div>
+            ) : (
+              <span className="break-words w-full text-white">
+                {chat.userMessage}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
+        {chat.parsedResponse.map((part, i) =>
+          part.type === "code" ? (
+            <div key={i} className="relative">
+              <pre className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto relative">
+                <code>{part.content}</code>
+              </pre>
+              <button
+                onClick={() => handleCopy(part.content, i)}
+                className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white p-1 rounded"
+              >
+                <Clipboard size={16} />
+              </button>
+              {copiedIndex === i && (
+                <span className="absolute top-2 right-10 bg-gray-700 text-white px-2 py-1 text-xs rounded">
+                  Copied!
+                </span>
+              )}
+            </div>
+          ) : (
+            <span key={i}>{part.content}</span>
+          )
+        )}
+      </div>
+    </div>
+  ))
+)
+}
 
               {morePrompt !== "" && (
                 <div className="flex flex-col gap-1 ml-36">
