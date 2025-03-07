@@ -408,7 +408,7 @@ const page = () => {
                   </div>
                   <div className="ml-1 mt-[2%]">Chats</div>
                 </Link>
-                <div className="h-64 overflow-y-scroll scrollbar-thin  text-gray-600">
+                <div className="max-h-80 overflow-y-scroll scrollbar-thin  text-gray-600">
                   {Array.isArray(chatThread) &&
                     chatThread.map((chat) => (
                       <div
