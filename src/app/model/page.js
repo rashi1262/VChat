@@ -179,16 +179,16 @@ const page = ({ params }) => {
             <div className="flex flex-col gap-2 sticky overflow-y-scroll h-full w-full  ">
              
                 <div className="flex flex-col gap-1 mt-20 ">
-                  <div className="mr-72  self-end bg-blue-500 text-white px-3 py-2 rounded-xl max-w-[70%]">
+                  <div className="mr-72  self-end bg-gray-500 text-white px-3 py-2 rounded-xl max-w-[70%]">
                     {msg}
                   </div>
-                  <div className="self-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[70%]">
+                  {/* <div className="self-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[70%]"> */}
                   {loading && (
                     <div className="self-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[70%] flex items-center gap-2">
-                      <span className="animate-pulse">...</span>
+                      <span className="animate-pulse ">...</span>
                     </div>
                   )}
-                  </div>
+                  {/* </div> */}
                 </div>
               
 
@@ -525,7 +525,7 @@ const page = ({ params }) => {
                 </p>
               </div>
             </div>
-            <div className="mb-5 ml-20 w-2/5 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
+            <div className="mb-5 ml-20 w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
               {/* <button className="ml-2 p-2 rounded-full bg-white">
                 <div className="w-7 h-6 p-1 ">
                   <svg
