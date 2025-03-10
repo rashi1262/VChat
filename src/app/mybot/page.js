@@ -29,9 +29,9 @@ const page = () => {
     <>
       <div className="flex w-full justify-between bg-gray-50 text-sm">
       <Navbar/>
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  ml-auto w-4/5">
+        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  ml-auto w-[80%]">
           <div className="max-w-4xl w-full rounded-md p-6 mt-10">
-            <strong className="text-xl text-gray-600  ml-20  text-lg">
+            <strong className=" text-gray-600  ml-20  text-lg">
               My Bots
             </strong>
             {/* <button className="flex absolute top-20 right-56 text-gray-400 px-4 py-2 rounded-md border  rounded-l-full rounded-r-full hover:border-black">
@@ -86,8 +86,8 @@ const page = () => {
                     </h1>
                   </div>
                 </div>
-                 <div className="grid grid-cols-1 rounded-4xl items-center mr-20 ml-20 ">
-                  <div className="flex  border rounded-md p-4 hover:bg-white">
+                 <div className="grid grid-cols-1 rounded-4xl items-center mr-16 ml-16 ">
+                  <div className="flex border rounded-md p-4 hover:bg-white justify-center gap-6">
                     <div className="mr-3 ml-5">
                       <Link
                         href="/model"
@@ -336,12 +336,12 @@ const page = () => {
                 </div>
 
                
-                <div className="grid grid-cols-1  items-center mr-20 ml-20 ">
+                <div className="grid grid-cols-1 items-center mt-5 ">
                   <div className="mt-5  border-t rounded-md p-4 hover:bg-white ">
-                    <h1 className="text-black   mt-1 mb-1 ml-15 text-sm">
+                    <h1 className="text-black   text-sm">
                       Recent
                     </h1>
-                    <h1 className="text-gray-600 mx-auto  mb-2  text-sm ">
+                    <h1 className="text-gray-600  text-sm ">
                       Review your recently used bots below. You can easily
                       change your favorite bots by drag and drop between the
                       Recent and Favorite sections for a personalized
@@ -382,3 +382,8 @@ const page = () => {
 };
 
 export default page;
+
+
+
+
+

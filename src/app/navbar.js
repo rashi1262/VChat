@@ -104,14 +104,13 @@ const page = () => {
         )}
 
         <div
-          className={`h-screen md:w-[18%] bg-white text-black fixed left-0 top-0 w-30%  flex-col items-center p-4 transition-transform duration-300 
+          className={`h-screen md:w-[18%] bg-white text-black fixed left-0 top-0 w-[35%] overflow-y-auto flex-col items-center p-4 transition-transform duration-300 
             ${isNavVisible ? "translate-x-0" : "-translate-x-64"}`}
         >
           <button
             onClick={() => setIsNavVisible(false)}
             className="block p-0.5 border hover:bg-gray-100 rounded md:hidden"
           >
-
             <div className="w-7 h-[2%] p-1 ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -139,7 +138,6 @@ const page = () => {
                   <Plus size={12} className="mt-[5%]" />
                   <div className="ml-2 text-sm ">New Chat</div>
                 </Link>
-              
               </li>
 
               <li>
@@ -796,7 +794,7 @@ const page = () => {
               <li>
                 <Link
                   href="/model"
-                  className="flex  mb-2 block p-2 hover:bg-gray-100 rounded text-sm"
+                  className="flex  mb-2  p-2 hover:bg-gray-100 rounded text-sm"
                 >
                   <div className="w-6 h-4 p-1 mt-1 ">
                     <svg
@@ -816,6 +814,7 @@ const page = () => {
                   </div>
                   <div className="ml-1 mt-[2%]">Chats</div>
                 </Link>
+                <div className="h-72">
                 <div className="max-h-80 overflow-y-scroll scrollbar-thin  text-gray-600">
                   {Array.isArray(chatThread) &&
                     chatThread.map((chat) => (
@@ -874,56 +873,60 @@ const page = () => {
                       </div>
                     ))}
                 </div>
+                </div>
+               
               </li>
             </ul>
-            <ul>
-              <li>
-                <Link
-                  href="/explore"
-                  className="flex fixed  bottom-14 items-center p-2 mb-2 hover:bg-gray-200 rounded-lg text-sm font-medium transition duration-200"
-                >
-                  <div className="w-7  h-[2%] flex items-center justify-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 18 18"
-                      className="w-5 h-5 text-gray-600"
-                    >
-                      <g
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="1.5"
+            <div className="relative h-[25vh]">
+              {" "}
+              {/* Ensure parent has relative & enough height */}
+              <ul className="absolute bottom-0 w-full">
+                <li>
+                  <Link
+                    href="/explore"
+                    className="flex bg-white items-center p-2 mb-2 hover:bg-gray-200 rounded-lg text-sm font-medium transition duration-200"
+                  >
+                    <div className="w-7 h-[2%] flex items-center justify-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 18 18"
+                        className="w-5 h-5 text-gray-600"
                       >
-                        <path d="M6.3 2.25H3.45c-.42 0-.63 0-.79.082a.75.75 0 0 0-.328.328c-.082.16-.082.37-.082.79V6.3c0 .42 0 .63.082.79a.75.75 0 0 0 .328.328c.16.082.37.082.79.082H6.3c.42 0 .63 0 .79-.082a.75.75 0 0 0 .328-.328c.082-.16.082-.37.082-.79V3.45c0-.42 0-.63-.082-.79a.75.75 0 0 0-.328-.328c-.16-.082-.37-.082-.79-.082M14.55 2.25H11.7c-.42 0-.63 0-.79.082a.75.75 0 0 0-.328.328c-.082.16-.082.37-.082.79V6.3c0 .42 0 .63.082.79a.75.75 0 0 0 .327.328c.16.082.371.082.791.082h2.85c.42 0 .63 0 .79-.082a.75.75 0 0 0 .328-.328c.082-.16.082-.37.082-.79V3.45c0-.42 0-.63-.082-.79a.75.75 0 0 0-.327-.328c-.16-.082-.371-.082-.791-.082M14.55 10.5H11.7c-.42 0-.63 0-.79.082a.75.75 0 0 0-.328.327c-.082.16-.082.371-.082.791v2.85c0 .42 0 .63.082.79a.75.75 0 0 0 .327.328c.16.082.371.082.791.082h2.85c.42 0 .63 0 .79-.082a.75.75 0 0 0 .328-.327c.082-.16.082-.371.082-.791V11.7c0-.42 0-.63-.082-.79a.75.75 0 0 0-.327-.328c-.16-.082-.371-.082-.791-.082M6.3 10.5H3.45c-.42 0-.63 0-.79.082a.75.75 0 0 0-.328.327c-.082.16-.082.371-.082.791v2.85c0 .42 0 .63.082.79a.75.75 0 0 0 .328.328c.16.082.37.082.79.082H6.3c.42 0 .63 0 .79-.082a.75.75 0 0 0 .328-.327c.082-.16.082-.371.082-.791V11.7c0-.42 0-.63-.082-.79a.75.75 0 0 0-.328-.328c-.16-.082-.37-.082-.79-.082"></path>
-                      </g>
-                    </svg>
-                  </div>
-                  <span className="ml-2 text-gray-700">Explore Bots</span>
-                </Link>
-              </li>
-
-              <li className="mt-[5%] fixed left-4 bottom-1 flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-sm cursor-pointer border-t border-gray-400 ">
-                <Link href="/profile" className="flex">
-                  <div className="w-5 h-5 p-5 flex items-center justify-center rounded-full text-white font-bold bg-green-700">
-                    {email ? email[0].toUpperCase() : "?"}
-                  </div>
-
-                  <div className="flex flex-col ml-3">
-                    <span className="font-medium text-gray-900">
-                      {name ? name : "User"}
-                    </span>
-                    <div className="text-xs overflow-hidden text-gray-500">
-                      {email}
+                        <g
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="1.5"
+                        >
+                          <path d="M6.3 2.25H3.45c-.42 0-.63 0-.79.082a.75.75 0 0 0-.328.328c-.082.16-.082.37-.082.79V6.3c0 .42 0 .63.082.79a.75.75 0 0 0 .328.328c.16.082.37.082.79.082H6.3c.42 0 .63 0 .79-.082a.75.75 0 0 0 .328-.328c.082-.16.082-.37.082-.79V3.45c0-.42 0-.63-.082-.79a.75.75 0 0 0-.328-.328c-.16-.082-.37-.082-.79-.082M14.55 2.25H11.7c-.42 0-.63 0-.79.082a.75.75 0 0 0-.328.328c-.082.16-.082.37-.082.79V6.3c0 .42 0 .63.082.79a.75.75 0 0 0 .327.328c.16.082.371.082.791.082h2.85c.42 0 .63 0 .79-.082a.75.75 0 0 0 .328-.328c.082-.16.082-.37.082-.79V3.45c0-.42 0-.63-.082-.79a.75.75 0 0 0-.327-.328c-.16-.082-.371-.082-.791-.082M14.55 10.5H11.7c-.42 0-.63 0-.79.082a.75.75 0 0 0-.328.327c-.082.16-.082.371-.082.791v2.85c0 .42 0 .63.082.79a.75.75 0 0 0 .327.328c.16.082.371.082.791.082h2.85c.42 0 .63 0 .79-.082a.75.75 0 0 0 .328-.327c.082-.16.082-.371.082-.791V11.7c0-.42 0-.63-.082-.79a.75.75 0 0 0-.327-.328c-.16-.082-.371-.082-.791-.082M6.3 10.5H3.45c-.42 0-.63 0-.79.082a.75.75 0 0 0-.328.327c-.082.16-.082.371-.082.791v2.85c0 .42 0 .63.082.79a.75.75 0 0 0 .328.328c.16.082.37.082.79.082H6.3c.42 0 .63 0 .79-.082a.75.75 0 0 0 .328-.327c.082-.16.082-.371.082-.791V11.7c0-.42 0-.63-.082-.79a.75.75 0 0 0-.328-.328c-.16-.082-.37-.082-.79-.082"></path>
+                        </g>
+                      </svg>
                     </div>
-                  </div>
-                </Link>
-              </li>
-            </ul>
+                    <span className="ml-2 text-gray-700">Explore Bots</span>
+                  </Link>
+                </li>
+
+                <li className="bg-white flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-sm cursor-pointer border-t border-gray-400">
+                  <Link href="/profile" className="flex">
+                    <div className="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold bg-green-700">
+                      {email ? email[0].toUpperCase() : "?"}
+                    </div>
+
+                    <div className="flex flex-col ml-3">
+                      <span className="font-medium text-gray-900">
+                        {name ? name : "User"}
+                      </span>
+                      <div className="text-xs overflow-hidden text-gray-500">
+                        {email}
+                      </div>
+                    </div>
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </nav>
         </div>
-       
-
       </div>
     </div>
   );

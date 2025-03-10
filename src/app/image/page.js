@@ -26,7 +26,7 @@ const page = () => {
     <>
       <div className="flex w-full justify-between bg-gray-50">
         <Navbar/>
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center ml-auto w-4/5">
+        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center ml-auto w-[80%]">
           <div className="flex justify-center items-center h-screen">
             <div className="max-w-4xl w-full rounded-md p-6 text-center">
               <div className="w-16 h-16 rounded-full ml-[240px] mb-10 ">

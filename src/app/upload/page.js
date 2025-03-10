@@ -24,7 +24,7 @@ const page = () => {
     <>
       <div className="flex w-full justify-between bg-gray-50">
         <Navbar/>
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center ml-auto w-4/5">
+        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center ml-auto w-[80%]">
           <div className="max-w-3xl    rounded-md  text-center ">
             <div className="w-16 h-16 rounded-full ml-72 mb-10 ">
               <svg
