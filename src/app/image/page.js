@@ -7,6 +7,10 @@ import Navbar from "../navbar";
 const page = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
+    const[prompt,setPrompt] = useState("")
+    const[userId,setUserId] = useState(null)
+    const[msg,setMsg] = useState('')
+
     useEffect(() => {
       if (typeof window !== "undefined") {
         try {
@@ -18,10 +22,15 @@ const page = () => {
             const user = JSON.parse(storedUser);
             setEmail(user?.email || "No Email");
             setName(user?.name || "No Name");
+            setUserId(user?.id)
           }
         } catch (error) {}
       }
     }, []);
+
+  
+
+    
   return (
     <>
       <div className="flex w-full justify-between bg-gray-50">

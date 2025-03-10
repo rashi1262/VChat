@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect , useRef} from "react";
 import React from "react";
 import Link from "next/link";
 import { useChat } from "./chatContext";
@@ -35,6 +35,21 @@ const page = () => {
   }, []);
 
 
+  const chatContainerRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (chatContainerRef.current && !chatContainerRef.current.contains(event.target)) {
+        setOpenMenu(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+ 
 
   const getChatById = (c) => {
     router.push(`/chat/${c}`);
@@ -408,14 +423,14 @@ const page = () => {
                   </div>
                   <div className="ml-1 mt-[2%]">Chats</div>
                 </Link>
-                <div className="h-64 overflow-y-scroll scrollbar-thin  text-gray-600">
+                <div className="max-h-80 overflow-y-scroll scrollbar-thin  text-gray-600">
                   {Array.isArray(chatThread) &&
                     chatThread.map((chat) => (
                       <div
                         key={chat.chatId}
                         className="relative rounded-lg pl-5 flex items-center justify-between  hover:bg-gray-200 mb-3"
                       >
-                        {/* Message Content in a flex row */}
+                        
                         <div
                           onClick={() => getChatById(chat.chatId)}
                           className="flex-1  cursor-pointer truncate text-ellipsis whitespace-nowrap p-1"
@@ -437,9 +452,9 @@ const page = () => {
 
                         </button>
 
-                        {/* Dropdown Menu */}
+                       
                         {openMenu === chat.chatId && (
-                          <div className="absolute right-2 z-50 top-8 bg-white shadow-md rounded-lg w-32">
+                          <div ref={chatContainerRef} className="absolute right-2 z-50 top-8 sticky  bg-white shadow-md rounded-lg w-32">
                             <button
                               onClick={() => {
                                 deleteChat(chat.chatId);
