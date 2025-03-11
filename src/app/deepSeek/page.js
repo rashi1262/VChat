@@ -317,8 +317,8 @@ const page = () => {
 </div>
 </div>
   <div className="min-h-screen md:block bg-gray-50 flex flex-col items-center justify-center  ml-auto w-4/5 hidden">
-          <div className="max-w-4xl w-full   rounded-md p-6 text-center ">
-            <h1 className="text-3xl  text-gray-600 mb-16">
+  <div className="max-w-4xl w-full rounded-md p-6 text-center ml-auto mr-auto ">
+  <h1 className="text-3xl mt-48  text-gray-600 mb-16">
               How can I help you today?
             </h1>
             <div className="grid grid-cols-4 gap-6">
