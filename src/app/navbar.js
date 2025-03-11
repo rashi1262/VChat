@@ -422,7 +422,8 @@ const page = () => {
                   </div>
                   <div className="ml-1 mt-[2%]">Chats</div>
                 </Link>
-                <div className="max-h-80 overflow-y-scroll scrollbar-thin  text-gray-600">
+                <div className="h-1">
+                <div className="max-h-4 overflow-y-scroll scrollbar-thin  text-gray-600">
                   {Array.isArray(chatThread) &&
                     chatThread.map((chat) => (
                       <div
@@ -481,6 +482,8 @@ const page = () => {
                       </div>
                     ))}
                 </div>
+                </div>
+                
               </li>
             </ul>
             <ul>
@@ -834,7 +837,8 @@ const page = () => {
                   </div>
                   <div className="ml-1 mt-[2%]">Chats</div>
                 </Link>
-                <div className="max-h-80 overflow-y-scroll scrollbar-thin  text-gray-600">
+                <div className="md:h-72 h-40">
+                <div className="md:max-h-72 overflow-y-scroll scrollbar-thin max-h-40  text-gray-600">
                   {Array.isArray(chatThread) &&
                     chatThread.map((chat) => (
                       <div
@@ -893,6 +897,8 @@ const page = () => {
                       </div>
                     ))}
                 </div>
+                </div>
+                
               </li>
             </ul>
             <ul>
