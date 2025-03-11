@@ -29,9 +29,9 @@ const page = () => {
     <>
       <div className="flex w-full justify-between bg-gray-50 text-sm">
       <Navbar/>
-      <div className="min-h-screen bg-gray-50 flex-col items-center justify-center  ml-auto  md:hidden">
+      <div className="min-h-screen bg-gray-50 flex-col items-center justify-center   md:hidden">
           <div className="max-w-4xl w-full rounded-md p-6 mt-10">
-            <strong className=" text-gray-600  ml-20  text-lg">
+            <strong className=" text-gray-600    text-lg">
               My Bots
             </strong>
             {/* <button className="flex absolute top-20 right-56 text-gray-400 px-4 py-2 rounded-md border  rounded-l-full rounded-r-full hover:border-black">
@@ -54,10 +54,10 @@ const page = () => {
               Customize
             </button> */}
 
-            <h1 className="text-gray-400 mt-1 mb-5 ml-20 text-sm">
+            <h1 className="text-gray-400 mt-1 mb-5  text-sm">
               Manage your favorite bots.
             </h1>
-            <div className="grid grid-cols-1 gap-6 items-center mr-20 ml-20  ">
+            <div className="grid grid-cols-1 gap-6 items-center mr-5  ">
               <div className="relative border text-center  rounded-3xl p-4 hover:bg-white ">
                 <h1 className=" flex items-center text-center justify-center text-black mt-1 mb-1 ml-15 mx-auto text-sm">
                   <div className="w-4 h-4 mr-2 ">
@@ -86,16 +86,16 @@ const page = () => {
                     </h1>
                   </div>
                 </div>
-                 <div className="grid grid-cols-1 rounded-4xl items-center  ">
-                  <div className="flex border rounded-md p-4 overflow-x-auto hover:bg-white justify-center gap-6">
-                    <div className="mr-3 ml-5">
+                 <div className="flex flex-wrap rounded-4xl items-center gap-2 sm:gap-4 lg:gap-6">
+                  <div className="flex border rounded-md p-4 overflow-x-scroll hover:bg-white  gap-6 whitespace-nowrap">
+                    <div className="mr-3 ml-5 ">
                       <Link
                         href="/model"
-                        className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm  "
+                        className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm block "
                       >
                         <div  className=" mx-auto ">
                           <div className="flex  border rounded-md p-1 hover:bg-white ">
-                            <div className="w-5 h-5 m-4 ">
+                            <div className="w-10 h-10 m-4 ">
                               <svg
                                 viewBox="0 0 42 42"
                                 fill="none"
@@ -146,11 +146,11 @@ const page = () => {
                     <div className="mr-3 ml-5">
                       <Link
                         href="/openAIGPT-4o"
-                        className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm  "
+                        className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm block "
                       >
                         <div className=" mx-auto ">
                           <div className="flex  border rounded-md p-1 hover:bg-white ">
-                            <div className="w-5 h-5 m-4">
+                            <div className="w-10 h-10 m-4">
                               <svg
                                 viewBox="0 0 42 42"
                                 fill="none"
@@ -201,11 +201,11 @@ const page = () => {
                     <div className="mr-3 ml-5">
                       <Link
                         href="/deepSeek"
-                        className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm  "
+                        className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm bolck "
                       >
                         <div className="mx-auto ">
                           <div className="flex  border rounded-md p-1 hover:bg-white ">
-                            <div className="w-5 h-5 m-4">
+                            <div className="w-10 h-10 m-4">
                               <svg
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -255,11 +255,11 @@ const page = () => {
                     <div className="mr-3 ml-5">
                       <Link
                         href="/image"
-                        className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm "
+                        className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm block "
                       >
                         <div className="grid grid-cols-1  items-center   mb-2">
                           <div className="flex  border rounded-md p-1 hover:bg-white ">
-                            <div className="w-5 h-5 m-4 ">
+                            <div className="w-10 h-10 m-4 ">
                               <svg
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -433,9 +433,9 @@ const page = () => {
                     </h1>
                   </div>
                 </div>
-                 <div className="grid grid-cols-1 rounded-4xl items-center  ">
-                  <div className="flex border rounded-md overflow-x-auto p-4 hover:bg-white justify-center gap-6">
-                    <div className="mr-3 ml-20">
+                 <div className="grid grid-cols-1  rounded-4xl items-center mr-10 ml-10 ">
+                  <div className="flex border rounded-md overflow-x-scroll p-4 hover:bg-white gap-6">
+                    <div className="mr-3 ml-5">
                       <Link
                         href="/model"
                         className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm  "
@@ -599,7 +599,7 @@ const page = () => {
                         DeepSeek
                       </Link>
                     </div>
-                    <div className="mr-10 ml-5">
+                    <div className="mr-3 ml-5">
                       <Link
                         href="/image"
                         className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm "

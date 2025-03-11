@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useChat} from ".././chatContext";
 
 import Navbar from "../navbar";
+import { ChevronDown } from "lucide-react";
 const page = ({ params }) => {
   const { chatThread, setChatThread } = useChat();
 
@@ -183,26 +184,26 @@ const page = ({ params }) => {
           <div className="max-w-4xl w-full  rounded-md p-6 text-center">
          
            <button
-        className="h-6  bg-gray-300 text-black rounded"
+        className="h-6 flex w-full justify-center items-center text-center text-black rounded"
         onClick={() => setShowButtons(!showButtons)}
       >
-        Gemini
+        Gemini <ChevronDown/>
       </button>
 
       {showButtons && (
-        <div className="flex flex-col items-center justify-center ">
-          <ul className="bg-gray-500 rounded-lg w-4/5">
-          <li>
+        <div className="flex flex-col  items-center justify-center  ">
+          <ul className="bg-gray-200  rounded-lg w-4/5">
+          <li className="text-center">
                 <Link
                   href="/mybot"
-                  className="flex border-black p-2 hover:bg-gray-300 rounded text-sm mt-[10%] mr-5"
+                  className="flex border-black p-2 ml-16 hover:bg-gray-300 rounded text-sm mt-[10%] mr-5"
                 >
                   <div className="w-5  h-[2%] p-1 ">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 18 18"
-                      className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--tiny___trsDz"
+                      className=" bg-white rounded-full  CustomIcon-module__icon___zGR29 CustomIcon-module__icon--tiny___trsDz"
                     >
                       <g clipPath="url(#your-bots_svg__a)">
                         <path
@@ -211,6 +212,7 @@ const page = ({ params }) => {
                           strokeLinejoin="round"
                           strokeWidth="1.5"
                           d="m9 1.5-.976 3.904c-.19.762-.286 1.143-.484 1.453a2.25 2.25 0 0 1-.683.683c-.31.198-.69.293-1.453.484L1.5 9l3.904.976c.762.19 1.143.286 1.453.484.275.176.507.408.683.683.198.31.293.69.484 1.452L9 16.5l.976-3.905c.19-.761.286-1.142.484-1.452.176-.275.408-.507.683-.683.31-.198.69-.293 1.452-.484L16.5 9l-3.905-.976c-.761-.19-1.142-.286-1.452-.484a2.25 2.25 0 0 1-.683-.683c-.198-.31-.293-.69-.484-1.453z"
+                        fill="black"
                         ></path>
                       </g>
                       <defs>
@@ -226,7 +228,7 @@ const page = ({ params }) => {
               <li>
                 <Link
                   href="/model"
-                  className="flex border-black items-center p-[1%] text-gray-400 hover:bg-gray-100 rounded text-sm mr-5"
+                  className="flex border-black items-center ml-16 p-[1%] text-gray-400 hover:bg-gray-100 rounded text-sm mr-5"
                 >
                   <div className="w-8  h-[2%] p-1 ">
                     <svg

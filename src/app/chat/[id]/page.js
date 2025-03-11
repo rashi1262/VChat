@@ -279,7 +279,7 @@ const ChatPage = ({ params }) => {
         <Navbar />
         <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center  md:hidden">
           <div
-            className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  "
+            className="max-w absolute top-4  overflow-y-scroll rounded-md h-[75%] p-4 mr-5 text-center  mt-20  "
             ref={chatContainerRef}
           >
             <div className="flex flex-col sticky  h-full w-full ">
@@ -369,7 +369,7 @@ const ChatPage = ({ params }) => {
         </div>
       </div>
 
-      <div className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
+      <div className="ml-20 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
         {chat.parsedResponse.map((part, i) =>
           part.type === "code" ? (
             <div key={i} className="relative">
@@ -617,7 +617,7 @@ const ChatPage = ({ params }) => {
         </div>
       </div>
 
-      <div className="fixed top-3 right-5 flex items-center ">
+      <div className="fixed top-3  md:block right-5  items-center hidden ">
         <button className="flex items-center">
           <Link
             href="/model"
