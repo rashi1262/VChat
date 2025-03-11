@@ -232,7 +232,7 @@ const page = () => {
                   <div className="ml-1 mt-[2%]">Gemini</div>
                 </Link>
               </li>
-              {/* <li>
+               <li>
                 <Link
                   href="/openAIGPT-4o"
                   className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
@@ -277,7 +277,7 @@ const page = () => {
                   </div>
                   <div className="ml-1 mt-[2%]">OpenAI GPT-4o</div>
                 </Link>
-              </li> */}
+              </li> 
               <li>
                 <Link
                   href="/deepSeek"
