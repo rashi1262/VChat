@@ -525,7 +525,7 @@ const page = () => {
                   </svg>
                 </div>
               </button>
-              <button className="p-1 mr-2 rounded-full bg-gray-200">
+              <button onClick={handleResponse}   className="p-1 mr-2 rounded-full bg-gray-200">
                 <div className="w-7 h-6 p-1 ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
