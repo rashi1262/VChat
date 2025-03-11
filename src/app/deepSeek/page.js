@@ -3,30 +3,236 @@ import React from "react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import Navbar from "../navbar";
-
+import { useRouter } from "next/navigation";
+import { useChat} from ".././chatContext";
 const page = () => {
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
- useEffect(() => {
-     if (typeof window !== "undefined") {
-       try {
-         const storedUser = localStorage.getItem("user");
-         if (!storedUser) {
-           router.push("/login");
-           return;
-         } else {
-           const user = JSON.parse(storedUser);
-           setEmail(user?.email || "No Email");
-           setName(user?.name || "No Name");
-         }
-       } catch (error) {}
-     }
-   }, []);
+      const [email, setEmail] = useState("");
+      const[prompt,setPrompt] = useState("")
+      const[userId,setUserId] = useState(null)
+      const[msg,setMsg] = useState('')
+     const [error, setError] = useState("");
+       const [response, setResponse] = useState("");
+       const [loading, setLoading] = useState(false);
+         const { chatThread, setChatThread } = useChat();
+       const router = useRouter()
+      useEffect(() => {
+        if (typeof window !== "undefined") {
+          try {
+            const storedUser = localStorage.getItem("user");
+            if (!storedUser) {
+              router.push("/login");
+              return;
+            } else {
+              const user = JSON.parse(storedUser);
+              setEmail(user?.email || "No Email");
+              setName(user?.name || "No Name");
+              setUserId(user?.id)
+            }
+          } catch (error) {}
+        }
+      }, []);
+  
+      useEffect(() => {
+        if (!userId) return;
+    
+       
+        
+          const fetchUserChats = async () => {
+            try {
+              const response = await fetch(
+                `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-by-userid/${userId}`
+              ); 
+        
+              if (!response.ok) {
+                throw new Error("Failed to fetch chats");
+              }
+        
+              const data = await response.json();
+              console.log("Fetched data:", data); 
+        
+              
+              setChatThread(
+                Array.isArray(data?.chatMessages)
+                  ? data.chatMessages.map((chat) => ({
+                      chatId: chat.id,
+                      message: chat.userSearch?.[0]?.userMessage || "No message",
+                    }))
+                  : []
+              );
+            } catch (error) {
+              console.error("Error fetching user chats:", error);
+              setChatThread([]); 
+            }
+          };
+        
+          fetchUserChats();
+        }, [userId]);
+        
+      const handleResponse = async () => {
+        if(prompt==''){return;}
+        setLoading(true);
+        try {
+          const current = prompt
+          setMsg(current)
+          setPrompt("")
+          const searchRes = await fetch(
+            `${
+              process.env.NEXT_PUBLIC_BASE_URL
+            }/chatbot/search?message=${encodeURIComponent(current)}`
+          );
+          
+          if (!searchRes.ok) throw new Error("Error fetching bot response");
+    
+          const data = await searchRes.text();
+          const formattedResponse = data
+            .split(/[*-]\s+/)
+            .filter((point) => point.trim())
+            .join(" ");
+    
+          setResponse(formattedResponse);
+          
+    
+          const createChatRes = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/create`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                userSearch: [
+                  { userMessage: prompt, botResponse: formattedResponse},
+                ],
+                userId,
+                type:"deepSeek"
+              }),
+            }
+          );
+    
+          
+    
+          if (!createChatRes.ok) throw new Error("Failed to create chat");
+    
+          const chatData = await createChatRes.json();
+          
+          const chatHistoryRes = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${chatData.id}`
+          );
+    
+          if (!chatHistoryRes.ok) throw new Error("Failed to fetch chat history");
+    
+          const chatHistory = await chatHistoryRes.json();
+    
+          if (chatHistory.userSearch?.length > 0 && chatHistory.userId === userId) {
+            const firstMessage = chatHistory.userSearch[0];
+    
+            setChatThread((prev) => {
+              const chatExists = prev.some((chat) => chat.chatId === chatData.id);
+              if (!chatExists) {
+                return [
+                  ...prev,
+                  { chatId: chatData.id, message: firstMessage.userMessage},
+                ];
+              }
+              return prev;
+            });
+            
+          }
+    
+          router.push(`/chat/${chatData.id}`);
+          setLoading(false);
+        } catch (error) {
+          setLoading(false);
+          setError(error.message);
+        }
+      };
+      
+      
+      const handleKeyDown = (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          handleResponse();
+    
+          
+        }
+      };
+  
+      
   return (
     <>
       <div className="flex w-full justify-between bg-gray-50">
      <Navbar/>
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  ml-auto w-4/5">
+        {msg?(        <>
+   <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
+     <Navbar />
+
+     <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center  w-4/5">
+       <div
+         className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  "
+         
+       >
+         <div className="flex flex-col sticky  h-full w-full ">
+      
+
+<div className="flex flex-col gap-1 mr-36">
+ {Array(1)
+   .fill(0)
+   .map((_, index) => (
+     <div key={index} className="animate-pulse flex flex-col gap-1 mr-36">
+       {/* User Message Skeleton */}
+       <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
+
+       {/* Response Skeleton */}
+       <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
+     </div>
+   ))}
+</div>
+
+         </div>
+
+         <div className="mb-5 ml-20 w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
+           <input
+             type="text"
+             value={prompt}
+             onChange={(e) => setPrompt(e.target.value)}
+             onKeyDown={handleKeyDown}
+             placeholder="Send a message..."
+             className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
+           />
+
+           <button
+             onClick={handleResponse}
+             className=" p-1 mr-2 rounded-full bg-white flex items-center justify-center"
+           >
+             {loading ? (
+               <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+             ) : (
+               <div className="w-7 h-6 p-1">
+                 <svg
+                   xmlns="http://www.w3.org/2000/svg"
+                   fill="none"
+                   viewBox="0 0 18 18"
+                   className="text-gray-400 CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+                 >
+                   <path
+                     fill="currentColor"
+                     fillRule="evenodd"
+                     d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
+                     clipRule="evenodd"
+                   ></path>
+                 </svg>
+               </div>
+             )}
+           </button>
+         </div>
+       </div>
+     </div>
+   </div>
+
+   <div className="fixed top-3 right-5 flex items-center ">
+    
+   </div>
+ </>):(
+  <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  ml-auto w-4/5">
           <div className="max-w-4xl w-full   rounded-md p-6 text-center ">
             <h1 className="text-3xl  text-gray-600 mb-16">
               How can I help you today?
@@ -190,8 +396,7 @@ const page = () => {
                   "Can you help me write a function?"
                 </p>
               </div>
-            </div>
-            <div className="mb-5 ml-20 w-2/5 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
+              <div className="mb-5 ml-20 w-2/5 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
               <button className="ml-2 p-2 rounded-full bg-gray-200">
                 <div className="w-7 h-6 p-1 ">
                   <svg
@@ -212,6 +417,9 @@ const page = () => {
               </button>
               <input
                 type="text"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                onKeyDown={handleKeyDown}
                 placeholder="Send a message..."
                 className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
               />
@@ -251,8 +459,10 @@ const page = () => {
                 </div>
               </button>
             </div>
+            </div>
+         
           </div>
-        </div>
+        </div>)}
       </div>
       <div className="fixed top-3 right-5 flex items-center ">
         <button className="flex items-center">
