@@ -277,8 +277,176 @@ const ChatPage = ({ params }) => {
     <>
       <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
         <Navbar />
+        <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center  md:hidden">
+          <div
+            className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  "
+            ref={chatContainerRef}
+          >
+            <div className="flex flex-col sticky  h-full w-full ">
+            {isloading ? (
+  
+  <div className="flex flex-col gap-1 mr-36">
+    {Array(1)
+      .fill(0)
+      .map((_, index) => (
+        <div key={index} className="animate-pulse flex flex-col gap-1 mr-36">
+          {/* User Message Skeleton */}
+          <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
 
-        <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center  w-4/5">
+          {/* Response Skeleton */}
+          <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
+        </div>
+      ))}
+  </div>
+) : (
+  // 🔵 Actual Chat Data
+  chatHistory.map((chat, index) => (
+    <div key={index} className="flex flex-col gap-1 ">
+      <div className="flex flex-col overflow-y-auto max-h-[500px]">
+        <div className="flex justify-end w-full ">
+          {editIndex !== index && (
+            <button
+              onClick={() => {
+                setEditIndex(index);
+                setEditMessage(chat.userMessage);
+              }}
+              className="text-black rounded-md text-sm mr-3"
+            >
+              <Pencil size={15} />
+            </button>
+          )}
+
+          <div
+            className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${
+              editIndex === index
+                ? "bg-gray-500 w-[70%]"
+                : "bg-gray-600"
+            }`}
+          >
+            {editIndex === index ? (
+              <div className="flex flex-col w-full">
+                <input
+                  type="text"
+                  value={editMessage}
+                  onChange={(e) => setEditMessage(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSaveEdit(index);
+                      handleAddChat();
+                      setEditIndex(null);
+                    }
+                  }}
+                  className="w-full bg-transparent text-white p-2 rounded-md outline-none "
+                  autoFocus
+                />
+
+                <div className="flex justify-end gap-2 mt-2">
+                  <button
+                    onClick={() => setEditIndex(null)}
+                    className="px-3 py-1 bg-gray-400 text-white rounded-md"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      handleSaveEdit(index);
+                      handleAddChat();
+                      setEditIndex(null);
+                    }}
+                    className="px-3 py-1 bg-green-500 text-white rounded-md"
+                  >
+                    Send
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <span className="break-words w-full text-white">
+                {chat.userMessage}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
+        {chat.parsedResponse.map((part, i) =>
+          part.type === "code" ? (
+            <div key={i} className="relative">
+              <pre className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto relative">
+                <code>{part.content}</code>
+              </pre>
+              <button
+                onClick={() => handleCopy(part.content, i)}
+                className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white p-1 rounded"
+              >
+                <Clipboard size={16} />
+              </button>
+              {copiedIndex === i && (
+                <span className="absolute top-2 right-10 bg-gray-700 text-white px-2 py-1 text-xs rounded">
+                  Copied!
+                </span>
+              )}
+            </div>
+          ) : (
+            <span key={i}>{part.content}</span>
+          )
+        )}
+      </div>
+    </div>
+  ))
+)
+}
+
+              {morePrompt !== "" && (
+                <div className="flex flex-col gap-1 ml-36">
+                  {loading && (
+                    <div className="mself-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[5%] flex items-center gap-2">
+                      <span className="animate-pulse">...</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="mb-5 ml-10 w-3/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
+              <input
+                type="text"
+                value={moreChat}
+                onChange={(e) => setMoreChat(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Send a message..."
+                className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
+              />
+
+              <button
+                onClick={handleAddChat}
+                className=" p-1 mr-2 rounded-full bg-white flex items-center justify-center"
+              >
+                {loading ? (
+                  <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <div className="w-7 h-6 p-1">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 18 18"
+                      className="text-gray-400 CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+                    >
+                      <path
+                        fill="currentColor"
+                        fillRule="evenodd"
+                        d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                  </div>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="min-h-screen md:block relative bg-gray-50  flex-col items-center justify-center  w-4/5 hidden">
           <div
             className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  "
             ref={chatContainerRef}
