@@ -18,7 +18,7 @@ const page = ({ params }) => {
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState(null);
   const[msg,setMsg] = useState('')
- const[cachedChat,setCachedChat]= useState('')
+  
   const router = useRouter();
   const [showButtons, setShowButtons] = useState(false);
   useEffect(() => {
@@ -63,7 +63,7 @@ const page = ({ params }) => {
           }
     
           const data = await response.json();
-          console.log("Fetched data:", data); // Debugging log
+          console.log("Fetched data:", data); 
     
           // Ensure chatMessages is an array before mapping
           setChatThread(
@@ -86,12 +86,13 @@ const page = ({ params }) => {
   const handleResponse = async () => {
     setLoading(true);
     try {
-      setMsg(prompt)
+      const current = prompt
+      setMsg(current)
       setPrompt("")
       const searchRes = await fetch(
         `${
           process.env.NEXT_PUBLIC_BASE_URL
-        }/chatbot/search?message=${encodeURIComponent(msg)}`
+        }/chatbot/search?message=${encodeURIComponent(current)}`
       );
       
       if (!searchRes.ok) throw new Error("Error fetching bot response");
@@ -112,17 +113,20 @@ const page = ({ params }) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             userSearch: [
-              { userMessage: prompt, botResponse: formattedResponse },
+              { userMessage: prompt, botResponse: formattedResponse},
             ],
             userId,
+            type:"Gemini"
           }),
         }
       );
 
+      
+
       if (!createChatRes.ok) throw new Error("Failed to create chat");
 
       const chatData = await createChatRes.json();
-
+      
       const chatHistoryRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${chatData.id}`
       );
@@ -139,7 +143,7 @@ const page = ({ params }) => {
           if (!chatExists) {
             return [
               ...prev,
-              { chatId: chatData.id, message: firstMessage.userMessage },
+              { chatId: chatData.id, message: firstMessage.userMessage, type:'Gemini' },
             ];
           }
           return prev;
