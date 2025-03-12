@@ -23,7 +23,7 @@ const page = () => {
         try {
           const storedUser = localStorage.getItem("user");
           if (!storedUser) {
-            router.push("/login");
+            router.push("/home");
             return;
           } else {
             const user = JSON.parse(storedUser);

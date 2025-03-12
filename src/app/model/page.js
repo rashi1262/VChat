@@ -51,6 +51,8 @@ const page = ({ params }) => {
       try {
         const storedUser = localStorage.getItem("user");
         if (!storedUser) {
+          router.push("/model");
+          return;
         } else {
           const user = JSON.parse(storedUser);
           setEmail(user?.email || "No Email");
