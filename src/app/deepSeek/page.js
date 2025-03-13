@@ -571,7 +571,7 @@ const page = () => {
   
   )}
       </div>
-      <div className="fixed md:block top-3 right-5  items-center hidden">
+      {/* <div className="fixed md:block top-3 right-5  items-center hidden">
         <button className="flex items-center">
           <Link
             href="/deepSeek"
@@ -621,7 +621,7 @@ const page = () => {
             DeepSeek
           </Link>
         </button>
-      </div>
+      </div> */}
     </>
   );
 };

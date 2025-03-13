@@ -337,7 +337,7 @@ const page = () => {
   
       </div>  
       
-      <div className="fixed top-3 right-5 flex items-center ">
+      {/* <div className="fixed top-3 right-5 flex items-center ">
         <button className="flex items-center">
           <Link
             href="/upload"
@@ -376,7 +376,7 @@ const page = () => {
             Upload & Ask PDF
           </Link>
         </button>
-      </div>
+      </div> */}
     </>
   );
 };

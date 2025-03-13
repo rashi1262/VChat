@@ -501,7 +501,7 @@ const Page = () => {
         </div> */}
         <div className="min-h-screen bg-gray-50 flex flex-col items-center mt-4 ml-auto w-[80%]">
           <div className="grid grid-cols-1 gap-6 items-center mr-20 ml-20">
-            <div className="flex border rounded-md p-1 bg-gray-200 rounded-l-full rounded-r-full mr-20 ml-20">
+            <div className="flex border mt-14 rounded-md p-1 bg-gray-200 rounded-l-full rounded-r-full mr-20 ml-20">
               {[
                 "Popular",
                 "AI Models",
