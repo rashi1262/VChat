@@ -24,7 +24,8 @@ export default function Sidebar() {
         await signOut({ redirect: false });
     
         localStorage.removeItem("user");
-        router.push("/login");
+        localStorage.setItem("hasLoggedIn", false);
+        router.push("/model");
         console.log("Logging out...");
       }; 
    

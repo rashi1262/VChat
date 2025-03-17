@@ -30,7 +30,7 @@ const page = () => {
       <div className="flex w-full justify-between bg-gray-50 text-sm">
       <Navbar/>
       <div className="min-h-screen bg-gray-50 flex-col items-center justify-center   md:hidden">
-          <div className="max-w-4xl w-full rounded-md p-6 mt-10">
+          <div className="max-w-4xl  w-full rounded-md p-6 mt-10">
             <strong className=" text-gray-600    text-lg">
               My Bots
             </strong>
@@ -377,7 +377,7 @@ const page = () => {
           </div>
         </div>
         <div className="min-h-screen md:block bg-gray-50 flex flex-col items-center justify-center  ml-auto w-[80%] hidden">
-          <div className="max-w-4xl w-full rounded-md p-6 mt-10">
+          <div className="max-w-4xl w-full rounded-md p-6 mt-12">
             <strong className=" text-gray-600  ml-20  text-lg">
               My Bots
             </strong>

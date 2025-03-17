@@ -17,13 +17,25 @@ const page = () => {
   const router = useRouter();
   const [openMenu, setOpenMenu] = useState(null);
   const [shareLink, setShareLink] = useState("");
+  const hasLoggedIn = typeof window !== "undefined" && localStorage.getItem("hasLoggedIn") === "true";
+
+  
+
+  useEffect(() => {
+    if (hasLoggedIn) {
+      setIsNavVisible(true);
+    } else {
+      setIsNavVisible(false);
+    }
+  }, [hasLoggedIn]);
+
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
         const storedUser = localStorage.getItem("user");
         if (!storedUser) {
-          router.push("/login");
+          router.push("/model");
           return;
         } else {
           const user = JSON.parse(storedUser);
@@ -89,7 +101,8 @@ const page = () => {
       duration: Infinity;
     }
   };
-
+  
+  
   return (
     <div>
       <div className="relative z-40">
@@ -121,7 +134,7 @@ const page = () => {
  
         <div
           className={`h-screen w-64 bg-white md:block text-black overflow-y-auto fixed left-0 top-0 flex flex-col items-center p-4 transition-transform duration-300 ${
-            isNavVisible ? "translate-x-0" : "-translate-x-64 hidden"
+            !isNavVisible ? "-translate-x-64" : "translate-x-0 hidden"
           }`}
         >
           <nav className="w-full flex flex-col justify-between flex-grow">
@@ -189,7 +202,7 @@ const page = () => {
               </li>
               <li>
                 <Link
-                  href="/vChat"
+                  href="/vchat"
                   className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded text-sm"
                 >
                   <div className="w-8  h-[2%] p-1 ">
@@ -252,7 +265,7 @@ const page = () => {
               </li>
               <li>
                 <Link
-                  href="/openAIGPT-4o"
+                  href="/openAI"
                   className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
                 >
                   <div className="w-8  h-[2%] p-1 ">
@@ -293,10 +306,10 @@ const page = () => {
                       </defs>
                     </svg>
                   </div>
-                  <div className="ml-1 mt-[2%]">OpenAI GPT-4o</div>
+                  <div className="ml-1 mt-[2%]">OpenAI</div>
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/deepSeek"
                   className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
@@ -344,7 +357,7 @@ const page = () => {
                   </div>
                   <div className="ml-1 mt-[2%]">DeepSeek</div>
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   href="/image"
@@ -440,8 +453,8 @@ const page = () => {
                   </div>
                   <div className="ml-1 mt-[2%]">Chats</div>
                 </Link>
-                <div className="md:h-64 h-32">
-                <div className="md:max-h-64 overflow-y-scroll scrollbar-thin max-h-40  text-gray-600">
+                <div className="md:h-72 h-32">
+                <div className="md:max-h-72 overflow-y-scroll scrollbar-thin max-h-40  text-gray-600">
                   {Array.isArray(chatThread) &&
                     chatThread.map((chat) => (
                       <div
@@ -549,6 +562,7 @@ const page = () => {
               </li>
             </ul>
           </nav>
+         
         </div>
       </div>
     </div>

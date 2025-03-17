@@ -9,9 +9,11 @@ const Header = () => {
 
   console.log(pathname, "Current Pathname");
   const freePoints = 100;
-
+  if (pathname === "/login" || pathname === "/signup") {
+    return null;
+  }
   return (
-    <header className="fixed top-0 w-full bg-white shadow-md">
+    <header className="z-10 fixed top-0 w-full bg-white shadow-sm">
       <div className="container mx-auto flex items-center justify-between py-3 px-5">
 
         {/* Left Side (Empty Space or Logo) */}
@@ -286,3 +288,6 @@ const Header = () => {
 };
 
 export default Header;
+
+
+

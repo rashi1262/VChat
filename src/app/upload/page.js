@@ -17,20 +17,25 @@ const page = () => {
        const [loading, setLoading] = useState(false);
          const { chatThread, setChatThread } = useChat();
          const router = useRouter();
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-          const user = JSON.parse(storedUser);
-          setEmail(user?.email || "No Email");
-          setName(user?.name || "No Name");
-          setUserId(user?.id)
+   useEffect(() => {
+      if (typeof window !== "undefined") {
+        try {
+          const storedUser = localStorage.getItem("user");
+          if (!storedUser) {
+            router.push("/login");
+            return;
+          } else {
+            const user = JSON.parse(storedUser);
+            setEmail(user?.email || "No Email");
+            setName(user?.name || "No Name");
+            setUserId(user?.id);
+          }
+        } catch (error) {
+          console.error("Error reading user data:", error);
         }
-      } catch (error) {}
-    }
-  }, []);
-
+      }
+     
+    }, []);
 
 
   useEffect(() => {
@@ -269,14 +274,14 @@ const page = () => {
               Get instant answers and insights from your documents—just upload
               and ask!
             </h1>
-            <div className="mb-5 ml-20 w-2/5 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
-          <button className="ml-2 p-2 rounded-full bg-gray-200">
+            <div className="mb-5 ml-20 w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
+          <button className="ml-2 p-2 rounded-full bg-white">
             <div className="w-7 h-6 p-1 ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 18 18"
-                className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+                className="text-gray-400 CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
               >
                 <path
                   stroke="currentColor"
@@ -296,7 +301,7 @@ const page = () => {
             placeholder="Send a message..."
             className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
           />
-          <button  className="p-1 rounded-full bg-gray-200">
+          {/* <button  className="p-1 rounded-full bg-gray-200">
             <div className="w-7 h-6 p-1 ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -313,14 +318,14 @@ const page = () => {
                 ></path>
               </svg>
             </div> 
-          </button>
-          <button onClick={handleResponse}  className="p-1 mr-2 rounded-full bg-gray-200">
+          </button> */}
+          <button onClick={handleResponse}  className="p-1 mr-2 rounded-full bg-white">
             <div className="w-7 h-6 p-1 ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 18 18"
-                className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+                className="text-gray-400 CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
               >
                 <path
                   fill="currentColor"
