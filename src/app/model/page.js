@@ -10,6 +10,7 @@ import Navbar from "../navbar";
 import { ChevronDown } from "lucide-react";
 const page = ({ params }) => {
   const { chatThread, setChatThread } = useChat();
+  const [showPopup, setShowPopup] = useState(false);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -22,13 +23,26 @@ const page = ({ params }) => {
   
   const router = useRouter();
   const [showButtons, setShowButtons] = useState(false);
+
+  const handleRedirect = (path) => {
+    setShowPopup(false);
+    window.location.href = path;
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowPopup(true);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
         const storedUser = localStorage.getItem("user");
         if (!storedUser) {
-          router.push("/login");
-          return;
+         
+        
+          
         } else {
           const user = JSON.parse(storedUser);
           setEmail(user?.email || "No Email");
@@ -761,6 +775,16 @@ Gemini <ChevronDown/>
           </Link>
         </button>
       </div>
+      {showPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-gray-600 w-96 p-4 rounded-lg shadow-lg text-center">
+            <h2 className="text-xl font-semibold mb-4">Welcome back</h2>
+            <p className="mb-4">Log in or sign up to get smarter responses, upload files and images, and more.</p>
+            <button onClick={() => handleRedirect('/login')} className="w-full px-2 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100">Log in</button>
+            <button onClick={() => handleRedirect('/signup')} className="w-full px-2 py-2 bg-transparent text-white border border-white rounded-full  hover:bg-gray-600">Sign up</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
