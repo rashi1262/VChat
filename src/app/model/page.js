@@ -708,7 +708,7 @@ Gemini <ChevronDown/>
  )}
       </div>
 
-      {/* <div className="fixed top-3 right-5 flex items-center ">
+      <div className="fixed top-3 right-5 flex items-center ">
         <button className="flex items-center text-black border rounded-l-full rounded-r-full p-1 bg-yellow-200">
           <div className="w-5 h-5 m1-2 mr-2">
             <svg
@@ -775,8 +775,17 @@ Gemini <ChevronDown/>
             Gemini
           </Link>
         </button>
-      </div> */}
-     
+      </div>
+      {showPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-gray-600 w-96 p-4 rounded-lg shadow-lg text-center">
+            <h2 className="text-xl font-semibold mb-4">Welcome back</h2>
+            <p className="mb-4">Log in or sign up to get smarter responses, upload files and images, and more.</p>
+            <button onClick={() => handleRedirect('/login')} className="w-full px-2 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100">Log in</button>
+            <button onClick={() => handleRedirect('/signup')} className="w-full px-2 py-2 bg-transparent text-white border border-white rounded-full  hover:bg-gray-600">Sign up</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
