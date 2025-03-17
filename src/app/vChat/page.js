@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useChat} from ".././chatContext";
+import { useChat} from "../chatContext";
 import Image from "next/image";
 import Navbar from "../navbar";
 import Header from "../header"

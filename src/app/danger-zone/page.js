@@ -187,7 +187,7 @@ export default function DangerZonePage() {
 
   return (
     <div className="flex w-full justify-between bg-gray-50 text-sm">
-      <div className="min-h-screen bg-gray-50 flex flex-col ml-auto w-4/5">
+      <div className="min-h-screen  mt-12 bg-gray-50 flex flex-col ml-auto w-4/5">
         <Toaster position="buttom-right" richColors />
 
         <div className="flex gap-7 p-6">

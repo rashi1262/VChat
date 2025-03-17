@@ -5,7 +5,7 @@ import React from "react";
 import Link from "next/link";
 import Navbar from "../navbar";
 import { useRouter } from "next/navigation";
-import { useChat} from ".././chatContext";
+import { useChat} from "../chatContext";
 
 const page = () => {
   const [name, setName] = useState("");

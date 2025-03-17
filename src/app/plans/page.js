@@ -22,7 +22,7 @@ export default function PlansPage() {
 
   return (
     <div className="flex w-full justify-between bg-gray-50 text-sm">
-      <div className="min-h-screen bg-gray-50 flex flex-col   ml-auto w-4/5">
+      <div className="min-h-screen  mt-12 bg-gray-50 flex flex-col   ml-auto w-4/5">
         <div className="flex gap-8 p-10">
           <Sidebar />
 

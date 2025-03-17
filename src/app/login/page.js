@@ -23,6 +23,7 @@ const Login = () => {
     if (session?.user) {
       try {
         localStorage.setItem("user", JSON.stringify(session.user));
+        localStorage.setItem("hasLoggedIn", true);
         router.push("/model");
       } catch (error) {
         toast.error("Error saving user data");
@@ -86,6 +87,7 @@ const Login = () => {
       };
 
       localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("hasLoggedIn", true);
       toast.success("Login successful!");
       setIsLogin(true);
       router.push("/model");
