@@ -161,6 +161,7 @@ const page = () => {
     <>
       <div className="flex w-full justify-between bg-gray-50">
      <Navbar/>
+    
         {msg?(        <>
    <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
      <Navbar />
@@ -232,13 +233,99 @@ const page = () => {
     
    </div>
  </>):(
-  <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  ml-auto w-4/5">
-          <div className="max-w-4xl w-full   rounded-md p-6 text-center ">
-            <h1 className="text-3xl  text-gray-600 mb-16">
+  <>
+  <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center  md:hidden">
+
+<div className="max-w-4xl w-full  rounded-md p-6 text-center">
+
+
+  <h1 className="text-3xl mt-48 text-gray-600 ">
+    How can I help you today?
+  </h1>
+
+  <div className="mb-5 ml-5 w-3/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
+    {/* <button className="ml-2 p-2 rounded-full bg-white">
+      <div className="w-7 h-6 p-1 ">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 18 18"
+          className="text-gray-400 CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+        >
+          <path
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.5"
+            d="M9 3.75v10.5M3.75 9h10.5"
+          ></path>
+        </svg>
+      </div>
+    </button> */}
+
+    <input
+      type="text"
+      value={prompt}
+      onChange={(e) => setPrompt(e.target.value)}
+      onKeyDown={handleKeyDown}
+      placeholder="Send a message..."
+      className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
+    />
+    {/* <button className="p-1 rounded-full bg-gray-200">
+      <div className="w-7 h-6 p-1 ">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 18 18"
+          className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+        >
+          <path
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.5"
+            d="M2.25 7.5v3m3.375-6v9M9 2.25v13.5M12.375 4.5v9m3.375-6v3"
+          ></path>
+        </svg>
+      </div>
+    </button> */}
+    <button
+      onClick={handleResponse}
+      className="p-1 mr-2 rounded-full bg-gray-200 flex items-center justify-center bg-white"
+    >
+      {loading ? (
+        <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+      ) : (
+        <div className="w-7 h-6 p-1">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 18 18"
+            className="text-gray-400 CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+          >
+            <path
+              fill="currentColor"
+              fillRule="evenodd"
+              d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
+              clipRule="evenodd"
+            ></path>
+          </svg>
+        </div>
+      )}
+    </button>
+  </div>
+</div>
+</div>
+  <div className="min-h-screen md:block bg-gray-50 flex flex-col items-center justify-center  ml-auto w-4/5 hidden">
+  <div className="max-w-4xl w-full rounded-md p-6 text-center ml-auto mr-auto ">
+  <h1 className="text-3xl mt-48  text-gray-600 mb-16">
               How can I help you today?
             </h1>
             <div className="grid grid-cols-4 gap-6">
-              <div className="relative border rounded-md p-4 hover:shadow-lg">
+              <div className="relative border rounded-md p-4 hover:bg-white cursor-pointer"
+              onClick={() =>
+                setPrompt("Solve a debate: is a tamato a fruit or a vegetable?")
+              }>
                 <div className="w-10 h-10 mb-2">
                   {" "}
                   <svg
@@ -277,7 +364,10 @@ const page = () => {
                   "Solve a debate: is a tamato a fruit or a vegetable?"
                 </p>
               </div>
-              <div className="relative border rounded-md p-4 hover:shadow-lg">
+              <div className="relative border rounded-md p-4 hover:bg-white cursor-pointer"
+               onClick={() =>
+                setPrompt( "Help me write a cover letter.Ask me about my education to get started")
+              }>
                 <div className="w-10 h-10 mb-2">
                   {" "}
                   <svg
@@ -317,7 +407,10 @@ const page = () => {
                   started"
                 </p>
               </div>
-              <div className="relative border rounded-md p-4 hover:shadow-lg">
+              <div className="relative border rounded-md p-4 hover:bg-white cursor-pointer"
+               onClick={() =>
+                setPrompt("Help me plan meals for the week.")
+              }>
                 <div className="w-10 h-10 mb-2">
                   {" "}
                   <svg
@@ -356,7 +449,10 @@ const page = () => {
                   "Help me plan meals for the week."
                 </p>
               </div>
-              <div className="relative border rounded-md p-4 hover:shadow-lg">
+              <div className="relative border rounded-md p-4 hover:bg-white cursor-pointer"
+               onClick={() =>
+                setPrompt( "Can you help me write a function?")
+              }>
                 <div className="w-10 h-10 mb-2">
                   {" "}
                   <svg
@@ -396,14 +492,14 @@ const page = () => {
                   "Can you help me write a function?"
                 </p>
               </div>
-              <div className="mb-5 ml-20 w-2/5 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
-              <button className="ml-2 p-2 rounded-full bg-gray-200">
+              <div className="mb-5 ml-20 w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
+              {/* <button className="ml-2 p-2 rounded-full bg-white">
                 <div className="w-7 h-6 p-1 ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 18 18"
-                    className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+                    className="text-gray-400 CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
                   >
                     <path
                       stroke="currentColor"
@@ -414,7 +510,8 @@ const page = () => {
                     ></path>
                   </svg>
                 </div>
-              </button>
+              </button> */}
+
               <input
                 type="text"
                 value={prompt}
@@ -423,7 +520,7 @@ const page = () => {
                 placeholder="Send a message..."
                 className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
               />
-              <button className="p-1 rounded-full bg-gray-200">
+              {/* <button className="p-1 rounded-full bg-gray-200">
                 <div className="w-7 h-6 p-1 ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -440,31 +537,41 @@ const page = () => {
                     ></path>
                   </svg>
                 </div>
-              </button>
-              <button onClick={handleResponse}  className="p-1 mr-2 rounded-full bg-gray-200">
-                <div className="w-7 h-6 p-1 ">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 18 18"
-                    className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
-                  >
-                    <path
-                      fill="currentColor"
-                      fillRule="evenodd"
-                      d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
-                </div>
+              </button> */}
+              <button
+                onClick={handleResponse}
+                className="p-1 mr-2 rounded-full bg-gray-200 flex items-center justify-center bg-white"
+              >
+                {loading ? (
+                  <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <div className="w-7 h-6 p-1">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 18 18"
+                      className="text-gray-400 CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+                    >
+                      <path
+                        fill="currentColor"
+                        fillRule="evenodd"
+                        d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                  </div>
+                )}
               </button>
             </div>
             </div>
          
           </div>
-        </div>)}
+        </div>
+  </>
+  
+  )}
       </div>
-      <div className="fixed top-3 right-5 flex items-center ">
+      <div className="fixed md:block top-3 right-5  items-center hidden">
         <button className="flex items-center">
           <Link
             href="/deepSeek"

@@ -131,7 +131,7 @@ const Login = () => {
             Continue with Google
           </button>
 
-          <button
+          {/* <button
             onClick={handleAppleLogin}
             className="flex items-center justify-center gap-2 p-2 border border-gray-300 rounded bg-white text-gray-600"
             disabled={isLoading}
@@ -143,7 +143,7 @@ const Login = () => {
               alt="Apple logo"
             />
             Continue with Apple
-          </button>
+          </button> */}
 
           <div className="flex items-center my-4">
             <hr className="flex-grow border-t border-gray-300" />
