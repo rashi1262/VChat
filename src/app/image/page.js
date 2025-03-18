@@ -71,83 +71,79 @@ const page = () => {
         fetchUserChats();
       }, [userId]);
       
-    const handleResponse = async () => {
-      if(prompt==''){return;}
-      setLoading(true);
-      try {
-        const current = prompt
-        setMsg(current)
-        setPrompt("")
-        const searchRes = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_BASE_URL
-          }/chatbot/search?message=${encodeURIComponent(current)}`
-        );
-        
-        if (!searchRes.ok) throw new Error("Error fetching bot response");
-  
-        const data = await searchRes.text();
-        const formattedResponse = data
-          .split(/[*-]\s+/)
-          .filter((point) => point.trim())
-          .join(" ");
-  
-        setResponse(formattedResponse);
-        
-  
-        const createChatRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/create`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              userSearch: [
-                { userMessage: prompt, botResponse: formattedResponse},
-              ],
-              userId,
-              type:"ImageGeneration"
-            }),
-          }
-        );
-  
-        
-  
-        if (!createChatRes.ok) throw new Error("Failed to create chat");
-  
-        const chatData = await createChatRes.json();
-        
-        const chatHistoryRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${chatData.id}`
-        );
-  
-        if (!chatHistoryRes.ok) throw new Error("Failed to fetch chat history");
-  
-        const chatHistory = await chatHistoryRes.json();
-  
-        if (chatHistory.userSearch?.length > 0 && chatHistory.userId === userId) {
-          const firstMessage = chatHistory.userSearch[0];
-  
-          setChatThread((prev) => {
-            const chatExists = prev.some((chat) => chat.chatId === chatData.id);
-            if (!chatExists) {
-              return [
-                ...prev,
-                { chatId: chatData.id, message: firstMessage.userMessage},
-              ];
-            }
-            return prev;
-          });
-          
-        }
-  
-        router.push(`/chat/${chatData.id}`);
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-        setError(error.message);
-      }
-    };
+      const handleResponse = async () => {
+        if (prompt.trim() === "") return;
     
+        setLoading(true);
+        try {
+          const current = prompt;
+          setMsg(current);
+          setPrompt("");
+    
+          const searchRes = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/generate-image?userId=${userId}&prompt=${encodeURIComponent(
+              current
+            )}`
+          );
+    
+          if (!searchRes.ok) throw new Error("Error fetching bot response");
+    
+          const data = await searchRes.json(); // Properly parse JSON response
+          const formattedResponse = data.imageUrl || "No Image URL"; // Extract image URL
+    
+          setResponse(formattedResponse);
+    
+          const createChatRes = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/create`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                userSearch: [
+                  { userMessage: current, botResponse: formattedResponse },
+                ],
+                userId,
+                type: "ImageGeneration",
+              }),
+            }
+          );
+    
+          if (!createChatRes.ok) throw new Error("Failed to create chat");
+    
+          const chatData = await createChatRes.json();
+    
+          // Fetch chat history
+          const chatHistoryRes = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${chatData.id}`
+          );
+    
+          if (!chatHistoryRes.ok) throw new Error("Failed to fetch chat history");
+    
+          const chatHistory = await chatHistoryRes.json();
+    
+          if (chatHistory.userSearch?.length > 0 && chatHistory.userId === userId) {
+            const firstMessage = chatHistory.userSearch[0];
+    
+            setChatThread((prev) => {
+              const chatExists = prev.some((chat) => chat.chatId === chatData.id);
+              if (!chatExists) {
+                return [
+                  ...prev,
+                  { chatId: chatData.id, message: firstMessage.userMessage },
+                ];
+              }
+              return prev;
+            });
+          }
+    
+          router.push(`/chat/${chatData.id}`);
+          setLoading(false);
+        } catch (error) {
+          setLoading(false);
+          setError(error.message);
+        }
+      };
+      
     
     const handleKeyDown = (e) => {
       if (e.key === "Enter") {

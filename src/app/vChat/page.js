@@ -17,9 +17,13 @@ const page = ({ params }) => {
   const [error, setError] = useState("");
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState("");
+  const [responses, setResponses] = useState([]);
+ const[selected,setSelected] = useState("")
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState(null);
   const[msg,setMsg] = useState('')
+
+  const [messages,setMessages] = useState([])
   
   const router = useRouter();
   const [showButtons, setShowButtons] = useState(false);
@@ -85,82 +89,7 @@ const page = ({ params }) => {
       fetchUserChats();
     }, [userId]);
     
-  const handleResponse = async () => {
-    if(prompt==''){return;}
-    setLoading(true);
-    try {
-      const current = prompt
-      setMsg(current)
-      setPrompt("")
-      const searchRes = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_BASE_URL
-        }/chatbot/search?message=${encodeURIComponent(current)}`
-      );
-      
-      if (!searchRes.ok) throw new Error("Error fetching bot response");
 
-      const data = await searchRes.text();
-      const formattedResponse = data
-        .split(/[*-]\s+/)
-        .filter((point) => point.trim())
-        .join(" ");
-
-      setResponse(formattedResponse);
-      
-
-      const createChatRes = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/create`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userSearch: [
-              { userMessage: prompt, botResponse: formattedResponse},
-            ],
-            userId,
-            type:"Gemini"
-          }),
-        }
-      );
-
-      
-
-      if (!createChatRes.ok) throw new Error("Failed to create chat");
-
-      const chatData = await createChatRes.json();
-      
-      const chatHistoryRes = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${chatData.id}`
-      );
-
-      if (!chatHistoryRes.ok) throw new Error("Failed to fetch chat history");
-
-      const chatHistory = await chatHistoryRes.json();
-
-      if (chatHistory.userSearch?.length > 0 && chatHistory.userId === userId) {
-        const firstMessage = chatHistory.userSearch[0];
-
-        setChatThread((prev) => {
-          const chatExists = prev.some((chat) => chat.chatId === chatData.id);
-          if (!chatExists) {
-            return [
-              ...prev,
-              { chatId: chatData.id, message: firstMessage.userMessage, type:'Gemini' },
-            ];
-          }
-          return prev;
-        });
-        
-      }
-
-      router.push(`/chat/${chatData.id}`);
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      setError(error.message);
-    }
-  };
   
   
   const handleKeyDown = (e) => {
@@ -174,86 +103,201 @@ const page = ({ params }) => {
   const getChatById = (c) => {
     router.push(`/chat/${c}`);
   };
+  const handleResponse = async () => {
+    if (prompt === "") return;
+    setLoading(true);
+  
+    try {
+      const current = prompt;
+      setSelected(prompt)
+      setMsg(current);
+      setPrompt("");
+      
+  
+      const cleanUserId = userId.trim();
+      const geminiRes = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/search?userId=${encodeURIComponent(cleanUserId)}&message=${encodeURIComponent(current)}`
+      );
+      const openAIRes = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/openai?userId=${encodeURIComponent(cleanUserId)}&message=${encodeURIComponent(current)}`
+      );
+  
+      if (!geminiRes.ok || !openAIRes.ok) throw new Error("Error fetching bot response");
+  
+      const geminiData = await geminiRes.json(); // Parse as JSON
+      const openAIData = await openAIRes.json(); // Parse as JSON
+  
+      setResponses([
+        { text: geminiData.botResponse, type: "Gemini" },
+        { text: openAIData.botResponse, type: "OpenAI" },
+      ]);
+  
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      setError(error.message);
+    }
+  };
+  
 
- 
+
+  const chooseResponse = async (chosenResponse, modelType) => {
+    try { 
+      console.log('clicked');
+      
+      const createChatRes = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/create`,
+
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userSearch: [{ userMessage: selected, botResponse: chosenResponse }],
+            userId,
+            type: modelType, 
+          }),
+        }
+      );
+  
+      if (!createChatRes.ok) throw new Error("Failed to create chat");
+  
+      const chatData = await createChatRes.json();
+  
+      const chatHistoryRes = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${chatData.id}`
+      );
+  
+      if (!chatHistoryRes.ok) throw new Error("Failed to fetch chat history");
+  
+      const chatHistory = await chatHistoryRes.json();
+  
+      if (chatHistory.userSearch?.length > 0 && chatHistory.userId === userId) {
+        const firstMessage = chatHistory.userSearch[0];
+  
+        setChatThread((prev) => {
+          const chatExists = prev.some((chat) => chat.chatId === chatData.id);
+          if (!chatExists) {
+            return [
+              ...prev,
+              {
+                chatId: chatData.id,
+                message: firstMessage.userMessage,
+                type: modelType,
+              },
+            ];
+          }
+          return prev;
+        });
+      }
+  
+      router.push(`/chat/${chatData.id}`);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+  
+  const handleResponseSelection = (selectedResponse) => {
+    chooseResponse(selectedResponse.text, selectedResponse.type);
+  };
+  
+  
+
+
   return (
     <div className="bg-gray-50">
       <div className="flex w-full justify-between bg-gray-50 text-sm">
       <Navbar/>
  
   
-        {msg?  (
-   <>
-   <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
-     <Navbar />
+      {msg ? (
+  <>
+    <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
+      <Navbar />
 
-     <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center  w-[80%]">
-       <div
-         className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  "
-         
-       >
-         <div className="flex flex-col sticky  h-full w-full ">
+      <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center w-[80%]">
+      {loading &&  <div className="max-w absolute top-4 overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center mt-20">
+          <div className="flex flex-col sticky h-full w-full">
+            {/* Skeleton Loader (Only Show When No Responses Exist) */}
+            {responses.length === 0 && (
+              <div className="flex flex-col gap-1 mr-36">
+                {Array(1).fill(0).map((_, index) => (
+                  <div key={index} className="animate-pulse flex flex-col gap-1 mr-36">
+                    {/* User Message Skeleton */}
+                    <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
+                    {/* Response Skeleton */}
+                    <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>}
+
       
 
-<div className="flex flex-col gap-1 mr-36">
- {Array(1)
-   .fill(0)
-   .map((_, index) => (
-     <div key={index} className="animate-pulse flex flex-col gap-1 mr-36">
-       {/* User Message Skeleton */}
-       <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
 
-       {/* Response Skeleton */}
-       <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
-     </div>
-   ))}
-</div>
 
-         </div>
+{responses.length > 0 && (
+  <div className="w-full flex flex-col items-center mt-5">
+    <p className="text-gray-500 text-sm mb-2">Which response would u like :</p>
+     <p className="text-xs">your response will help vchat get better</p>
+    <div className="flex justify-center items-center gap-8 w-full">
+      {responses.map((response, index) => (
+        <div
+          key={index}
+          className="w-full h-[60vh] overflow-y-scroll max-w-md p-4 border rounded-md shadow-md text-center cursor-pointer hover:border hover:border-purple-500 hover:border-2"
+          onClick={(e) => {  
+            e.preventDefault();
+            e.stopPropagation();
+           chooseResponse(response.text, response.type)}}
+        >
+          <p className="text-gray-800">{response.text}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
 
-         <div className="mb-5 ml-20 w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
-           <input
-             type="text"
-             value={prompt}
-             onChange={(e) => setPrompt(e.target.value)}
-             onKeyDown={handleKeyDown}
-             placeholder="Send a message..."
-             className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
-           />
+    
 
-           <button
-             onClick={handleResponse}
-             className=" p-1 mr-2 rounded-full bg-white flex items-center justify-center"
-           >
-             {loading ? (
-               <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-             ) : (
-               <div className="w-7 h-6 p-1">
-                 <svg
-                   xmlns="http://www.w3.org/2000/svg"
-                   fill="none"
-                   viewBox="0 0 18 18"
-                   className="text-gray-400 CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
-                 >
-                   <path
-                     fill="currentColor"
-                     fillRule="evenodd"
-                     d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
-                     clipRule="evenodd"
-                   ></path>
-                 </svg>
-               </div>
-             )}
-           </button>
-         </div>
-       </div>
-     </div>
-   </div>
+       
+        <div className="mb-5 w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2 rounded-full">
+          <input
+            type="text"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Send a message..."
+            className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
+          />
 
-   <div className="fixed top-3 right-5 flex items-center ">
-     
-   </div>
- </>):       
+          <button onClick={handleResponse} className="p-1 mr-2 rounded-full bg-white flex items-center justify-center">
+            {loading ? (
+              <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <div className="w-7 h-6 p-1">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 18 18"
+                  className="text-gray-400"
+                >
+                  <path
+                    fill="currentColor"
+                    fillRule="evenodd"
+                    d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
+                    clipRule="evenodd"
+                  ></path>
+                </svg>
+              </div>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  </>
+)
+ :       
  (
   <>
   <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center  md:hidden">
