@@ -5,7 +5,7 @@ import React from "react";
 import Link from "next/link";
 import Navbar from "../navbar";
 import { useRouter } from "next/navigation";
-import { useChat} from ".././chatContext";
+import { useChat} from "../chatContext";
 
 const page = () => {
   const [name, setName] = useState("");
@@ -465,8 +465,8 @@ const page = () => {
           </div>
         </div>)}
       </div>
-      <div className="fixed top-3 right-5 flex items-center ">
-        {/* <button className="flex items-center text-black border rounded-l-full rounded-r-full p-1 bg-yellow-200">
+      {/* <div className="fixed top-3 right-5 flex items-center ">
+        <button className="flex items-center text-black border rounded-l-full rounded-r-full p-1 bg-yellow-200">
           <div className="w-5 h-5 m1-2 mr-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -484,7 +484,7 @@ const page = () => {
             </svg>
           </div>
           Go Pro
-        </button> */}
+        </button>
         <button className="flex items-center">
           <Link
             href="/openAIGPT-4o "
@@ -531,7 +531,7 @@ const page = () => {
             OpenAI GPT-4o
           </Link>
         </button>
-      </div>
+      </div> */}
     </>
   );
 };

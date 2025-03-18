@@ -26,7 +26,8 @@ export default function LoginConnectionPage() {
         setUser(parsedUser);
         setIsGmailUser(parsedUser.email);
       } else {
-        router.push("/login");
+        router.push("/model");
+        localStorage.setItem("hasLoggedIn", false);
       }
     }
   }, [session, router]);
@@ -36,7 +37,7 @@ export default function LoginConnectionPage() {
     if (isGmailUser) {
       await signOut({ redirect: false });
       localStorage.removeItem("user");
-      router.push("/login");
+      router.push("/model");
     } else {
       await signIn("google");
     }
@@ -45,7 +46,7 @@ export default function LoginConnectionPage() {
 
   return (
     <div className="flex w-full justify-between bg-gray-50 text-sm">
-      <div className="min-h-screen bg-gray-50 flex flex-col ml-auto w-4/5">
+      <div className="min-h-screen  mt-12 bg-gray-50 flex flex-col ml-auto w-4/5">
         <div className="flex gap-7 p-6">
           <Sidebar />
 

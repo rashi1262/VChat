@@ -270,8 +270,8 @@ const page = () => {
                 words!
               </h1>
             </div>
-            <div className="mb-5 ml-20 w-2/5 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
-              <button className="ml-2 p-2 rounded-full bg-gray-200">
+            <div className="mb-5 ml-20 w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
+              {/* <button className="ml-2 p-2 rounded-full bg-gray-200">
                 <div className="w-7 h-6 p-1 ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -288,7 +288,7 @@ const page = () => {
                     ></path>
                   </svg>
                 </div>
-              </button>
+              </button> */}
               <input
                 type="text"
                 value={prompt}
@@ -297,7 +297,7 @@ const page = () => {
                 placeholder="Send a message..."
                 className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
               />
-              <button  className="p-1 rounded-full bg-gray-200">
+              {/* <button  className="p-1 rounded-full bg-gray-200">
                 <div className="w-7 h-6 p-1 ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -314,14 +314,14 @@ const page = () => {
                     ></path>
                   </svg>
                 </div>
-              </button>
-              <button onClick={handleResponse}  className="p-1 mr-2 rounded-full bg-gray-200">
+              </button> */}
+              <button onClick={handleResponse}  className="p-1 mr-2 rounded-full bg-white">
                 <div className="w-7 h-6 p-1 ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 18 18"
-                    className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+                    className=" text-gray-400 CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
                   >
                     <path
                       fill="currentColor"
@@ -336,8 +336,8 @@ const page = () => {
           </div>
         </div>)}
       </div>
-      <div className="fixed top-3 right-5 flex items-center ">
-        {/* <button className="flex items-center text-black border rounded-l-full rounded-r-full p-1 bg-yellow-200">
+      {/* <div className="fixed top-3 right-5 flex items-center ">
+        <button className="flex items-center text-black border rounded-l-full rounded-r-full p-1 bg-yellow-200">
           <div className="w-5 h-5 m1-2 mr-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -355,7 +355,7 @@ const page = () => {
             </svg>
           </div>
           Go Pro
-        </button> */}
+        </button>
         <button className="flex items-center">
           <Link
             href="/image"
@@ -390,7 +390,7 @@ const page = () => {
             Image Generation
           </Link>
         </button>
-      </div>
+      </div> */}
     </>
   );
 };
