@@ -115,6 +115,7 @@ const ChatPage = ({ params }) => {
       }
     }
   }, []);
+  const [generatedImage, setGeneratedImage] = useState(null);
 
   useEffect(() => {
   
@@ -141,91 +142,119 @@ const ChatPage = ({ params }) => {
     };
 
     fetchUserChats();
+
   }, [userId]);
 
   const getChatById = (c) => {
     router.push(`/chat/${c}`);
   };
-
   const fetchBotResponse = async () => {
-    
     try {
       const searchRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${id}`
       );
-
+  
       if (!searchRes.ok) {
         throw new Error("Error fetching bot response");
-      } 
-      setisLoading(false)
-     
+      }
+  
+      setisLoading(false);
+  
       const data = await searchRes.json();
-      setChatModel(data?.type)
+      setChatModel(data?.type);
+  
       const formattedChats = (data?.userSearch || []).map((chat) => ({
         ...chat,
         parsedResponse: extractCodeBlocks(chat.botResponse),
       }));
-
+  
       setChatHistory(formattedChats);
+  
+      
+      if (data?.type === "ImageGeneration") {
+        const imageResponse = formattedChats.find((chat) => chat.botResponse)?.botResponse;
+        setGeneratedImage(imageResponse);
+      }
+  
     } catch (error) {
       setError(error.message);
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handleAddChat = async () => {
     if (!id || !moreChat) return;
-
+  
     const currentPrompt = moreChat;
-
     setMorePrompt(currentPrompt);
     setMoreChat("");
     setLoading(true);
-
+  
     try {
-      const searchRes = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_BASE_URL
-        }/chatbot/search?message=${encodeURIComponent(currentPrompt)}`
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${id}`
       );
-
-      if (!searchRes.ok) {
-        throw new Error("Error fetching bot response");
-      }
-
-      const data = await searchRes.text();
-      const formattedResponse = extractCodeBlocks(data);
-
-      const newChat = {
-        userMessage: currentPrompt,
-        botResponse: data,
-        parsedResponse: formattedResponse,
-      };
-
-      setChatHistory((prevChats) => [...prevChats, newChat]);
       
-      setLoading(false);
-      await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ userSearch: [newChat] }),
-        }
-      );
-
-     
-      scrollToBottom();
-      setMorePrompt("");
-      setMoreResponse("");
+      if (!response.ok) {
+        throw new Error("Error fetching existing chat data");
+      }
+  
+      const chatData = await response.json();
+      const existingUserSearch = chatData?.userSearch || [];
+  
+      let newChat;
+  
+      if (chatModel === "ImageGeneration") {
+        const imageRes = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/generate-image?userId=${userId}&prompt=${encodeURIComponent(currentPrompt)}`
+        );
+  
+        if (!imageRes.ok) throw new Error("Error generating image");
+  
+        const imageData = await imageRes.json();
+  
+        newChat = {
+          userMessage: currentPrompt,
+          botResponse: imageData.imageUrl,
+          parsedResponse: null,
+        };
+        
+        setGeneratedImage(imageData.imageUrl);
+      } else {
+        const searchRes = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/search?message=${encodeURIComponent(currentPrompt)}`
+        );
+  
+        if (!searchRes.ok) throw new Error("Error fetching bot response");
+  
+        const data = await searchRes.json();
+        const formattedResponse = extractCodeBlocks(data);
+  
+        newChat = {
+          userMessage: currentPrompt,
+          botResponse: data,
+          parsedResponse: formattedResponse,
+        };
+      }
+  
+      const updatedUserSearch = [...existingUserSearch, newChat];
+  
+      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userSearch: updatedUserSearch }),
+      });
+  
+      setChatHistory(updatedUserSearch);
     } catch (error) {
-      setError(error.message);
+      console.error("Error adding new chat:", error);
+    } finally {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
    
@@ -473,16 +502,14 @@ const ChatPage = ({ params }) => {
       .fill(0)
       .map((_, index) => (
         <div key={index} className="animate-pulse flex flex-col gap-1 mr-36">
-          {/* User Message Skeleton */}
           <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
 
-          {/* Response Skeleton */}
           <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
         </div>
       ))}
   </div>
 ) : (
-  // 🔵 Actual Chat Data
+
   chatHistory.map((chat, index) => (
     <div key={index} className="flex flex-col gap-1 ">
       <div className="flex flex-col overflow-y-auto max-h-[500px]">
@@ -552,30 +579,7 @@ const ChatPage = ({ params }) => {
         </div>
       </div>
 
-      <div className="ml-20 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
-        {chat.parsedResponse.map((part, i) =>
-          part.type === "code" ? (
-            <div key={i} className="relative">
-              <pre className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto relative">
-                <code>{part.content}</code>
-              </pre>
-              <button
-                onClick={() => handleCopy(part.content, i)}
-                className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white p-1 rounded"
-              >
-                <Clipboard size={16} />
-              </button>
-              {copiedIndex === i && (
-                <span className="absolute top-2 right-10 bg-gray-700 text-white px-2 py-1 text-xs rounded">
-                  Copied!
-                </span>
-              )}
-            </div>
-          ) : (
-            <span key={i}>{part.content}</span>
-          )
-        )}
-      </div>
+    g
     </div>
   ))
 )
@@ -642,16 +646,13 @@ const ChatPage = ({ params }) => {
       .fill(0)
       .map((_, index) => (
         <div key={index} className="animate-pulse flex flex-col gap-1 mr-36">
-          {/* User Message Skeleton */}
           <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
 
-          {/* Response Skeleton */}
           <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
         </div>
       ))}
   </div>
 ) : (
-  // 🔵 Actual Chat Data
   chatHistory.map((chat, index) => (
     <div key={index} className="flex flex-col gap-1 mr-36">
       <div className="flex flex-col overflow-y-auto max-h-[500px]">
@@ -721,7 +722,10 @@ const ChatPage = ({ params }) => {
         </div>
       </div>
 
-      <div className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
+      {chatModel==="ImageGeneration"? (<div  className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
+        <div> <img src={generatedImage} alt="img"/> </div>
+      </div>):
+      (<div className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
         {chat.parsedResponse.map((part, i) =>
           part.type === "code" ? (
             <div key={i} className="relative">
@@ -744,7 +748,7 @@ const ChatPage = ({ params }) => {
             <span key={i}>{part.content}</span>
           )
         )}
-      </div>
+      </div>)}
     </div>
   ))
 )

@@ -202,7 +202,7 @@ const page = () => {
               </li>
               <li>
                 <Link
-                  href="/vchat"
+                  href="/vChat"
                   className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded text-sm"
                 >
                   <div className="w-8  h-[2%] p-1 ">
