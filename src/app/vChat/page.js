@@ -9,6 +9,8 @@ import Image from "next/image";
 import Navbar from "../navbar";
 import Header from "../header"
 import { ChevronDown } from "lucide-react";
+import { toast, Toaster } from "sonner";
+
 const page = ({ params }) => {
   const { chatThread, setChatThread } = useChat();
 
@@ -121,7 +123,14 @@ const page = ({ params }) => {
       const openAIRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/openai?userId=${encodeURIComponent(cleanUserId)}&message=${encodeURIComponent(current)}`
       );
-  
+       
+       
+                 if (geminiRes.status === 402 || openAIRes.status===400) {
+                   toast.error("Insufficient credits");
+                   setMsg(null);
+                   setLoading(false);
+                   return; // Stop further execution
+                 }
       if (!geminiRes.ok || !openAIRes.ok) throw new Error("Error fetching bot response");
   
       const geminiData = await geminiRes.json(); // Parse as JSON
@@ -205,6 +214,8 @@ const page = ({ params }) => {
 
   return (
     <div className="bg-gray-50">
+                          <Toaster position="top-center" richColors />
+      
       <div className="flex w-full justify-between bg-gray-50 text-sm">
       <Navbar/>
  
@@ -217,7 +228,6 @@ const page = ({ params }) => {
       <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center w-[80%]">
       {loading &&  <div className="max-w absolute top-4 overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center mt-20">
           <div className="flex flex-col sticky h-full w-full">
-            {/* Skeleton Loader (Only Show When No Responses Exist) */}
             {responses.length === 0 && (
               <div className="flex flex-col gap-1 mr-36">
                 {Array(1).fill(0).map((_, index) => (

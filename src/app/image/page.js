@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Navbar from "../navbar";
 import { useRouter } from "next/navigation";
 import { useChat} from ".././chatContext";
+import { toast, Toaster } from "sonner";
 
 
 const page = () => {
@@ -85,6 +86,16 @@ const page = () => {
               current
             )}`
           );
+
+
+          
+
+          if (searchRes.status === 400) {
+            toast.error("Insufficient credits");
+            setMsg(null);
+            setLoading(false);
+            return; // Stop further execution
+          }
     
           if (!searchRes.ok) throw new Error("Error fetching bot response");
     
@@ -108,6 +119,8 @@ const page = () => {
             }
           );
     
+
+      
           if (!createChatRes.ok) throw new Error("Failed to create chat");
     
           const chatData = await createChatRes.json();
@@ -158,6 +171,8 @@ const page = () => {
   return (
     <>
       <div className="flex w-full justify-between bg-gray-50">
+                    <Toaster position="top-center" richColors />
+        
         <Navbar/>
        {msg? (
         <>
