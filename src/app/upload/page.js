@@ -5,7 +5,9 @@ import Link from "next/link";
 import Navbar from "../navbar";
 import { useChat} from ".././chatContext";
 import { useRouter } from "next/navigation";
+import { useCredits } from "@/context/creditContext";
 const page = () => {
+  const {hasCredits} = useCredits()
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [file, setFile] = useState(null);
 
@@ -266,7 +268,7 @@ const page = () => {
 
   return (
     <>
-      <div className="flex w-full justify-between bg-gray-50">
+   {hasCredits?(   <div className="flex w-full justify-between bg-gray-50">
         <Navbar/>
      {msg?  (
    <>
@@ -438,48 +440,26 @@ const page = () => {
           </div>
         </div>)}
   
-      </div>  
-      
-      {/* <div className="fixed top-3 right-5 flex items-center ">
-        <button className="flex items-center">
-          <Link
-            href="/upload"
-            className="flex items-center hover:bg-gray-200 rounded text-black text-base p-2"
+      </div>  ):(<div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
+      <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center">
+        <h2 className="text-2xl  font-bold">Insufficient Credit</h2>
+        <p className=" p-2  text-lg ">
+          You hit your free credit limit .Please Consider buying our plans for uninterrupted services
+        </p>
+        <div className=" p-2 mt-4">
+          <button
+            onClick={() => handleRedirect("/plans")}
+            className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
           >
-            <div className="w-8 h-7 pl-1 pr-1  ">
-              <svg
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 42 42"
-                className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
-              >
-                <path
-                  d="M.5 21C.5 9.678 9.678.5 21 .5S41.5 9.678 41.5 21 32.322 41.5 21 41.5.5 32.322.5 21Z"
-                  fill="#fff"
-                ></path>
-                <rect
-                  x="0.656"
-                  y="0.656"
-                  width="40.688"
-                  height="40.688"
-                  rx="20.344"
-                  stroke="#EEE"
-                  strokeWidth="1.313"
-                ></rect>
-                <path
-                  d="M27.918 17.253 22.7 12.036v5.217h5.217Z"
-                  fill="#D47070"
-                ></path>
-                <path
-                  d="M22.7 18.744c-.822 0-1.49-.669-1.49-1.491v-5.217h-5.217a1.49 1.49 0 0 0-1.491 1.49v14.907a1.49 1.49 0 0 0 1.49 1.49l10.435.002c.823 0 1.491-.668 1.491-1.49v-9.691h-5.217Z"
-                  fill="#D47070"
-                ></path>
-              </svg>
-            </div>
-            Upload & Ask PDF
-          </Link>
-        </button>
-      </div> */}
+            Show Plans
+          </button>
+          
+        </div>
+       
+      </div>
+    </div>)}
+      
+      
     </>
   );
 };

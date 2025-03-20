@@ -6,9 +6,7 @@ import { useChat } from "../../chatContext";
 import { useRouter } from "next/navigation";
 import { Edit, Pencil } from "lucide-react";
 import { Clipboard } from "lucide-react";
-import { useCredits } from "@/context/creditContext";
 const ChatPage = ({ params }) => {
-  const {hasCredits} = useCredits()
   const { id } = use(params);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -110,26 +108,11 @@ const ChatPage = ({ params }) => {
       let newBotResponse, newParsedResponse;
       setLoading(true)
   
-      if (chatModel === "ImageGeneration") {
-        console.log("Generating updated image for prompt:", editMessage);
-        const imageRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/generate-image?userId=${encodeURIComponent(
-            userId
-          )}&prompt=${encodeURIComponent(editMessage)}`
-        );
-  
-        if (!imageRes.ok) throw new Error("Error generating image");
-  
-        const imageData = await imageRes.json();
-        newBotResponse = imageData.imageUrl;
-        newParsedResponse = null; 
-      } 
-      else {
+     
         console.log("Fetching updated bot response for:", editMessage);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/search?userId=${encodeURIComponent(
-            userId
-          )}&message=${encodeURIComponent(editMessage)}`
+            `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/openai?userId=${encodeURIComponent(userId)}&message=${encodeURIComponent(editMessage)}`
+
         );
   
         if (!response.ok) throw new Error("Error fetching updated bot response");
@@ -139,7 +122,7 @@ const ChatPage = ({ params }) => {
   
         newBotResponse = data.botResponse;
         newParsedResponse = extractCodeBlocks(newBotResponse);
-      }
+      
   
       setChatHistory((prevChats) =>
         prevChats.map((chat, i) =>  
@@ -257,7 +240,6 @@ const ChatPage = ({ params }) => {
           parsedResponse: extractCodeBlocks(chat.botResponse),
         }))
       );
-      if (data?.type === "ImageGeneration") setGeneratedImage(data);
     } catch (error) {
       setError(error.message);
     } finally {
@@ -327,35 +309,12 @@ const ChatPage = ({ params }) => {
 
       let newChat;
 
-      if (chatModel === "ImageGeneration") {
-        console.log("Generating image for prompt:", moreChat);
-        const imageRes = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_BASE_URL
-          }/chatbot/generate-image?userId=${encodeURIComponent(
-            userId
-          )}&prompt=${encodeURIComponent(moreChat)}`
-        );
-        
-    
-        if (!imageRes.ok) throw new Error("Error generating image");
-
-        const imageData = await imageRes.json();
-        newChat = {
-          userMessage: moreChat,
-          botResponse: imageData.imageUrl,
-          parsedResponse: null,
-        };
-        setGeneratedImage(imageData.imageUrl);
-        setImgLoading(false)
-      } else {
+   
+      
         console.log("Fetching bot response for message:", moreChat);
         const searchRes = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_BASE_URL
-          }/chatbot/search?userId=${encodeURIComponent(
-            userId
-          )}&message=${encodeURIComponent(moreChat)}`
+            `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/openai?userId=${encodeURIComponent(userId)}&message=${encodeURIComponent(moreChat)}`
+
         );
 
         if (!searchRes.ok) throw new Error("Error fetching bot response");
@@ -368,13 +327,13 @@ const ChatPage = ({ params }) => {
         newChat = {
           userMessage: moreChat,
           botResponse: data.botResponse,
-           parsedResponse: extractCodeBlocks(data.botResponse)
-        };
-      }
+          parsedResponse: extractCodeBlocks(data.botResponse)
 
-      // Constructing the correct PUT request body
+        };
+      
+
       const requestBody = JSON.stringify({
-        id, // Ensuring ID is included in the request
+        id, 
         userSearch: [newChat],
       });
 
@@ -432,10 +391,9 @@ const ChatPage = ({ params }) => {
   }, [chatHistory]);
 
 
-
   return (
     <>
-    {hasCredits?(  <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
+      <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
         <Navbar />
         <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center  md:hidden">
           <div
@@ -671,21 +629,7 @@ const ChatPage = ({ params }) => {
                       </div>
                     </div>
 
-                    {chatModel === "ImageGeneration" && chat.botResponse ? <div className="ml-36 self-start">
-  {loading && chat.userMessage === morePrompt ? (
-    <div className="w-48 h-48 bg-gray-300 flex items-center justify-center rounded-xl">
-      <div className="w-8 h-8 border-4 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
-    </div>
-  ) : (
-    <img 
-      src={chat.botResponse} 
-
-      alt={`Generated image for ${chat.userMessage}`} 
-      className="rounded-xl max-w-96  h-auto" 
-    />
-  )}
-</div>
-:  (
+ 
       <div className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
         {(
           chat.parsedResponse && chat.parsedResponse.length > 0
@@ -714,7 +658,7 @@ const ChatPage = ({ params }) => {
           )
         )}
       </div>
-    ) }
+    
                   </div>
                 ))
               )}
@@ -774,26 +718,9 @@ const ChatPage = ({ params }) => {
             </div>
           </div>
         </div>
-      </div>):(<div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
-      <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center">
-        <h2 className="text-2xl  font-bold">Insufficient Credit</h2>
-        <p className=" p-2  text-lg ">
-          You hit your free credit limit .Please Consider buying our plans for uninterrupted services
-        </p>
-        <div className=" p-2 mt-4">
-          <button
-            onClick={() => handleRedirect("/plans")}
-            className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
-          >
-            Show Plans
-          </button>
-          
-        </div>
-       
       </div>
-    </div>)}
 
-     
+    
     </>
   );
 };

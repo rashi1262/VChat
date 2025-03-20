@@ -6,10 +6,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useChat } from ".././chatContext";
 import { toast, Toaster } from "sonner";
+import { useCredits } from "@/context/creditContext";
 
 import Navbar from "../navbar";
 import { ChevronDown } from "lucide-react";
 const page = ({ params }) => {
+  const {hasCredits} = useCredits()
   const { chatThread, setChatThread } = useChat();
   const [showPopup, setShowPopup] = useState(false);
 
@@ -25,27 +27,42 @@ const page = ({ params }) => {
   const router = useRouter();
   const [showButtons, setShowButtons] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+ const[creditPopup,setShowCreditPopup] = useState(false)
   useEffect(() => {
     const hasLoggedIn = localStorage.getItem("hasLoggedIn") === "true";
     if (hasLoggedIn) {
-      setShowPopup(false); // Popup hata do
+      setShowPopup(false); 
     } else {
-      // Agar login nahi hai toh 2 sec baad popup dikhao
       setShowPopup(true);
       
     }
   }, []);
+
+
+  useEffect(() => {
+    const hasCredits = localStorage.getItem("credits")
+    if (hasCredits == '0') {
+      setShowCreditPopup(false); 
+    } else {
+      setShowCreditPopup(true);
+      
+    }
+  }, []);
+
+
+
+
+
   const handleRedirect = (path) => {
     setShowPopup(false);
     if (path === "/login") {
-      // localStorage.setItem("hasLoggedIn", "true");
       setShowPopup(false);
     }
     window.location.href = path;
   };
 
-  console.log("showPopup ", showPopup);
+
+  
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -112,7 +129,9 @@ const handleResponse = async () => {
 
       );
       if (searchRes.status === 402) {
+        setShowCreditPopup(true)
         toast.error("Insufficient credits");
+       
         setMsg(null);
         setLoading(false);
         return; 
@@ -126,9 +145,7 @@ const handleResponse = async () => {
       
       
       const formattedResponse = data.botResponse
-        // .split(/[*-]\s+/)
-        // .filter((point) => point.trim())
-        // .join(" ");
+        
 
       setResponse(formattedResponse);
 
@@ -197,7 +214,8 @@ const handleResponse = async () => {
   };
 
   return (
-    <div className="bg-gray-50">
+<>
+  {hasCredits?(  <div className="bg-gray-50">``
             <Toaster position="top-center" richColors />
       
       <div className="flex w-full justify-between bg-gray-50 text-sm">
@@ -311,6 +329,12 @@ const handleResponse = async () => {
           </div>
         </div>
       )}
+
+       
+
+
+
+
                 {showButtons && (
                   <div className="flex flex-col  items-center justify-center  ">
                     <ul className="bg-gray-200  rounded-lg w-4/5">
@@ -844,7 +868,26 @@ const handleResponse = async () => {
           </div>
         </div>
       )}
-    </div>
+    </div>):(
+       <div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
+      <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center">
+        <h2 className="text-2xl  font-bold">Insufficient Credit</h2>
+        <p className=" p-2  text-lg ">
+          You hit your free credit limit .Please Consider buying our plans for uninterrupted services
+        </p>
+        <div className=" p-2 mt-4">
+          <button
+            onClick={() => handleRedirect("/plans")}
+            className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
+          >
+            Show Plans
+          </button>
+          
+        </div>
+       
+      </div>
+    </div>)}
+    </>
   );
 };
 

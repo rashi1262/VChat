@@ -31,76 +31,7 @@ const ChatPage = ({ params }) => {
   const [generatedImage, setGeneratedImage] = useState([]);
   console.log(chatHistory, "chatHistorychatHistory");
 
-  // const handleSaveEdit = async (index) => {
-  //   if (!editMessage.trim()) return;
-  
-  //   setLoading(true);
-  
-  //   try {
-  //     console.log("Fetching updated bot response for:", editMessage);
-  //     const response = await fetch(
-  //       `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/search?userId=${encodeURIComponent(userId)}&message=${encodeURIComponent(editMessage)}`
-  //     );
-  
-  //     if (!response.ok) throw new Error("Error fetching updated bot response");
-  
-  //     const data = await response.json(); 
-  //     console.log("Updated bot response received:", data);
-  
-  //     const newBotResponse = data.botResponse;
-  //     const newParsedResponse = extractCodeBlocks(newBotResponse);
-  
-  //     setChatHistory((prevChats) =>
-  //       prevChats.map((chat, i) =>
-  //         i === index
-  //           ? {
-  //               ...chat,
-  //               userMessage: editMessage,
-  //               botResponse: newBotResponse,
-  //               parsedResponse: newParsedResponse,
-  //             }
-  //           : chat
-  //       )
-  //     );
-  
-  //     // Constructing request body similar to handleAddChat
-  //     const requestBody = JSON.stringify({
-  //       id,
-  //       userSearch: [
-  //         {
-  //           userMessage: editMessage,
-  //           botResponse: newBotResponse,
-  //           parsedResponse: newParsedResponse,
-  //         },
-  //       ],
-  //     });
-  
-  //     console.log("PUT Request Body:", requestBody);
-  
-  //     const updateRes = await fetch(
-  //       `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
-  //       {
-  //         method: "PUT",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: requestBody,
-  //       }
-  //     );
-  
-  //     if (!updateRes.ok) {
-  //       const errorText = await updateRes.text();
-  //       console.error("Update API Error Response:", errorText);
-  //       throw new Error(`Error updating chat data: ${errorText}`);
-  //     }
-  
-  //     console.log("Chat updated successfully!");
-  //     fetchBotResponse(); // Refresh chat history
-  //     setEditIndex(null);
-  //   } catch (error) {
-  //     console.error("Error updating chat:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+
   const handleSaveEdit = async (index) => {
     if (!editMessage.trim()) return;
   
@@ -124,23 +55,6 @@ const ChatPage = ({ params }) => {
         newBotResponse = imageData.imageUrl;
         newParsedResponse = null; 
       } 
-      else {
-        console.log("Fetching updated bot response for:", editMessage);
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/search?userId=${encodeURIComponent(
-            userId
-          )}&message=${encodeURIComponent(editMessage)}`
-        );
-  
-        if (!response.ok) throw new Error("Error fetching updated bot response");
-  
-        const data = await response.json();
-        console.log("Updated bot response received:", data);
-  
-        newBotResponse = data.botResponse;
-        newParsedResponse = extractCodeBlocks(newBotResponse);
-      }
-  
       setChatHistory((prevChats) =>
         prevChats.map((chat, i) =>  
           i === index
@@ -193,12 +107,7 @@ const ChatPage = ({ params }) => {
   };
   
 
-  const handleCopy = (code, index) => {
-    navigator.clipboard.writeText(code).then(() => {
-      setCopiedIndex(index);
-      setTimeout(() => setCopiedIndex(null), 2000);
-    });
-  };
+
 
   useEffect(() => setisLoading(true), [id]);
 
@@ -327,7 +236,7 @@ const ChatPage = ({ params }) => {
 
       let newChat;
 
-      if (chatModel === "ImageGeneration") {
+      
         console.log("Generating image for prompt:", moreChat);
         const imageRes = await fetch(
           `${
@@ -348,29 +257,8 @@ const ChatPage = ({ params }) => {
         };
         setGeneratedImage(imageData.imageUrl);
         setImgLoading(false)
-      } else {
-        console.log("Fetching bot response for message:", moreChat);
-        const searchRes = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_BASE_URL
-          }/chatbot/search?userId=${encodeURIComponent(
-            userId
-          )}&message=${encodeURIComponent(moreChat)}`
-        );
-
-        if (!searchRes.ok) throw new Error("Error fetching bot response");
-
-        const data = await searchRes.json();
-        console.log("Bot response received:", data);
-
-        const responseText =
-          typeof data === "string" ? data : JSON.stringify(data);
-        newChat = {
-          userMessage: moreChat,
-          botResponse: data.botResponse,
-           parsedResponse: extractCodeBlocks(data.botResponse)
-        };
-      }
+      
+     
 
       // Constructing the correct PUT request body
       const requestBody = JSON.stringify({
@@ -435,7 +323,7 @@ const ChatPage = ({ params }) => {
 
   return (
     <>
-    {hasCredits?(  <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
+   {hasCredits?(   <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
         <Navbar />
         <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center  md:hidden">
           <div
@@ -774,25 +662,25 @@ const ChatPage = ({ params }) => {
             </div>
           </div>
         </div>
-      </div>):(<div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
-      <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center">
-        <h2 className="text-2xl  font-bold">Insufficient Credit</h2>
-        <p className=" p-2  text-lg ">
-          You hit your free credit limit .Please Consider buying our plans for uninterrupted services
-        </p>
-        <div className=" p-2 mt-4">
-          <button
-            onClick={() => handleRedirect("/plans")}
-            className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
-          >
-            Show Plans
-          </button>
-          
-        </div>
-       
       </div>
-    </div>)}
-
+):(<div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
+  <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center">
+    <h2 className="text-2xl  font-bold">Insufficient Credit</h2>
+    <p className=" p-2  text-lg ">
+      You hit your free credit limit .Please Consider buying our plans for uninterrupted services
+    </p>
+    <div className=" p-2 mt-4">
+      <button
+        onClick={() => handleRedirect("/plans")}
+        className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
+      >
+        Show Plans
+      </button>
+      
+    </div>
+   
+  </div>
+</div>)}
      
     </>
   );

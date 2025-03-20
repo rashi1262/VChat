@@ -64,8 +64,31 @@ const page = () => {
   }, []);
  
 
-  const getChatById = (c) => {
-    router.push(`/chat/${c}`);
+  const getChatById = async(c) => {
+   const response = await fetch(`https://chatbot-2vqr.onrender.com/chatbot/get-By/${c}`);
+    if (!response.ok) throw new Error("Failed to fetch chat data");
+
+    const chatData = await response.json();
+    if (!chatData || !chatData.type) throw new Error("Invalid chat data");
+
+    
+
+    switch (chatData.type) {
+      case "Gemini":
+     router.push(`/chat/${chatData.id}`);
+        break;
+      case "ImageGeneration":
+         router.push(`/imageChat/${chatData.id}`);
+        break;
+      case "openAI":
+         router.push(`/openAIchat/${chatData.id}`);
+        break;
+      default:
+        router.push(`/chat/${chatData.id}`);
+
+    }
+
+    
   };
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {

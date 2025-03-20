@@ -5,11 +5,13 @@ import Navbar from "../../navbar";
 import { useChat } from "../../chatContext";
 import { useRouter } from "next/navigation";
 import { Edit, Pencil } from "lucide-react";
-import { Clipboard } from "lucide-react";
 import { useCredits } from "@/context/creditContext";
+import { Clipboard } from "lucide-react";
+import { toast, Toaster } from "sonner";
+
 const ChatPage = ({ params }) => {
-  const {hasCredits} = useCredits()
   const { id } = use(params);
+  const {hasCredits,setHasCredits} = useCredits()
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
@@ -31,76 +33,6 @@ const ChatPage = ({ params }) => {
   const [generatedImage, setGeneratedImage] = useState([]);
   console.log(chatHistory, "chatHistorychatHistory");
 
-  // const handleSaveEdit = async (index) => {
-  //   if (!editMessage.trim()) return;
-  
-  //   setLoading(true);
-  
-  //   try {
-  //     console.log("Fetching updated bot response for:", editMessage);
-  //     const response = await fetch(
-  //       `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/search?userId=${encodeURIComponent(userId)}&message=${encodeURIComponent(editMessage)}`
-  //     );
-  
-  //     if (!response.ok) throw new Error("Error fetching updated bot response");
-  
-  //     const data = await response.json(); 
-  //     console.log("Updated bot response received:", data);
-  
-  //     const newBotResponse = data.botResponse;
-  //     const newParsedResponse = extractCodeBlocks(newBotResponse);
-  
-  //     setChatHistory((prevChats) =>
-  //       prevChats.map((chat, i) =>
-  //         i === index
-  //           ? {
-  //               ...chat,
-  //               userMessage: editMessage,
-  //               botResponse: newBotResponse,
-  //               parsedResponse: newParsedResponse,
-  //             }
-  //           : chat
-  //       )
-  //     );
-  
-  //     // Constructing request body similar to handleAddChat
-  //     const requestBody = JSON.stringify({
-  //       id,
-  //       userSearch: [
-  //         {
-  //           userMessage: editMessage,
-  //           botResponse: newBotResponse,
-  //           parsedResponse: newParsedResponse,
-  //         },
-  //       ],
-  //     });
-  
-  //     console.log("PUT Request Body:", requestBody);
-  
-  //     const updateRes = await fetch(
-  //       `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
-  //       {
-  //         method: "PUT",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: requestBody,
-  //       }
-  //     );
-  
-  //     if (!updateRes.ok) {
-  //       const errorText = await updateRes.text();
-  //       console.error("Update API Error Response:", errorText);
-  //       throw new Error(`Error updating chat data: ${errorText}`);
-  //     }
-  
-  //     console.log("Chat updated successfully!");
-  //     fetchBotResponse(); // Refresh chat history
-  //     setEditIndex(null);
-  //   } catch (error) {
-  //     console.error("Error updating chat:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
   const handleSaveEdit = async (index) => {
     if (!editMessage.trim()) return;
   
@@ -110,19 +42,23 @@ const ChatPage = ({ params }) => {
       let newBotResponse, newParsedResponse;
       setLoading(true)
   
-      if (chatModel === "ImageGeneration") {
-        console.log("Generating updated image for prompt:", editMessage);
-        const imageRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/generate-image?userId=${encodeURIComponent(
-            userId
-          )}&prompt=${encodeURIComponent(editMessage)}`
-        );
-  
-        if (!imageRes.ok) throw new Error("Error generating image");
-  
-        const imageData = await imageRes.json();
-        newBotResponse = imageData.imageUrl;
-        newParsedResponse = null; 
+      if (chatModel === "openAI") {
+
+            console.log("Fetching updated bot response for:", editMessage);
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/openai?userId=${encodeURIComponent(userId)}&message=${encodeURIComponent(editMessage)}`
+
+            );
+      
+            if (!response.ok) throw new Error("Error fetching updated bot response");
+      
+            const data = await response.json();
+            console.log("Updated bot response received:", data);
+      
+            newBotResponse = data.botResponse;
+            newParsedResponse = extractCodeBlocks(newBotResponse);
+          
+
       } 
       else {
         console.log("Fetching updated bot response for:", editMessage);
@@ -245,6 +181,13 @@ const ChatPage = ({ params }) => {
       const searchRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${id}`
       );
+      if(searchRes.status === 402){
+        toast.error("Insufficient credits");
+                    
+                    setMsg(null);
+                    setLoading(false);
+                    return; 
+      }
       if (!searchRes.ok) throw new Error("Error fetching bot response");
       const data = await searchRes.json();
       console.log(data, "datadata");
@@ -257,7 +200,6 @@ const ChatPage = ({ params }) => {
           parsedResponse: extractCodeBlocks(chat.botResponse),
         }))
       );
-      if (data?.type === "ImageGeneration") setGeneratedImage(data);
     } catch (error) {
       setError(error.message);
     } finally {
@@ -317,10 +259,10 @@ const ChatPage = ({ params }) => {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${id}`
       );
-
-      if (!response.ok) throw new Error("Error fetching existing chat data");
-
+      
+     
       const chatData = await response.json();
+    
       const existingUserSearch = Array.isArray(chatData?.userSearch)
         ? chatData.userSearch
         : [];
@@ -328,27 +270,28 @@ const ChatPage = ({ params }) => {
       let newChat;
 
       if (chatModel === "ImageGeneration") {
-        console.log("Generating image for prompt:", moreChat);
-        const imageRes = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_BASE_URL
-          }/chatbot/generate-image?userId=${encodeURIComponent(
-            userId
-          )}&prompt=${encodeURIComponent(moreChat)}`
-        );
-        
-    
-        if (!imageRes.ok) throw new Error("Error generating image");
+       
+            console.log("Fetching bot response for message:", moreChat);
+            const searchRes = await fetch(
+                `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/openai?userId=${encodeURIComponent(userId)}&message=${encodeURIComponent(moreChat)}`
 
-        const imageData = await imageRes.json();
-        newChat = {
-          userMessage: moreChat,
-          botResponse: imageData.imageUrl,
-          parsedResponse: null,
-        };
-        setGeneratedImage(imageData.imageUrl);
-        setImgLoading(false)
-      } else {
+            );
+    
+            if (!searchRes.ok) throw new Error("Error fetching bot response");
+    
+            const data = await searchRes.json();
+            console.log("Bot response received:", data);
+    
+            const responseText =
+              typeof data === "string" ? data : JSON.stringify(data);
+            newChat = {
+              userMessage: moreChat,
+              botResponse: data.botResponse,
+              // parsedResponse: extractCodeBlocks(responseText)
+            };
+          
+      } 
+      else {
         console.log("Fetching bot response for message:", moreChat);
         const searchRes = await fetch(
           `${
@@ -358,8 +301,18 @@ const ChatPage = ({ params }) => {
           )}&message=${encodeURIComponent(moreChat)}`
         );
 
-        if (!searchRes.ok) throw new Error("Error fetching bot response");
+     
 
+    
+        if (searchRes.status === 402) {
+          console.log("Toast function triggered");
+
+          toast.error('Insufficient credits');
+
+          return;
+        }
+        
+       
         const data = await searchRes.json();
         console.log("Bot response received:", data);
 
@@ -368,7 +321,7 @@ const ChatPage = ({ params }) => {
         newChat = {
           userMessage: moreChat,
           botResponse: data.botResponse,
-           parsedResponse: extractCodeBlocks(data.botResponse)
+          // parsedResponse: extractCodeBlocks(responseText)
         };
       }
 
@@ -400,7 +353,7 @@ const ChatPage = ({ params }) => {
       console.log("Chat updated successfully!");
       setChatHistory((prevChats) => [...prevChats, newChat]);
     } catch (error) {
-      console.error("Error adding new chat:", error);
+      toast.error('error')
     } finally {
       setLoading(false);
     }
@@ -435,7 +388,10 @@ const ChatPage = ({ params }) => {
 
   return (
     <>
-    {hasCredits?(  <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
+                          <Toaster position="top-center" richColors />
+
+ {hasCredits?(     <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
+  
         <Navbar />
         <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center  md:hidden">
           <div
@@ -670,22 +626,7 @@ const ChatPage = ({ params }) => {
                         </div>
                       </div>
                     </div>
-
-                    {chatModel === "ImageGeneration" && chat.botResponse ? <div className="ml-36 self-start">
-  {loading && chat.userMessage === morePrompt ? (
-    <div className="w-48 h-48 bg-gray-300 flex items-center justify-center rounded-xl">
-      <div className="w-8 h-8 border-4 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
-    </div>
-  ) : (
-    <img 
-      src={chat.botResponse} 
-
-      alt={`Generated image for ${chat.userMessage}`} 
-      className="rounded-xl max-w-96  h-auto" 
-    />
-  )}
-</div>
-:  (
+  
       <div className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
         {(
           chat.parsedResponse && chat.parsedResponse.length > 0
@@ -714,7 +655,7 @@ const ChatPage = ({ params }) => {
           )
         )}
       </div>
-    ) }
+    
                   </div>
                 ))
               )}
@@ -786,7 +727,7 @@ const ChatPage = ({ params }) => {
             className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
           >
             Show Plans
-          </button>
+          </button>szzx
           
         </div>
        

@@ -199,7 +199,7 @@ const page = ({ params }) => {
         });
       }
   
-      router.push(`/chat/${chatData.id}`);
+      router.push(`/Vchatmodel/${chatData.id}`);
     } catch (error) {
       setError(error.message);
     }
