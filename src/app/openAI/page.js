@@ -6,6 +6,7 @@ import Link from "next/link";
 import Navbar from "../navbar";
 import { useRouter } from "next/navigation";
 import { useChat} from "../chatContext";
+import { toast, Toaster } from "sonner";
 
 const page = () => {
   const [name, setName] = useState("");
@@ -27,8 +28,7 @@ const page = () => {
              return;
            } else {
              const user = JSON.parse(storedUser);
-             setEmail(user?.email || "No Email");
-             setName(user?.name || "No Name");
+             
              setUserId(user?.id)
            }
          } catch (error) {}
@@ -71,82 +71,93 @@ const page = () => {
          fetchUserChats();
        }, [userId]);
        
-     const handleResponse = async () => {
-       if(prompt==''){return;}
-       setLoading(true);
-       try {
-         const current = prompt
-         setMsg(current)
-         setPrompt("")
-         const searchRes = await fetch(
-           `${
-             process.env.NEXT_PUBLIC_BASE_URL
-           }/chatbot/search?message=${encodeURIComponent(current)}`
-         );
-         
-         if (!searchRes.ok) throw new Error("Error fetching bot response");
-   
-         const data = await searchRes.text();
-         const formattedResponse = data
-           .split(/[*-]\s+/)
-           .filter((point) => point.trim())
-           .join(" ");
-   
-         setResponse(formattedResponse);
-         
-   
-         const createChatRes = await fetch(
-           `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/create`,
-           {
-             method: "POST",
-             headers: { "Content-Type": "application/json" },
-             body: JSON.stringify({
-               userSearch: [
-                 { userMessage: prompt, botResponse: formattedResponse},
-               ],
-               userId,
-               type:"openAI4o"
-             }),
-           }
-         );
-   
-         
-   
-         if (!createChatRes.ok) throw new Error("Failed to create chat");
-   
-         const chatData = await createChatRes.json();
-         
-         const chatHistoryRes = await fetch(
-           `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${chatData.id}`
-         );
-   
-         if (!chatHistoryRes.ok) throw new Error("Failed to fetch chat history");
-   
-         const chatHistory = await chatHistoryRes.json();
-   
-         if (chatHistory.userSearch?.length > 0 && chatHistory.userId === userId) {
-           const firstMessage = chatHistory.userSearch[0];
-   
-           setChatThread((prev) => {
-             const chatExists = prev.some((chat) => chat.chatId === chatData.id);
-             if (!chatExists) {
-               return [
-                 ...prev,
-                 { chatId: chatData.id, message: firstMessage.userMessage},
-               ];
-             }
-             return prev;
-           });
-           
-         }
-   
-         router.push(`/chat/${chatData.id}`);
-         setLoading(false);
-       } catch (error) {
-         setLoading(false);
-         setError(error.message);
-       }
-     };
+       const handleResponse = async () => {
+        if (prompt == "") {
+          return;
+        }
+        setLoading(true);
+        try {
+          const current = prompt;
+          setMsg(current);
+          setPrompt("");
+          const searchRes = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/openai?userId=${encodeURIComponent(userId)}&message=${encodeURIComponent(current)}`
+    
+          );
+          if (searchRes.status === 402) {
+            toast.error("Insufficient credits");
+            setMsg(null);
+            setLoading(false);
+            return; 
+          }
+      
+          if (!searchRes.ok) throw new Error("Error fetching bot response");
+          
+    
+          const data = await searchRes.json();
+          
+          
+          
+          const formattedResponse = data.botResponse
+            // .split(/[*-]\s+/)
+            // .filter((point) => point.trim())
+            // .join(" ");
+    
+          setResponse(formattedResponse);
+    
+          const createChatRes = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/create`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                userSearch: [
+                  { userMessage: prompt, botResponse: formattedResponse },
+                ],
+                userId,
+                type: "Gemini",
+              }),
+            }
+          );
+    
+          if (!createChatRes.ok) throw new Error("Failed to create chat");
+    
+          const chatData = await createChatRes.json();
+    
+          const chatHistoryRes = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${chatData.id}`
+          );
+    
+          if (!chatHistoryRes.ok) throw new Error("Failed to fetch chat history");
+    
+          const chatHistory = await chatHistoryRes.json();
+    
+          if (chatHistory.userSearch?.length > 0 && chatHistory.userId === userId) {
+            const firstMessage = chatHistory.userSearch[0];
+    
+            setChatThread((prev) => {
+              const chatExists = prev.some((chat) => chat.chatId === chatData.id);
+              if (!chatExists) {
+                return [
+                  ...prev,
+                  {
+                    chatId: chatData.id,
+                    message: firstMessage.userMessage,
+                    type: "Gemini",
+                  },
+                ];
+              }
+              return prev;
+            });
+          }
+    
+          router.push(`/chat/${chatData.id}`);
+          setLoading(false);
+        } catch (error) {
+          setLoading(false);
+          setError(error.message);
+        }
+      };
      
      
      const handleKeyDown = (e) => {
@@ -161,6 +172,8 @@ const page = () => {
   return (
     <>
       <div className="flex w-full justify-between bg-gray-50">
+                    <Toaster position="top-center" richColors />
+        
         <Navbar/>
        
         {msg? (     <>

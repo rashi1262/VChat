@@ -5,6 +5,7 @@ import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useChat } from ".././chatContext";
+import { toast, Toaster } from "sonner";
 
 import Navbar from "../navbar";
 import { ChevronDown } from "lucide-react";
@@ -97,7 +98,7 @@ const page = ({ params }) => {
     fetchUserChats();
   }, [userId]);
 
-  const handleResponse = async () => {
+const handleResponse = async () => {
     if (prompt == "") {
       return;
     }
@@ -107,18 +108,27 @@ const page = ({ params }) => {
       setMsg(current);
       setPrompt("");
       const searchRes = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_BASE_URL
-        }/chatbot/search?message=${encodeURIComponent(current)}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/search?userId=${encodeURIComponent(userId)}&message=${encodeURIComponent(msg)}`
+
       );
-
+      if (searchRes.status === 402) {
+        toast.error("Insufficient credits");
+        setMsg(null);
+        setLoading(false);
+        return; 
+      }
+  
       if (!searchRes.ok) throw new Error("Error fetching bot response");
+      
 
-      const data = await searchRes.text();
-      const formattedResponse = data
-        .split(/[*-]\s+/)
-        .filter((point) => point.trim())
-        .join(" ");
+      const data = await searchRes.json();
+      
+      
+      
+      const formattedResponse = data.botResponse
+        // .split(/[*-]\s+/)
+        // .filter((point) => point.trim())
+        // .join(" ");
 
       setResponse(formattedResponse);
 
@@ -188,6 +198,8 @@ const page = ({ params }) => {
 
   return (
     <div className="bg-gray-50">
+            <Toaster position="top-center" richColors />
+      
       <div className="flex w-full justify-between bg-gray-50 text-sm">
         <Navbar />
 

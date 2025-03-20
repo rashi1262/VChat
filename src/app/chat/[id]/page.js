@@ -19,32 +19,127 @@ const ChatPage = ({ params }) => {
   const [moreResponse, setMoreResponse] = useState("");
   const [userId, setUserId] = useState(null);
   const [moreChat, setMoreChat] = useState("");
-  const[chatModel,setChatModel] = useState('')
+  const [chatModel, setChatModel] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
-  const[isloading,setisLoading] = useState(false)
+  const [isloading, setisLoading] = useState(false);
   const chatContainerRef = useRef(null);
+  const[imgLoading,setImgLoading] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
   const [editMessage, setEditMessage] = useState("");
+  const [generatedImage, setGeneratedImage] = useState([]);
+  console.log(chatHistory, "chatHistorychatHistory");
 
-
+  // const handleSaveEdit = async (index) => {
+  //   if (!editMessage.trim()) return;
+  
+  //   setLoading(true);
+  
+  //   try {
+  //     console.log("Fetching updated bot response for:", editMessage);
+  //     const response = await fetch(
+  //       `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/search?userId=${encodeURIComponent(userId)}&message=${encodeURIComponent(editMessage)}`
+  //     );
+  
+  //     if (!response.ok) throw new Error("Error fetching updated bot response");
+  
+  //     const data = await response.json(); 
+  //     console.log("Updated bot response received:", data);
+  
+  //     const newBotResponse = data.botResponse;
+  //     const newParsedResponse = extractCodeBlocks(newBotResponse);
+  
+  //     setChatHistory((prevChats) =>
+  //       prevChats.map((chat, i) =>
+  //         i === index
+  //           ? {
+  //               ...chat,
+  //               userMessage: editMessage,
+  //               botResponse: newBotResponse,
+  //               parsedResponse: newParsedResponse,
+  //             }
+  //           : chat
+  //       )
+  //     );
+  
+  //     // Constructing request body similar to handleAddChat
+  //     const requestBody = JSON.stringify({
+  //       id,
+  //       userSearch: [
+  //         {
+  //           userMessage: editMessage,
+  //           botResponse: newBotResponse,
+  //           parsedResponse: newParsedResponse,
+  //         },
+  //       ],
+  //     });
+  
+  //     console.log("PUT Request Body:", requestBody);
+  
+  //     const updateRes = await fetch(
+  //       `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
+  //       {
+  //         method: "PUT",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: requestBody,
+  //       }
+  //     );
+  
+  //     if (!updateRes.ok) {
+  //       const errorText = await updateRes.text();
+  //       console.error("Update API Error Response:", errorText);
+  //       throw new Error(`Error updating chat data: ${errorText}`);
+  //     }
+  
+  //     console.log("Chat updated successfully!");
+  //     fetchBotResponse(); // Refresh chat history
+  //     setEditIndex(null);
+  //   } catch (error) {
+  //     console.error("Error updating chat:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const handleSaveEdit = async (index) => {
     if (!editMessage.trim()) return;
+  
+    setLoading(true);
+  
     try {
-      const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_BASE_URL
-        }/chatbot/search?message=${encodeURIComponent(editMessage)}`
-      );
-
-      if (!response.ok) {
-        throw new Error("Error fetching updated bot response");
+      let newBotResponse, newParsedResponse;
+      setLoading(true)
+  
+      if (chatModel === "ImageGeneration") {
+        console.log("Generating updated image for prompt:", editMessage);
+        const imageRes = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/generate-image?userId=${encodeURIComponent(
+            userId
+          )}&prompt=${encodeURIComponent(editMessage)}`
+        );
+  
+        if (!imageRes.ok) throw new Error("Error generating image");
+  
+        const imageData = await imageRes.json();
+        newBotResponse = imageData.imageUrl;
+        newParsedResponse = null; 
+      } else {
+        console.log("Fetching updated bot response for:", editMessage);
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/search?userId=${encodeURIComponent(
+            userId
+          )}&message=${encodeURIComponent(editMessage)}`
+        );
+  
+        if (!response.ok) throw new Error("Error fetching updated bot response");
+  
+        const data = await response.json();
+        console.log("Updated bot response received:", data);
+  
+        newBotResponse = data.botResponse;
+        newParsedResponse = extractCodeBlocks(newBotResponse);
       }
-
-      const newBotResponse = await response.text();
-      const newParsedResponse = extractCodeBlocks(newBotResponse);
-
-      setChatHistory((prevChats) => {
-        return prevChats.map((chat, i) =>
+  
+      setChatHistory((prevChats) =>
+        prevChats.map((chat, i) =>
           i === index
             ? {
                 ...chat,
@@ -53,38 +148,47 @@ const ChatPage = ({ params }) => {
                 parsedResponse: newParsedResponse,
               }
             : chat
-        );
+        )
+      );
+  
+      const requestBody = JSON.stringify({
+        id,
+        userSearch: [
+          {
+            userMessage: editMessage,
+            botResponse: newBotResponse,
+            parsedResponse: newParsedResponse,
+          },
+        ],
       });
-
-
-
-      await fetch(
+  
+      console.log("PUT Request Body:", requestBody);
+  
+      const updateRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userSearch: [
-              {
-                userMessage: editMessage,
-                botResponse: newBotResponse,
-                parsedResponse: newParsedResponse,
-              },
-            ],
-          }),
+          headers: { "Content-Type": "application/json" },
+          body: requestBody,
         }
       );
-
-      fetchBotResponse();
+  
+      if (!updateRes.ok) {
+        const errorText = await updateRes.text();
+        console.error("Update API Error Response:", errorText);
+        throw new Error(`Error updating chat data: ${errorText}`);
+      }
+  
+      console.log("Chat updated successfully!");
+      fetchBotResponse(); 
       setEditIndex(null);
     } catch (error) {
       console.error("Error updating chat:", error);
+    } finally {
+      setLoading(false);
     }
   };
-
-  const [copiedIndex, setCopiedIndex] = useState(null);
+  
 
   const handleCopy = (code, index) => {
     navigator.clipboard.writeText(code).then(() => {
@@ -93,12 +197,7 @@ const ChatPage = ({ params }) => {
     });
   };
 
-
-  useEffect(()=>{
-    setisLoading(true)
-  },[id])
-
-  
+  useEffect(() => setisLoading(true), [id]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -115,21 +214,16 @@ const ChatPage = ({ params }) => {
       }
     }
   }, []);
-  const [generatedImage, setGeneratedImage] = useState(null);
 
   useEffect(() => {
-  
     if (!userId) return;
-
     const fetchUserChats = async () => {
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-by-userid/${userId}`
         );
         if (!response.ok) throw new Error("Failed to fetch chats");
-
         const data = await response.json();
-
         setChatThread(
           data.chatMessages.map((chat) => ({
             chatId: chat.id,
@@ -140,126 +234,176 @@ const ChatPage = ({ params }) => {
         console.error("Error fetching user chats:", error);
       }
     };
-
     fetchUserChats();
-
   }, [userId]);
 
-  const getChatById = (c) => {
-    router.push(`/chat/${c}`);
-  };
   const fetchBotResponse = async () => {
     try {
       const searchRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${id}`
       );
-  
-      if (!searchRes.ok) {
-        throw new Error("Error fetching bot response");
-      }
-  
-      setisLoading(false);
-  
+      if (!searchRes.ok) throw new Error("Error fetching bot response");
       const data = await searchRes.json();
+      console.log(data, "datadata");
+
+      setisLoading(false);
       setChatModel(data?.type);
-  
-      const formattedChats = (data?.userSearch || []).map((chat) => ({
-        ...chat,
-        parsedResponse: extractCodeBlocks(chat.botResponse),
-      }));
-  
-      setChatHistory(formattedChats);
-  
-      
-      if (data?.type === "ImageGeneration") {
-        const imageResponse = formattedChats.find((chat) => chat.botResponse)?.botResponse;
-        setGeneratedImage(imageResponse);
-      }
-  
+      setChatHistory(
+        (data?.userSearch || []).map((chat) => ({
+          ...chat,
+          parsedResponse: extractCodeBlocks(chat.botResponse),
+        }))
+      );
+      if (data?.type === "ImageGeneration") setGeneratedImage(data);
     } catch (error) {
       setError(error.message);
     } finally {
       setLoading(false);
     }
   };
-  
+
+  useEffect(() => {
+    if (id) fetchBotResponse();
+  }, [id]);
+
+  const extractCodeBlocks = (message) => {
+    if (!message) {
+      console.error(
+        "extractCodeBlocks error: message is null or undefined",
+        message
+      );
+      return [{ type: "text", content: "Unknown message" }];
+    }
+
+    const messageStr =
+      typeof message === "string" ? message : JSON.stringify(message);
+    const codeBlockRegex = /```([\s\S]*?)```/g;
+    let parts = [],
+      lastIndex = 0;
+
+    messageStr.replace(codeBlockRegex, (match, code, index) => {
+      if (index > lastIndex) {
+        parts.push({
+          type: "text",
+          content: messageStr.slice(lastIndex, index),
+        });
+      }
+      parts.push({ type: "code", content: code });
+      lastIndex = index + match.length;
+    });
+
+    if (lastIndex < messageStr.length) {
+      parts.push({ type: "text", content: messageStr.slice(lastIndex) });
+    }
+
+    return parts.length > 0 ? parts : [{ type: "text", content: messageStr }];
+  };
 
   const handleAddChat = async () => {
-    if (!id || !moreChat) return;
-  
-    const currentPrompt = moreChat;
-    setMorePrompt(currentPrompt);
+    if (!id || !moreChat) {
+      return;
+    }
+
+    setMorePrompt(moreChat);
     setMoreChat("");
     setLoading(true);
-  
+    
+
     try {
+      console.log("Fetching existing chat for ID:", id);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${id}`
       );
-      
-      if (!response.ok) {
-        throw new Error("Error fetching existing chat data");
-      }
-  
+
+      if (!response.ok) throw new Error("Error fetching existing chat data");
+
       const chatData = await response.json();
-      const existingUserSearch = chatData?.userSearch || [];
-  
+      const existingUserSearch = Array.isArray(chatData?.userSearch)
+        ? chatData.userSearch
+        : [];
+
       let newChat;
-  
+
       if (chatModel === "ImageGeneration") {
+        console.log("Generating image for prompt:", moreChat);
         const imageRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/generate-image?userId=${userId}&prompt=${encodeURIComponent(currentPrompt)}`
+          `${
+            process.env.NEXT_PUBLIC_BASE_URL
+          }/chatbot/generate-image?userId=${encodeURIComponent(
+            userId
+          )}&prompt=${encodeURIComponent(moreChat)}`
         );
-  
+        
+    
         if (!imageRes.ok) throw new Error("Error generating image");
-  
+
         const imageData = await imageRes.json();
-  
         newChat = {
-          userMessage: currentPrompt,
+          userMessage: moreChat,
           botResponse: imageData.imageUrl,
           parsedResponse: null,
         };
-        
         setGeneratedImage(imageData.imageUrl);
+        setImgLoading(false)
       } else {
+        console.log("Fetching bot response for message:", moreChat);
         const searchRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/search?message=${encodeURIComponent(currentPrompt)}`
+          `${
+            process.env.NEXT_PUBLIC_BASE_URL
+          }/chatbot/search?userId=${encodeURIComponent(
+            userId
+          )}&message=${encodeURIComponent(moreChat)}`
         );
-  
+
         if (!searchRes.ok) throw new Error("Error fetching bot response");
-  
+
         const data = await searchRes.json();
-        const formattedResponse = extractCodeBlocks(data);
-  
+        console.log("Bot response received:", data);
+
+        const responseText =
+          typeof data === "string" ? data : JSON.stringify(data);
         newChat = {
-          userMessage: currentPrompt,
-          botResponse: data,
-          parsedResponse: formattedResponse,
+          userMessage: moreChat,
+          botResponse: data.botResponse,
+          // parsedResponse: extractCodeBlocks(responseText)
         };
       }
-  
-      const updatedUserSearch = [...existingUserSearch, newChat];
-  
-      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userSearch: updatedUserSearch }),
+
+      // Constructing the correct PUT request body
+      const requestBody = JSON.stringify({
+        id, // Ensuring ID is included in the request
+        userSearch: [newChat],
       });
-  
-      setChatHistory(updatedUserSearch);
+
+      console.log("PUT Request Body:", requestBody);
+      console.log(newChat, "newChat");
+
+      const updateRes = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: requestBody,
+        }
+      );
+
+      const updateResponseText = await updateRes.text();
+      
+      if (!updateRes.ok) {
+        console.error("Update API Error Response:", updateResponseText);
+        throw new Error(`Error updating chat data: ${updateResponseText}`);
+      }
+
+      console.log("Chat updated successfully!");
+      setChatHistory((prevChats) => [...prevChats, newChat]);
     } catch (error) {
       console.error("Error adding new chat:", error);
     } finally {
       setLoading(false);
     }
   };
-  
 
   useEffect(() => {
-   
-    
-     
     if (!id) return;
 
     fetchBotResponse();
@@ -284,206 +428,180 @@ const ChatPage = ({ params }) => {
     scrollToBottom();
   }, [chatHistory]);
 
-  const extractCodeBlocks = (message) => {
-    const codeBlockRegex = /```([\s\S]*?)```/g;
-    let parts = [];
-    let lastIndex = 0;
-
-    message.replace(codeBlockRegex, (match, code, index) => {
-      if (index > lastIndex) {
-        parts.push({ type: "text", content: message.slice(lastIndex, index) });
-      }
-      parts.push({ type: "code", content: code });
-      lastIndex = index + match.length;
-    });
-
-    if (lastIndex < message.length) {
-      parts.push({ type: "text", content: message.slice(lastIndex) });
-    }
-
-    return parts.length > 0 ? parts : [{ type: "text", content: message }];
-  };
-  
-
   const svgs = {
     Gemini: (
       <svg
-                      viewBox="0 0 42 42"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
-                    >
-                      <g clipPath="url(#clip0_11185_26182)">
-                        <path
-                          d="M0.5 21C0.5 9.678 9.678 0.5 21 0.5C32.322 0.5 41.5 9.678 41.5 21C41.5 32.322 32.322 41.5 21 41.5C9.678 41.5 0.5 32.322 0.5 21Z"
-                          fill="white"
-                        ></path>
-                        <g clipPath="url(#clip1_11185_26182)">
-                          <path
-                            d="M31.2789 18.8229C31.8234 17.1886 31.6359 15.3984 30.7652 13.9119C29.4557 11.6319 26.8232 10.4589 24.2522 11.0109C23.1084 9.72236 21.4652 8.98961 19.7424 9.00011C17.1144 8.99411 14.7827 10.6861 13.9742 13.1866C12.2859 13.5324 10.8287 14.5891 9.97594 16.0869C8.65669 18.3609 8.95744 21.2274 10.7199 23.1774C10.1754 24.8116 10.3629 26.6019 11.2337 28.0884C12.5432 30.3684 15.1757 31.5414 17.7467 30.9894C18.8897 32.2779 20.5337 33.0106 22.2564 32.9994C24.8859 33.0061 27.2184 31.3126 28.0269 28.8099C29.7152 28.4641 31.1724 27.4074 32.0252 25.9096C33.3429 23.6356 33.0414 20.7714 31.2797 18.8214L31.2789 18.8229ZM22.2579 31.4311C21.2057 31.4326 20.1864 31.0644 19.3787 30.3901C19.4154 30.3706 19.4792 30.3354 19.5204 30.3099L24.2994 27.5499C24.5439 27.4111 24.6939 27.1509 24.6924 26.8696V20.1324L26.7122 21.2986C26.7339 21.3091 26.7482 21.3301 26.7512 21.3541V26.9334C26.7482 29.4144 24.7389 31.4259 22.2579 31.4311ZM12.5949 27.3039C12.0677 26.3934 11.8779 25.3261 12.0587 24.2904C12.0939 24.3114 12.1562 24.3496 12.2004 24.3751L16.9794 27.1351C17.2217 27.2769 17.5217 27.2769 17.7647 27.1351L23.5989 23.7661V26.0986C23.6004 26.1226 23.5892 26.1459 23.5704 26.1609L18.7397 28.9501C16.5879 30.1891 13.8399 29.4526 12.5957 27.3039H12.5949ZM11.3372 16.8721C11.8622 15.9601 12.6909 15.2626 13.6779 14.9004C13.6779 14.9416 13.6757 15.0144 13.6757 15.0654V20.5861C13.6742 20.8666 13.8242 21.1269 14.0679 21.2656L19.9022 24.6339L17.8824 25.8001C17.8622 25.8136 17.8367 25.8159 17.8142 25.8061L12.9827 23.0146C10.8354 21.7711 10.0989 19.0239 11.3364 16.8729L11.3372 16.8721ZM27.9317 20.7339L22.0974 17.3649L24.1172 16.1994C24.1374 16.1859 24.1629 16.1836 24.1854 16.1934L29.0169 18.9826C31.1679 20.2254 31.9052 22.9771 30.6624 25.1281C30.1367 26.0386 29.3087 26.7361 28.3224 27.0991V21.4134C28.3247 21.1329 28.1754 20.8734 27.9324 20.7339H27.9317ZM29.9417 17.7084C29.9064 17.6866 29.8442 17.6491 29.7999 17.6236L25.0209 14.8636C24.7787 14.7219 24.4787 14.7219 24.2357 14.8636L18.4014 18.2326V15.9001C18.3999 15.8761 18.4112 15.8529 18.4299 15.8379L23.2607 13.0509C25.4124 11.8096 28.1634 12.5484 29.4039 14.7009C29.9282 15.6099 30.1179 16.6741 29.9402 17.7084H29.9417ZM17.3034 21.8656L15.2829 20.6994C15.2612 20.6889 15.2469 20.6679 15.2439 20.6439V15.0646C15.2454 12.5806 17.2607 10.5676 19.7447 10.5691C20.7954 10.5691 21.8124 10.9381 22.6202 11.6101C22.5834 11.6296 22.5204 11.6649 22.4784 11.6904L17.6994 14.4504C17.4549 14.5891 17.3049 14.8486 17.3064 15.1299L17.3034 21.8641V21.8656ZM18.4007 19.5001L20.9994 17.9994L23.5982 19.4994V22.5001L20.9994 24.0001L18.4007 22.5001V19.5001Z"
-                            fill="black"
-                          ></path>
-                        </g>
-                        <path
-                          d="M41.3443 21.0002C41.3443 9.76457 32.2359 0.65625 21.0002 0.65625C9.76457 0.65625 0.65625 9.76457 0.65625 21.0002C0.65625 32.2359 9.76457 41.3443 21.0002 41.3443C32.2359 41.3443 41.3443 32.2359 41.3443 21.0002Z"
-                          stroke="#EEEEEE"
-                          strokeWidth="1.313"
-                        ></path>
-                      </g>
-                      <defs>
-                        <clipPath id="clip0_11185_26182">
-                          <rect width="42" height="42" fill="white"></rect>
-                        </clipPath>
-                        <clipPath id="clip1_11185_26182">
-                          <rect
-                            width="24"
-                            height="24"
-                            fill="white"
-                            transform="translate(9 9)"
-                          ></rect>
-                        </clipPath>
-                      </defs>
-                    </svg>
+        viewBox="0 0 42 42"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
+      >
+        <g clipPath="url(#clip0_11185_26182)">
+          <path
+            d="M0.5 21C0.5 9.678 9.678 0.5 21 0.5C32.322 0.5 41.5 9.678 41.5 21C41.5 32.322 32.322 41.5 21 41.5C9.678 41.5 0.5 32.322 0.5 21Z"
+            fill="white"
+          ></path>
+          <g clipPath="url(#clip1_11185_26182)">
+            <path
+              d="M31.2789 18.8229C31.8234 17.1886 31.6359 15.3984 30.7652 13.9119C29.4557 11.6319 26.8232 10.4589 24.2522 11.0109C23.1084 9.72236 21.4652 8.98961 19.7424 9.00011C17.1144 8.99411 14.7827 10.6861 13.9742 13.1866C12.2859 13.5324 10.8287 14.5891 9.97594 16.0869C8.65669 18.3609 8.95744 21.2274 10.7199 23.1774C10.1754 24.8116 10.3629 26.6019 11.2337 28.0884C12.5432 30.3684 15.1757 31.5414 17.7467 30.9894C18.8897 32.2779 20.5337 33.0106 22.2564 32.9994C24.8859 33.0061 27.2184 31.3126 28.0269 28.8099C29.7152 28.4641 31.1724 27.4074 32.0252 25.9096C33.3429 23.6356 33.0414 20.7714 31.2797 18.8214L31.2789 18.8229ZM22.2579 31.4311C21.2057 31.4326 20.1864 31.0644 19.3787 30.3901C19.4154 30.3706 19.4792 30.3354 19.5204 30.3099L24.2994 27.5499C24.5439 27.4111 24.6939 27.1509 24.6924 26.8696V20.1324L26.7122 21.2986C26.7339 21.3091 26.7482 21.3301 26.7512 21.3541V26.9334C26.7482 29.4144 24.7389 31.4259 22.2579 31.4311ZM12.5949 27.3039C12.0677 26.3934 11.8779 25.3261 12.0587 24.2904C12.0939 24.3114 12.1562 24.3496 12.2004 24.3751L16.9794 27.1351C17.2217 27.2769 17.5217 27.2769 17.7647 27.1351L23.5989 23.7661V26.0986C23.6004 26.1226 23.5892 26.1459 23.5704 26.1609L18.7397 28.9501C16.5879 30.1891 13.8399 29.4526 12.5957 27.3039H12.5949ZM11.3372 16.8721C11.8622 15.9601 12.6909 15.2626 13.6779 14.9004C13.6779 14.9416 13.6757 15.0144 13.6757 15.0654V20.5861C13.6742 20.8666 13.8242 21.1269 14.0679 21.2656L19.9022 24.6339L17.8824 25.8001C17.8622 25.8136 17.8367 25.8159 17.8142 25.8061L12.9827 23.0146C10.8354 21.7711 10.0989 19.0239 11.3364 16.8729L11.3372 16.8721ZM27.9317 20.7339L22.0974 17.3649L24.1172 16.1994C24.1374 16.1859 24.1629 16.1836 24.1854 16.1934L29.0169 18.9826C31.1679 20.2254 31.9052 22.9771 30.6624 25.1281C30.1367 26.0386 29.3087 26.7361 28.3224 27.0991V21.4134C28.3247 21.1329 28.1754 20.8734 27.9324 20.7339H27.9317ZM29.9417 17.7084C29.9064 17.6866 29.8442 17.6491 29.7999 17.6236L25.0209 14.8636C24.7787 14.7219 24.4787 14.7219 24.2357 14.8636L18.4014 18.2326V15.9001C18.3999 15.8761 18.4112 15.8529 18.4299 15.8379L23.2607 13.0509C25.4124 11.8096 28.1634 12.5484 29.4039 14.7009C29.9282 15.6099 30.1179 16.6741 29.9402 17.7084H29.9417ZM17.3034 21.8656L15.2829 20.6994C15.2612 20.6889 15.2469 20.6679 15.2439 20.6439V15.0646C15.2454 12.5806 17.2607 10.5676 19.7447 10.5691C20.7954 10.5691 21.8124 10.9381 22.6202 11.6101C22.5834 11.6296 22.5204 11.6649 22.4784 11.6904L17.6994 14.4504C17.4549 14.5891 17.3049 14.8486 17.3064 15.1299L17.3034 21.8641V21.8656ZM18.4007 19.5001L20.9994 17.9994L23.5982 19.4994V22.5001L20.9994 24.0001L18.4007 22.5001V19.5001Z"
+              fill="black"
+            ></path>
+          </g>
+          <path
+            d="M41.3443 21.0002C41.3443 9.76457 32.2359 0.65625 21.0002 0.65625C9.76457 0.65625 0.65625 9.76457 0.65625 21.0002C0.65625 32.2359 9.76457 41.3443 21.0002 41.3443C32.2359 41.3443 41.3443 32.2359 41.3443 21.0002Z"
+            stroke="#EEEEEE"
+            strokeWidth="1.313"
+          ></path>
+        </g>
+        <defs>
+          <clipPath id="clip0_11185_26182">
+            <rect width="42" height="42" fill="white"></rect>
+          </clipPath>
+          <clipPath id="clip1_11185_26182">
+            <rect
+              width="24"
+              height="24"
+              fill="white"
+              transform="translate(9 9)"
+            ></rect>
+          </clipPath>
+        </defs>
+      </svg>
     ),
     deepSeek: (
       <svg
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 42 42"
-                className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
-              >
-                <path
-                  d="M.5 21C.5 9.678 9.678.5 21 .5S41.5 9.678 41.5 21 32.322 41.5 21 41.5.5 32.322.5 21Z"
-                  fill="#fff"
-                ></path>
-                <rect
-                  x="0.656"
-                  y="0.656"
-                  width="40.688"
-                  height="40.688"
-                  rx="20.344"
-                  stroke="#EEE"
-                  strokeWidth="1.313"
-                ></rect>
-                <g clipPath="url(#a)">
-                  <path
-                    d="M33 13.674v.53c-.197.576-.272 1.192-.581 1.73-.61 1.064-1.534 1.676-2.732 1.908-.291.057-.59.07-.584.518.018 1.56-.442 3.02-1.07 4.427-.466 1.04-1.167 1.929-1.949 2.76-.42.444-.396.47.164.676.414.153.825.318 1.225.503.244.112.584.18.515.569-.067.37-.36.501-.688.569a5.912 5.912 0 0 1-2.996-.15c-.332-.104-.522-.034-.752.14a8.46 8.46 0 0 1-1.295.818c-1.662.84-3.474.892-5.212.634-3.484-.519-5.893-2.569-7.344-5.745-.36-.79-.44-1.653-.702-2.466V19.08c.125-.084.087-.22.108-.336.359-1.94 1.297-3.53 2.939-4.661 1.578-1.086 3.37-1.225 5.206-1.004.43.052.797-.01 1.188-.142.938-.315 1.863-.71 2.893-.557.173.026.396.006.439.215.037.185-.192.223-.309.313-.649.503-.729 1.264-.097 1.686 1.191.797 2.149 1.84 3.166 2.822.485.469 1.004.893 1.636 1.159.146.061.286.159.44.02.345-.308.31-1.116-.061-1.41-1.492-1.18-1.987-3.152-1.23-4.854.108-.244.215-.452.536-.393.16.156.202.368.262.567.13.426.37.777.776.954.787.344 1.456.784 1.647 1.747.595-.56 1.228-.846 1.962-.837.681.007 1.252-.202 1.68-.734.298-.367.562-.35.818.036l.001.002ZM22.651 27.467c.094.36.205.644.537.143.044-.067.14-.1.21-.15.162-.158-.015-.216-.098-.275-1.334-.978-2.329-2.253-3.217-3.621-1.268-1.954-2.767-3.668-4.971-4.622-1.248-.54-2.538-.89-3.923-.71-.419.054-.635.238-.595.693.072.81.19 1.61.439 2.386.692 2.16 1.938 3.904 3.896 5.105.585.359 1.22.588 1.916.404.386-.103.572-.325.297-.745-.19-.292-.351-.613-.371-.98-.018-.32.116-.454.444-.415.292.036.54.17.784.312.612.359 1.209.741 1.754 1.194.847.7 1.749 1.267 2.9 1.282l-.002-.001Zm.089-6.797c-.192 1.174 1.195 1.769 1.91 1.325.267-.165.345-.32.214-.6-.371-.792-.864-1.498-1.54-2.058-.403-.334-.866-.566-1.418-.427-.207.052-.432.154-.442.4-.011.295.25.28.456.325.727.151.842.303.821 1.036l-.001-.001Zm-.58-.272c-.023-.18-.128-.301-.308-.292-.15.008-.266.12-.254.282.011.17.101.301.302.287.166-.011.243-.117.26-.276v-.001Z"
-                    fill="#506BFC"
-                  ></path>
-                  <path
-                    d="m22.652 27.469.746-.007c-.07.05-.165.084-.209.15-.332.501-.443.216-.537-.143Z"
-                    fill="#4C6EF2"
-                  ></path>
-                </g>
-                <defs>
-                  <clipPath id="a">
-                    <path
-                      fill="#fff"
-                      transform="translate(9 11.933)"
-                      d="M0 0h24v17.513H0z"
-                    ></path>
-                  </clipPath>
-                </defs>
-              </svg>
-    ),
-    uploadPDF:(
-      <svg
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 42 42"
-      className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
-    >
-      <path
-        d="M.5 21C.5 9.678 9.678.5 21 .5S41.5 9.678 41.5 21 32.322 41.5 21 41.5.5 32.322.5 21Z"
-        fill="#fff"
-      ></path>
-      <rect
-        x="0.656"
-        y="0.656"
-        width="40.688"
-        height="40.688"
-        rx="20.344"
-        stroke="#EEE"
-        strokeWidth="1.313"
-      ></rect>
-      <path
-        d="M27.918 17.253 22.7 12.036v5.217h5.217Z"
-        fill="#D47070"
-      ></path>
-      <path
-        d="M22.7 18.744c-.822 0-1.49-.669-1.49-1.491v-5.217h-5.217a1.49 1.49 0 0 0-1.491 1.49v14.907a1.49 1.49 0 0 0 1.49 1.49l10.435.002c.823 0 1.491-.668 1.491-1.49v-9.691h-5.217Z"
-        fill="#D47070"
-      ></path>
-    </svg>
-    ),
-    ImageGeneration:(
-      <svg
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 42 42"
-      className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
-    >
-      <path
-        d="M.5 21C.5 9.678 9.678.5 21 .5S41.5 9.678 41.5 21 32.322 41.5 21 41.5.5 32.322.5 21Z"
-        fill="#fff"
-      ></path>
-      <rect
-        x="0.656"
-        y="0.656"
-        width="40.688"
-        height="40.688"
-        rx="20.344"
-        stroke="#EEE"
-        strokeWidth="1.313"
-      ></rect>
-      <path
-        d="M19.164 22.32c.289 0 .548-.07.778-.213a1.71 1.71 0 0 0 .566-.573 1.49 1.49 0 0 0 .213-.786c0-.279-.071-.536-.213-.77a1.565 1.565 0 0 0-.566-.566 1.492 1.492 0 0 0-.778-.206c-.29 0-.551.069-.786.206a1.566 1.566 0 0 0-.566.565 1.504 1.504 0 0 0-.205.771c0 .29.068.551.205.786.142.235.33.426.566.573.235.142.497.213.786.213Zm-3.114 4.15h9.886c.254 0 .445-.061.573-.184.132-.122.198-.318.198-.587v-1.05l-2.615-2.454a1.315 1.315 0 0 0-.419-.264 1.241 1.241 0 0 0-.484-.096c-.157 0-.311.032-.463.096a1.497 1.497 0 0 0-.433.264L19.53 24.62l-1.102-.991a1.251 1.251 0 0 0-.389-.25 1.156 1.156 0 0 0-.845 0c-.132.049-.26.127-.381.235l-1.536 1.44v.646c0 .269.064.465.191.587.133.123.326.184.58.184Zm-.213 2.086c-.847 0-1.501-.23-1.961-.69-.456-.456-.683-1.105-.683-1.947v-7.433c0-.837.227-1.483.683-1.939.46-.46 1.114-.69 1.96-.69H26.15c.842 0 1.493.23 1.953.69.465.456.698 1.102.698 1.94v7.432c0 .842-.233 1.491-.698 1.946-.46.46-1.111.69-1.953.69H15.837Zm-.992-13.94c.04-.392.176-.703.411-.933.24-.23.59-.345 1.05-.345h9.372c.466 0 .816.115 1.05.345.236.23.375.54.42.933H14.845Zm1.44-2.395c.034-.372.169-.66.404-.867.235-.205.548-.308.94-.308h6.727c.397 0 .713.103.948.309.235.205.367.494.397.866h-9.416Z"
-        fill="#857DDD"
-      ></path>
-    </svg>
-    ),
-    openAI4o:(
-      <svg
-      viewBox="0 0 42 42"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
-    >
-      <g clipPath="url(#clip0_11185_26182)">
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 42 42"
+        className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
+      >
         <path
-          d="M0.5 21C0.5 9.678 9.678 0.5 21 0.5C32.322 0.5 41.5 9.678 41.5 21C41.5 32.322 32.322 41.5 21 41.5C9.678 41.5 0.5 32.322 0.5 21Z"
-          fill="white"
+          d="M.5 21C.5 9.678 9.678.5 21 .5S41.5 9.678 41.5 21 32.322 41.5 21 41.5.5 32.322.5 21Z"
+          fill="#fff"
         ></path>
-        <g clipPath="url(#clip1_11185_26182)">
+        <rect
+          x="0.656"
+          y="0.656"
+          width="40.688"
+          height="40.688"
+          rx="20.344"
+          stroke="#EEE"
+          strokeWidth="1.313"
+        ></rect>
+        <g clipPath="url(#a)">
           <path
-            d="M31.2789 18.8229C31.8234 17.1886 31.6359 15.3984 30.7652 13.9119C29.4557 11.6319 26.8232 10.4589 24.2522 11.0109C23.1084 9.72236 21.4652 8.98961 19.7424 9.00011C17.1144 8.99411 14.7827 10.6861 13.9742 13.1866C12.2859 13.5324 10.8287 14.5891 9.97594 16.0869C8.65669 18.3609 8.95744 21.2274 10.7199 23.1774C10.1754 24.8116 10.3629 26.6019 11.2337 28.0884C12.5432 30.3684 15.1757 31.5414 17.7467 30.9894C18.8897 32.2779 20.5337 33.0106 22.2564 32.9994C24.8859 33.0061 27.2184 31.3126 28.0269 28.8099C29.7152 28.4641 31.1724 27.4074 32.0252 25.9096C33.3429 23.6356 33.0414 20.7714 31.2797 18.8214L31.2789 18.8229ZM22.2579 31.4311C21.2057 31.4326 20.1864 31.0644 19.3787 30.3901C19.4154 30.3706 19.4792 30.3354 19.5204 30.3099L24.2994 27.5499C24.5439 27.4111 24.6939 27.1509 24.6924 26.8696V20.1324L26.7122 21.2986C26.7339 21.3091 26.7482 21.3301 26.7512 21.3541V26.9334C26.7482 29.4144 24.7389 31.4259 22.2579 31.4311ZM12.5949 27.3039C12.0677 26.3934 11.8779 25.3261 12.0587 24.2904C12.0939 24.3114 12.1562 24.3496 12.2004 24.3751L16.9794 27.1351C17.2217 27.2769 17.5217 27.2769 17.7647 27.1351L23.5989 23.7661V26.0986C23.6004 26.1226 23.5892 26.1459 23.5704 26.1609L18.7397 28.9501C16.5879 30.1891 13.8399 29.4526 12.5957 27.3039H12.5949ZM11.3372 16.8721C11.8622 15.9601 12.6909 15.2626 13.6779 14.9004C13.6779 14.9416 13.6757 15.0144 13.6757 15.0654V20.5861C13.6742 20.8666 13.8242 21.1269 14.0679 21.2656L19.9022 24.6339L17.8824 25.8001C17.8622 25.8136 17.8367 25.8159 17.8142 25.8061L12.9827 23.0146C10.8354 21.7711 10.0989 19.0239 11.3364 16.8729L11.3372 16.8721ZM27.9317 20.7339L22.0974 17.3649L24.1172 16.1994C24.1374 16.1859 24.1629 16.1836 24.1854 16.1934L29.0169 18.9826C31.1679 20.2254 31.9052 22.9771 30.6624 25.1281C30.1367 26.0386 29.3087 26.7361 28.3224 27.0991V21.4134C28.3247 21.1329 28.1754 20.8734 27.9324 20.7339H27.9317ZM29.9417 17.7084C29.9064 17.6866 29.8442 17.6491 29.7999 17.6236L25.0209 14.8636C24.7787 14.7219 24.4787 14.7219 24.2357 14.8636L18.4014 18.2326V15.9001C18.3999 15.8761 18.4112 15.8529 18.4299 15.8379L23.2607 13.0509C25.4124 11.8096 28.1634 12.5484 29.4039 14.7009C29.9282 15.6099 30.1179 16.6741 29.9402 17.7084H29.9417ZM17.3034 21.8656L15.2829 20.6994C15.2612 20.6889 15.2469 20.6679 15.2439 20.6439V15.0646C15.2454 12.5806 17.2607 10.5676 19.7447 10.5691C20.7954 10.5691 21.8124 10.9381 22.6202 11.6101C22.5834 11.6296 22.5204 11.6649 22.4784 11.6904L17.6994 14.4504C17.4549 14.5891 17.3049 14.8486 17.3064 15.1299L17.3034 21.8641V21.8656ZM18.4007 19.5001L20.9994 17.9994L23.5982 19.4994V22.5001L20.9994 24.0001L18.4007 22.5001V19.5001Z"
-            fill="black"
+            d="M33 13.674v.53c-.197.576-.272 1.192-.581 1.73-.61 1.064-1.534 1.676-2.732 1.908-.291.057-.59.07-.584.518.018 1.56-.442 3.02-1.07 4.427-.466 1.04-1.167 1.929-1.949 2.76-.42.444-.396.47.164.676.414.153.825.318 1.225.503.244.112.584.18.515.569-.067.37-.36.501-.688.569a5.912 5.912 0 0 1-2.996-.15c-.332-.104-.522-.034-.752.14a8.46 8.46 0 0 1-1.295.818c-1.662.84-3.474.892-5.212.634-3.484-.519-5.893-2.569-7.344-5.745-.36-.79-.44-1.653-.702-2.466V19.08c.125-.084.087-.22.108-.336.359-1.94 1.297-3.53 2.939-4.661 1.578-1.086 3.37-1.225 5.206-1.004.43.052.797-.01 1.188-.142.938-.315 1.863-.71 2.893-.557.173.026.396.006.439.215.037.185-.192.223-.309.313-.649.503-.729 1.264-.097 1.686 1.191.797 2.149 1.84 3.166 2.822.485.469 1.004.893 1.636 1.159.146.061.286.159.44.02.345-.308.31-1.116-.061-1.41-1.492-1.18-1.987-3.152-1.23-4.854.108-.244.215-.452.536-.393.16.156.202.368.262.567.13.426.37.777.776.954.787.344 1.456.784 1.647 1.747.595-.56 1.228-.846 1.962-.837.681.007 1.252-.202 1.68-.734.298-.367.562-.35.818.036l.001.002ZM22.651 27.467c.094.36.205.644.537.143.044-.067.14-.1.21-.15.162-.158-.015-.216-.098-.275-1.334-.978-2.329-2.253-3.217-3.621-1.268-1.954-2.767-3.668-4.971-4.622-1.248-.54-2.538-.89-3.923-.71-.419.054-.635.238-.595.693.072.81.19 1.61.439 2.386.692 2.16 1.938 3.904 3.896 5.105.585.359 1.22.588 1.916.404.386-.103.572-.325.297-.745-.19-.292-.351-.613-.371-.98-.018-.32.116-.454.444-.415.292.036.54.17.784.312.612.359 1.209.741 1.754 1.194.847.7 1.749 1.267 2.9 1.282l-.002-.001Zm.089-6.797c-.192 1.174 1.195 1.769 1.91 1.325.267-.165.345-.32.214-.6-.371-.792-.864-1.498-1.54-2.058-.403-.334-.866-.566-1.418-.427-.207.052-.432.154-.442.4-.011.295.25.28.456.325.727.151.842.303.821 1.036l-.001-.001Zm-.58-.272c-.023-.18-.128-.301-.308-.292-.15.008-.266.12-.254.282.011.17.101.301.302.287.166-.011.243-.117.26-.276v-.001Z"
+            fill="#506BFC"
+          ></path>
+          <path
+            d="m22.652 27.469.746-.007c-.07.05-.165.084-.209.15-.332.501-.443.216-.537-.143Z"
+            fill="#4C6EF2"
           ></path>
         </g>
+        <defs>
+          <clipPath id="a">
+            <path
+              fill="#fff"
+              transform="translate(9 11.933)"
+              d="M0 0h24v17.513H0z"
+            ></path>
+          </clipPath>
+        </defs>
+      </svg>
+    ),
+    uploadPDF: (
+      <svg
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 42 42"
+        className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
+      >
         <path
-          d="M41.3443 21.0002C41.3443 9.76457 32.2359 0.65625 21.0002 0.65625C9.76457 0.65625 0.65625 9.76457 0.65625 21.0002C0.65625 32.2359 9.76457 41.3443 21.0002 41.3443C32.2359 41.3443 41.3443 32.2359 41.3443 21.0002Z"
-          stroke="#EEEEEE"
-          strokeWidth="1.313"
+          d="M.5 21C.5 9.678 9.678.5 21 .5S41.5 9.678 41.5 21 32.322 41.5 21 41.5.5 32.322.5 21Z"
+          fill="#fff"
         ></path>
-      </g>
-      <defs>
-        <clipPath id="clip0_11185_26182">
-          <rect width="42" height="42" fill="white"></rect>
-        </clipPath>
-        <clipPath id="clip1_11185_26182">
-          <rect
-            width="24"
-            height="24"
+        <rect
+          x="0.656"
+          y="0.656"
+          width="40.688"
+          height="40.688"
+          rx="20.344"
+          stroke="#EEE"
+          strokeWidth="1.313"
+        ></rect>
+        <path d="M27.918 17.253 22.7 12.036v5.217h5.217Z" fill="#D47070"></path>
+        <path
+          d="M22.7 18.744c-.822 0-1.49-.669-1.49-1.491v-5.217h-5.217a1.49 1.49 0 0 0-1.491 1.49v14.907a1.49 1.49 0 0 0 1.49 1.49l10.435.002c.823 0 1.491-.668 1.491-1.49v-9.691h-5.217Z"
+          fill="#D47070"
+        ></path>
+      </svg>
+    ),
+    ImageGeneration: (
+      <svg
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 42 42"
+        className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
+      >
+        <path
+          d="M.5 21C.5 9.678 9.678.5 21 .5S41.5 9.678 41.5 21 32.322 41.5 21 41.5.5 32.322.5 21Z"
+          fill="#fff"
+        ></path>
+        <rect
+          x="0.656"
+          y="0.656"
+          width="40.688"
+          height="40.688"
+          rx="20.344"
+          stroke="#EEE"
+          strokeWidth="1.313"
+        ></rect>
+        <path
+          d="M19.164 22.32c.289 0 .548-.07.778-.213a1.71 1.71 0 0 0 .566-.573 1.49 1.49 0 0 0 .213-.786c0-.279-.071-.536-.213-.77a1.565 1.565 0 0 0-.566-.566 1.492 1.492 0 0 0-.778-.206c-.29 0-.551.069-.786.206a1.566 1.566 0 0 0-.566.565 1.504 1.504 0 0 0-.205.771c0 .29.068.551.205.786.142.235.33.426.566.573.235.142.497.213.786.213Zm-3.114 4.15h9.886c.254 0 .445-.061.573-.184.132-.122.198-.318.198-.587v-1.05l-2.615-2.454a1.315 1.315 0 0 0-.419-.264 1.241 1.241 0 0 0-.484-.096c-.157 0-.311.032-.463.096a1.497 1.497 0 0 0-.433.264L19.53 24.62l-1.102-.991a1.251 1.251 0 0 0-.389-.25 1.156 1.156 0 0 0-.845 0c-.132.049-.26.127-.381.235l-1.536 1.44v.646c0 .269.064.465.191.587.133.123.326.184.58.184Zm-.213 2.086c-.847 0-1.501-.23-1.961-.69-.456-.456-.683-1.105-.683-1.947v-7.433c0-.837.227-1.483.683-1.939.46-.46 1.114-.69 1.96-.69H26.15c.842 0 1.493.23 1.953.69.465.456.698 1.102.698 1.94v7.432c0 .842-.233 1.491-.698 1.946-.46.46-1.111.69-1.953.69H15.837Zm-.992-13.94c.04-.392.176-.703.411-.933.24-.23.59-.345 1.05-.345h9.372c.466 0 .816.115 1.05.345.236.23.375.54.42.933H14.845Zm1.44-2.395c.034-.372.169-.66.404-.867.235-.205.548-.308.94-.308h6.727c.397 0 .713.103.948.309.235.205.367.494.397.866h-9.416Z"
+          fill="#857DDD"
+        ></path>
+      </svg>
+    ),
+    openAI4o: (
+      <svg
+        viewBox="0 0 42 42"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
+      >
+        <g clipPath="url(#clip0_11185_26182)">
+          <path
+            d="M0.5 21C0.5 9.678 9.678 0.5 21 0.5C32.322 0.5 41.5 9.678 41.5 21C41.5 32.322 32.322 41.5 21 41.5C9.678 41.5 0.5 32.322 0.5 21Z"
             fill="white"
-            transform="translate(9 9)"
-          ></rect>
-        </clipPath>
-      </defs>
-    </svg>
-    )
+          ></path>
+          <g clipPath="url(#clip1_11185_26182)">
+            <path
+              d="M31.2789 18.8229C31.8234 17.1886 31.6359 15.3984 30.7652 13.9119C29.4557 11.6319 26.8232 10.4589 24.2522 11.0109C23.1084 9.72236 21.4652 8.98961 19.7424 9.00011C17.1144 8.99411 14.7827 10.6861 13.9742 13.1866C12.2859 13.5324 10.8287 14.5891 9.97594 16.0869C8.65669 18.3609 8.95744 21.2274 10.7199 23.1774C10.1754 24.8116 10.3629 26.6019 11.2337 28.0884C12.5432 30.3684 15.1757 31.5414 17.7467 30.9894C18.8897 32.2779 20.5337 33.0106 22.2564 32.9994C24.8859 33.0061 27.2184 31.3126 28.0269 28.8099C29.7152 28.4641 31.1724 27.4074 32.0252 25.9096C33.3429 23.6356 33.0414 20.7714 31.2797 18.8214L31.2789 18.8229ZM22.2579 31.4311C21.2057 31.4326 20.1864 31.0644 19.3787 30.3901C19.4154 30.3706 19.4792 30.3354 19.5204 30.3099L24.2994 27.5499C24.5439 27.4111 24.6939 27.1509 24.6924 26.8696V20.1324L26.7122 21.2986C26.7339 21.3091 26.7482 21.3301 26.7512 21.3541V26.9334C26.7482 29.4144 24.7389 31.4259 22.2579 31.4311ZM12.5949 27.3039C12.0677 26.3934 11.8779 25.3261 12.0587 24.2904C12.0939 24.3114 12.1562 24.3496 12.2004 24.3751L16.9794 27.1351C17.2217 27.2769 17.5217 27.2769 17.7647 27.1351L23.5989 23.7661V26.0986C23.6004 26.1226 23.5892 26.1459 23.5704 26.1609L18.7397 28.9501C16.5879 30.1891 13.8399 29.4526 12.5957 27.3039H12.5949ZM11.3372 16.8721C11.8622 15.9601 12.6909 15.2626 13.6779 14.9004C13.6779 14.9416 13.6757 15.0144 13.6757 15.0654V20.5861C13.6742 20.8666 13.8242 21.1269 14.0679 21.2656L19.9022 24.6339L17.8824 25.8001C17.8622 25.8136 17.8367 25.8159 17.8142 25.8061L12.9827 23.0146C10.8354 21.7711 10.0989 19.0239 11.3364 16.8729L11.3372 16.8721ZM27.9317 20.7339L22.0974 17.3649L24.1172 16.1994C24.1374 16.1859 24.1629 16.1836 24.1854 16.1934L29.0169 18.9826C31.1679 20.2254 31.9052 22.9771 30.6624 25.1281C30.1367 26.0386 29.3087 26.7361 28.3224 27.0991V21.4134C28.3247 21.1329 28.1754 20.8734 27.9324 20.7339H27.9317ZM29.9417 17.7084C29.9064 17.6866 29.8442 17.6491 29.7999 17.6236L25.0209 14.8636C24.7787 14.7219 24.4787 14.7219 24.2357 14.8636L18.4014 18.2326V15.9001C18.3999 15.8761 18.4112 15.8529 18.4299 15.8379L23.2607 13.0509C25.4124 11.8096 28.1634 12.5484 29.4039 14.7009C29.9282 15.6099 30.1179 16.6741 29.9402 17.7084H29.9417ZM17.3034 21.8656L15.2829 20.6994C15.2612 20.6889 15.2469 20.6679 15.2439 20.6439V15.0646C15.2454 12.5806 17.2607 10.5676 19.7447 10.5691C20.7954 10.5691 21.8124 10.9381 22.6202 11.6101C22.5834 11.6296 22.5204 11.6649 22.4784 11.6904L17.6994 14.4504C17.4549 14.5891 17.3049 14.8486 17.3064 15.1299L17.3034 21.8641V21.8656ZM18.4007 19.5001L20.9994 17.9994L23.5982 19.4994V22.5001L20.9994 24.0001L18.4007 22.5001V19.5001Z"
+              fill="black"
+            ></path>
+          </g>
+          <path
+            d="M41.3443 21.0002C41.3443 9.76457 32.2359 0.65625 21.0002 0.65625C9.76457 0.65625 0.65625 9.76457 0.65625 21.0002C0.65625 32.2359 9.76457 41.3443 21.0002 41.3443C32.2359 41.3443 41.3443 32.2359 41.3443 21.0002Z"
+            stroke="#EEEEEE"
+            strokeWidth="1.313"
+          ></path>
+        </g>
+        <defs>
+          <clipPath id="clip0_11185_26182">
+            <rect width="42" height="42" fill="white"></rect>
+          </clipPath>
+          <clipPath id="clip1_11185_26182">
+            <rect
+              width="24"
+              height="24"
+              fill="white"
+              transform="translate(9 9)"
+            ></rect>
+          </clipPath>
+        </defs>
+      </svg>
+    ),
   };
-
-
 
   return (
     <>
@@ -495,95 +613,94 @@ const ChatPage = ({ params }) => {
             ref={chatContainerRef}
           >
             <div className="flex flex-col sticky  h-full w-full ">
-            {isloading ? (
-  
-  <div className="flex flex-col gap-1 mr-36">
-    {Array(1)
-      .fill(0)
-      .map((_, index) => (
-        <div key={index} className="animate-pulse flex flex-col gap-1 mr-36">
-          <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
+              {isloading ? (
+                <div className="flex flex-col gap-1 mr-36">
+                  {Array(1)
+                    .fill(0)
+                    .map((_, index) => (
+                      <div
+                        key={index}
+                        className="animate-pulse flex flex-col gap-1 mr-36"
+                      >
+                        <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
 
-          <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
-        </div>
-      ))}
-  </div>
-) : (
-
-  chatHistory.map((chat, index) => (
-    <div key={index} className="flex flex-col gap-1 ">
-      <div className="flex flex-col overflow-y-auto max-h-[500px]">
-        <div className="flex justify-end w-full ">
-          {editIndex !== index && (
-            <button
-              onClick={() => {
-                setEditIndex(index);
-                setEditMessage(chat.userMessage);
-              }}
-              className="text-black rounded-md text-sm mr-3"
-            >
-              <Pencil size={15} />
-            </button>
-          )}
-
-          <div
-            className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${
-              editIndex === index
-                ? "bg-gray-500 w-[70%]"
-                : "bg-gray-600"
-            }`}
-          >
-            {editIndex === index ? (
-              <div className="flex flex-col w-full">
-                <input
-                  type="text"
-                  value={editMessage}
-                  onChange={(e) => setEditMessage(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleSaveEdit(index);
-                      handleAddChat();
-                      setEditIndex(null);
-                    }
-                  }}
-                  className="w-full bg-transparent text-white p-2 rounded-md outline-none "
-                  autoFocus
-                />
-
-                <div className="flex justify-end gap-2 mt-2">
-                  <button
-                    onClick={() => setEditIndex(null)}
-                    className="px-3 py-1 bg-gray-400 text-white rounded-md"
-                  >
-                    Cancel
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      handleSaveEdit(index);
-                      handleAddChat();
-                      setEditIndex(null);
-                    }}
-                    className="px-3 py-1 bg-green-500 text-white rounded-md"
-                  >
-                    Send
-                  </button>
+                        <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
+                      </div>
+                    ))}
                 </div>
-              </div>
-            ) : (
-              <span className="break-words w-full text-white">
-                {chat.userMessage}
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
+              ) : (
+                chatHistory.map((chat, index) => (
+                  <div key={index} className="flex flex-col gap-1 ">
+                    <div className="flex flex-col overflow-y-auto max-h-[500px]">
+                      <div className="flex justify-end w-full ">
+                        {editIndex !== index && (
+                          <button
+                            onClick={() => {
+                              setEditIndex(index);
+                              setEditMessage(chat.userMessage);
+                            }}
+                            className="text-black rounded-md text-sm mr-3"
+                          >
+                            <Pencil size={15} />
+                          </button>
+                        )}
 
-    g
-    </div>
-  ))
-)
-}
+                        <div
+                          className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${
+                            editIndex === index
+                              ? "bg-gray-500 w-[70%]"
+                              : "bg-gray-600"
+                          }`}
+                        >
+                          {editIndex === index ? (
+                            <div className="flex flex-col w-full">
+                              <input
+                                type="text"
+                                value={editMessage}
+                                onChange={(e) => setEditMessage(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    handleSaveEdit(index);
+                                    handleAddChat();
+                                    setEditIndex(null);
+                                  }
+                                }}
+                                className="w-full bg-transparent text-white p-2 rounded-md outline-none "
+                                autoFocus
+                              />
+
+                              <div className="flex justify-end gap-2 mt-2">
+                                <button
+                                  onClick={() => setEditIndex(null)}
+                                  className="px-3 py-1 bg-gray-400 text-white rounded-md"
+                                >
+                                  Cancel
+                                </button>
+
+                                <button
+                                  onClick={() => {
+                                    handleSaveEdit(index);
+                                    handleAddChat();
+                                    setEditIndex(null);
+                                  }}
+                                  className="px-3 py-1 bg-green-500 text-white rounded-md"
+                                >
+                                  Send
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <span className="break-words w-full text-white">
+                              {chat.userMessage}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    g
+                  </div>
+                ))
+              )}
 
               {morePrompt !== "" && (
                 <div className="flex flex-col gap-1 ml-36">
@@ -639,130 +756,155 @@ const ChatPage = ({ params }) => {
             ref={chatContainerRef}
           >
             <div className="flex flex-col sticky  h-full w-full ">
-            {isloading ? (
-  
-  <div className="flex flex-col gap-1 mr-36">
-    {Array(1)
-      .fill(0)
-      .map((_, index) => (
-        <div key={index} className="animate-pulse flex flex-col gap-1 mr-36">
-          <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
+              {isloading ? (
+                <div className="flex flex-col gap-1 mr-36">
+                  {Array(1)
+                    .fill(0)
+                    .map((_, index) => (
+                      <div
+                        key={index}
+                        className="animate-pulse flex flex-col gap-1 mr-36"
+                      >
+                        <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
 
-          <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
-        </div>
-      ))}
-  </div>
-) : (
-  chatHistory.map((chat, index) => (
-    <div key={index} className="flex flex-col gap-1 mr-36">
-      <div className="flex flex-col overflow-y-auto max-h-[500px]">
-        <div className="flex justify-end w-full pr-36">
-          {editIndex !== index && (
-            <button
-              onClick={() => {
-                setEditIndex(index);
-                setEditMessage(chat.userMessage);
-              }}
-              className="text-black rounded-md text-sm mr-3"
-            >
-              <Pencil size={15} />
-            </button>
-          )}
-
-          <div
-            className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${
-              editIndex === index
-                ? "bg-gray-500 w-[70%]"
-                : "bg-gray-600"
-            }`}
-          >
-            {editIndex === index ? (
-              <div className="flex flex-col w-full">
-                <input
-                  type="text"
-                  value={editMessage}
-                  onChange={(e) => setEditMessage(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleSaveEdit(index);
-                      handleAddChat();
-                      setEditIndex(null);
-                    }
-                  }}
-                  className="w-full bg-transparent text-white p-2 rounded-md outline-none "
-                  autoFocus
-                />
-
-                <div className="flex justify-end gap-2 mt-2">
-                  <button
-                    onClick={() => setEditIndex(null)}
-                    className="px-3 py-1 bg-gray-400 text-white rounded-md"
-                  >
-                    Cancel
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      handleSaveEdit(index);
-                      handleAddChat();
-                      setEditIndex(null);
-                    }}
-                    className="px-3 py-1 bg-green-500 text-white rounded-md"
-                  >
-                    Send
-                  </button>
+                        <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
+                      </div>
+                    ))}
                 </div>
-              </div>
-            ) : (
-              <span className="break-words w-full text-white">
-                {chat.userMessage}
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
+              ) : (
+                chatHistory.map((chat, index) => (
+                  <div key={index} className="flex flex-col gap-1 mr-36">
+                    <div className="flex flex-col overflow-y-auto max-h-[500px]">
+                      <div className="flex justify-end w-full pr-36">
+                        {editIndex !== index && (
+                          <button
+                            onClick={() => {
+                              setEditIndex(index);
+                              setEditMessage(chat.userMessage);
+                            }}
+                            className="text-black rounded-md text-sm mr-3"
+                          >
+                            <Pencil size={15} />
+                          </button>
+                        )}
 
-      {chatModel==="ImageGeneration"? (<div  className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
-        <div> <img src={generatedImage} alt="img"/> </div>
-      </div>):
-      (<div className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
-        {chat.parsedResponse.map((part, i) =>
+                        <div
+                          className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${
+                            editIndex === index
+                              ? "bg-gray-500 w-[70%]"
+                              : "bg-gray-600"
+                          }`}
+                        >
+                          {editIndex === index ? (
+                            <div className="flex flex-col w-full">
+                              <input
+                                type="text"
+                                value={editMessage}
+                                onChange={(e) => setEditMessage(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    handleSaveEdit(index);
+                                    handleAddChat();
+                                    setEditIndex(null);
+                                  }
+                                }}
+                                className="w-full bg-transparent text-white p-2 rounded-md outline-none "
+                                autoFocus
+                              />
+
+                              <div className="flex justify-end gap-2 mt-2">
+                                <button
+                                  onClick={() => setEditIndex(null)}
+                                  className="px-3 py-1 bg-gray-400 text-white rounded-md"
+                                >
+                                  Cancel
+                                </button>
+
+                                <button
+                                  onClick={() => {
+                                    handleSaveEdit(index);
+                                    handleAddChat();
+                                    setEditIndex(null);
+                                  }}
+                                  className="px-3 py-1 bg-green-500 text-white rounded-md"
+                                >
+                                  Send
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <span className="break-words w-full  text-white">
+                              {chat.userMessage}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {chatModel === "ImageGeneration" && chat.botResponse ? <div className="ml-36 self-start">
+  {loading && chat.userMessage === morePrompt ? (
+    <div className="w-48 h-48 bg-gray-300 flex items-center justify-center rounded-xl">
+      <div className="w-8 h-8 border-4 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  ) : (
+    <img 
+      src={chat.botResponse} 
+
+      alt={`Generated image for ${chat.userMessage}`} 
+      className="rounded-xl max-w-96  h-auto" 
+    />
+  )}
+</div>
+:  (
+      <div className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
+        {(
+          chat.parsedResponse && chat.parsedResponse.length > 0
+            ? chat.parsedResponse
+            : [{ type: "text", content: chat.botResponse }]
+        ).map((part, i) =>
           part.type === "code" ? (
             <div key={i} className="relative">
               <pre className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto relative">
                 <code>{part.content}</code>
               </pre>
-              <button
+              {/* <button
                 onClick={() => handleCopy(part.content, i)}
                 className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white p-1 rounded"
               >
                 <Clipboard size={16} />
-              </button>
-              {copiedIndex === i && (
+              </button> */}
+              {/* {copiedIndex === i && (
                 <span className="absolute top-2 right-10 bg-gray-700 text-white px-2 py-1 text-xs rounded">
                   Copied!
                 </span>
-              )}
+              )} */}
             </div>
           ) : (
             <span key={i}>{part.content}</span>
           )
         )}
-      </div>)}
-    </div>
-  ))
-)
-}
-
-              {morePrompt !== "" && (
-                <div className="flex flex-col gap-1 ml-36">
-                  {loading && (
-                    <div className="mself-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[5%] flex items-center gap-2">
-                      <span className="animate-pulse">...</span>
-                    </div>
-                  )}
-                </div>
+      </div>
+    ) }
+                  </div>
+                ))
               )}
+
+{morePrompt !== "" && (
+  <div className="flex flex-col gap-1 ml-36">
+    {loading ? (
+      chatModel === "ImageGeneration" ? (
+        <div className="w-48 h-48 bg-gray-300 flex items-center justify-center rounded-xl my-5">
+          <div className="w-8 h-8 border-4 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      ) : (
+        <div className="self-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[5%] flex items-center gap-2">
+          <span className="animate-pulse">...</span>
+        </div>
+      )
+    ) : null}
+  </div>
+)}
+
             </div>
 
             <div className="mb-5 ml-20 w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
@@ -811,7 +953,7 @@ const ChatPage = ({ params }) => {
             className="flex items-center hover:bg-gray-200 rounded text-black p-2"
           >
             <div className="w-7 h-6 p-1 ">
-            <span>{svgs[chatModel] || null}</span>
+              <span>{svgs[chatModel] || null}</span>
             </div>
             {chatModel}
           </Link>

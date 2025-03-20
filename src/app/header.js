@@ -3,9 +3,51 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { useState, useEffect } from "react";
 
 const Header = () => {
-  const pathname = usePathname(); // Get the current route
+  const pathname = usePathname();
+
+  const [credits,setCredits] = useState()
+ const [userId,setUserId] = useState()
+
+    useEffect(() => {
+      if (typeof window !== "undefined") {
+        try {
+          const storedUser = localStorage.getItem("user");
+          if (storedUser) {
+            const user = JSON.parse(storedUser);
+    
+            setUserId(user?.id);
+          }
+        } catch (error) {
+          console.error("Error parsing user data:", error);
+        }
+      }
+    }, []);
+
+    useEffect(() => {
+      if (userId) {
+        const fetchCredits = async () => {
+          try {
+            const response = await fetch(
+              `https://chatbot-2vqr.onrender.com/chatbot/get-by-userid/${userId}`
+            );
+            if (!response.ok) throw new Error("Failed to fetch credits");
+            
+            const data = await response.json();
+            setCredits(data.credits);
+  
+            // Store in localStorage
+            localStorage.setItem("credits", JSON.stringify(data.credits));
+          } catch (error) {
+            console.error("Error fetching credits:", error);
+          }
+        };
+  
+        fetchCredits();
+      }
+    }, [userId])
 
   console.log(pathname, "Current Pathname");
   const freePoints = 100;
@@ -276,9 +318,9 @@ const Header = () => {
           </button>
         )}
 
-         {/* Free Points Display */}
+  
          <div className="text-gray-600 text-sm font-medium">
-         Free Points: {freePoints}
+         Free Points: {credits}
           </div>
         </div>
 
