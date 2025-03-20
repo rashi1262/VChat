@@ -23,6 +23,7 @@ const page = () => {
         const { chatThread, setChatThread } = useChat();
       const router = useRouter()
      useEffect(() => {
+        if (typeof window === "undefined") return; 
        if (typeof window !== "undefined") {
          try {
            const storedUser = localStorage.getItem("user");

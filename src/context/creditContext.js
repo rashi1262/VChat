@@ -4,33 +4,49 @@ import { createContext, useContext, useState, useEffect } from "react";
 const CreditContext = createContext();
 
 export function CreditProvider({ children }) {
-  const storedCredits = localStorage.getItem("remainingCredits");
-  const parsedCredits = storedCredits ? JSON.parse(storedCredits) : 0;
-  
-  const [credits, setCredits] = useState(parsedCredits);
-  const [hasCredits, setHasCredits] = useState(parsedCredits !== 0);
-  
+  const [credits, setCredits] = useState(0);
+  const [hasCredits, setHasCredits] = useState(false);
+  const [loading, setLoading] = useState(true); // Prevents incorrect initial state
+
   useEffect(() => {
-    const checkLocalStorage = () => {
+    if (typeof window !== "undefined") { // ✅ Ensure it's running in the browser
       const storedCredits = localStorage.getItem("remainingCredits");
+      const userExists = localStorage.getItem("user") !== null;
 
       if (storedCredits) {
         const parsedCredits = JSON.parse(storedCredits);
-        if (parsedCredits !== credits) {
+        setCredits(parsedCredits);
+        setHasCredits(parsedCredits !== 0 || !userExists);
+      } else {
+        setHasCredits(!userExists);
+      }
+
+      setLoading(false); // ✅ Ensure correct state before rendering
+    }
+  }, []);
+
+  useEffect(() => {
+    const checkLocalStorage = () => {
+      if (typeof window !== "undefined") {
+        const storedCredits = localStorage.getItem("remainingCredits");
+        const userExists = localStorage.getItem("user") !== null;
+
+        if (storedCredits) {
+          const parsedCredits = JSON.parse(storedCredits);
           setCredits(parsedCredits);
-          setHasCredits(parsedCredits !== 0); // Only false if explicitly 0
+          setHasCredits(parsedCredits !== 0 || !userExists);
+        } else {
+          setHasCredits(!userExists);
         }
       }
     };
 
-    checkLocalStorage();
     const interval = setInterval(checkLocalStorage, 1000);
-
     return () => clearInterval(interval);
-  }, [credits]);
+  }, []);
 
   return (
-    <CreditContext.Provider value={{ hasCredits, setHasCredits, credits }}>
+    <CreditContext.Provider value={{ hasCredits, setHasCredits, credits, loading }}>
       {children}
     </CreditContext.Provider>
   );
