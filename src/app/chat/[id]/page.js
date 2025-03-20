@@ -362,7 +362,10 @@ const ChatPage = ({ params }) => {
 
         const data = await searchRes.json();
         console.log("Bot response received:", data);
-
+// Store remaining credits in localStorage
+if (data?.remainingCredits !== undefined) {
+  localStorage.setItem("remainingCredits", data.remainingCredits);
+}
         const responseText =
           typeof data === "string" ? data : JSON.stringify(data);
         newChat = {

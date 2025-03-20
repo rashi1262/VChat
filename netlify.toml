@@ -1,4 +1,0 @@
-[functions]
-  node_bundler = "esbuild"
-  timeout = 26 # Increases function timeout (max: 26 seconds)
-  directory = "netlify/functions" # Adjust if your functions are in a different folder

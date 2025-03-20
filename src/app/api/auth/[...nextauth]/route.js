@@ -37,6 +37,7 @@ const authOptions = {
                 email: user.email,
                 image: user.image,
                 googleLogin: true,
+                credits: 20,
               }),
             }
           );
