@@ -6,7 +6,7 @@ import { useChat } from "../../chatContext";
 import { useRouter } from "next/navigation";
 import { Edit, Pencil } from "lucide-react";
 import { useCredits } from "@/context/creditContext";
-import { Clipboard } from "lucide-react";
+import { Check,Clipboard } from "lucide-react";
 import { toast, Toaster } from "sonner";
 
 const ChatPage = ({ params }) => {
@@ -32,6 +32,17 @@ const ChatPage = ({ params }) => {
   const [editMessage, setEditMessage] = useState("");
   const [generatedImage, setGeneratedImage] = useState([]);
   console.log(chatHistory, "chatHistorychatHistory");
+  const [copiedIndex, setCopiedIndex] = useState(null);
+
+  const handleCopy = async (text, index) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedIndex(index);
+      setTimeout(() => setCopiedIndex(null), 2000); // Reset after 2s
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
 
   const handleSaveEdit = async (index) => {
     if (!editMessage.trim()) return;
@@ -129,12 +140,7 @@ const ChatPage = ({ params }) => {
   };
   
 
-  const handleCopy = (code, index) => {
-    navigator.clipboard.writeText(code).then(() => {
-      setCopiedIndex(index);
-      setTimeout(() => setCopiedIndex(null), 2000);
-    });
-  };
+
 
   useEffect(() => setisLoading(true), [id]);
 
@@ -656,21 +662,25 @@ const ChatPage = ({ params }) => {
         ).map((part, i) =>
           part.type === "code" ? (
             <div key={i} className="relative">
-              <pre className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto relative">
-                <code>{part.content}</code>
-              </pre>
-              {/* <button
-                onClick={() => handleCopy(part.content, i)}
-                className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white p-1 rounded"
-              >
-                <Clipboard size={16} />
-              </button> */}
-              {/* {copiedIndex === i && (
-                <span className="absolute top-2 right-10 bg-gray-700 text-white px-2 py-1 text-xs rounded">
-                  Copied!
-                </span>
-              )} */}
-            </div>
+                   <pre className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto relative">
+                     <code>{part.content}</code>
+                   </pre>
+             
+                  
+                   <button
+                     onClick={() => handleCopy(part.content, i)}
+                     className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white p-1 rounded"
+                   >
+                     {copiedIndex === i ? <Check size={16} /> : <Clipboard size={16} />}
+                   </button>
+             
+                  
+                   {copiedIndex === i && (
+                     <span className="absolute top-2 right-10 bg-gray-700 text-white px-2 py-1 text-xs rounded">
+                       Copied!
+                     </span>
+                   )}
+                 </div>
           ) : (
             <span key={i}>{part.content}</span>
           )
