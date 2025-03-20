@@ -488,13 +488,9 @@ const page = () => {
           You hit your free credit limit .Please Consider buying our plans for uninterrupted services
         </p>
         <div className=" p-2 mt-4">
-          <button
-            onClick={() => handleRedirect("/plans")}
-            className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
-          >
+        <Link href="/plans">
             Show Plans
-          </button>
-          
+            </Link>          
         </div>
        
       </div>

@@ -5,10 +5,11 @@ import Navbar from "../../navbar";
 import { useChat } from "../../chatContext";
 import { useRouter } from "next/navigation";
 import { Edit, Pencil } from "lucide-react";
-import { Clipboard } from "lucide-react";
+import { Check,Clipboard } from "lucide-react";
 import { useCredits } from "@/context/creditContext";
+
 const ChatPage = ({ params }) => {
-  const {hasCredits} = useCredits()
+  const {hasCredits,setHasCredits} = useCredits()
   const { id } = use(params);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -23,6 +24,7 @@ const ChatPage = ({ params }) => {
   const [moreChat, setMoreChat] = useState("");
   const [chatModel, setChatModel] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
+  
   const [isloading, setisLoading] = useState(false);
   const chatContainerRef = useRef(null);
   const[imgLoading,setImgLoading] = useState(false);
@@ -30,77 +32,19 @@ const ChatPage = ({ params }) => {
   const [editMessage, setEditMessage] = useState("");
   const [generatedImage, setGeneratedImage] = useState([]);
   console.log(chatHistory, "chatHistorychatHistory");
+  const [copiedIndex, setCopiedIndex] = useState(null);
 
-  // const handleSaveEdit = async (index) => {
-  //   if (!editMessage.trim()) return;
-  
-  //   setLoading(true);
-  
-  //   try {
-  //     console.log("Fetching updated bot response for:", editMessage);
-  //     const response = await fetch(
-  //       `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/search?userId=${encodeURIComponent(userId)}&message=${encodeURIComponent(editMessage)}`
-  //     );
-  
-  //     if (!response.ok) throw new Error("Error fetching updated bot response");
-  
-  //     const data = await response.json(); 
-  //     console.log("Updated bot response received:", data);
-  
-  //     const newBotResponse = data.botResponse;
-  //     const newParsedResponse = extractCodeBlocks(newBotResponse);
-  
-  //     setChatHistory((prevChats) =>
-  //       prevChats.map((chat, i) =>
-  //         i === index
-  //           ? {
-  //               ...chat,
-  //               userMessage: editMessage,
-  //               botResponse: newBotResponse,
-  //               parsedResponse: newParsedResponse,
-  //             }
-  //           : chat
-  //       )
-  //     );
-  
-  //     // Constructing request body similar to handleAddChat
-  //     const requestBody = JSON.stringify({
-  //       id,
-  //       userSearch: [
-  //         {
-  //           userMessage: editMessage,
-  //           botResponse: newBotResponse,
-  //           parsedResponse: newParsedResponse,
-  //         },
-  //       ],
-  //     });
-  
-  //     console.log("PUT Request Body:", requestBody);
-  
-  //     const updateRes = await fetch(
-  //       `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
-  //       {
-  //         method: "PUT",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: requestBody,
-  //       }
-  //     );
-  
-  //     if (!updateRes.ok) {
-  //       const errorText = await updateRes.text();
-  //       console.error("Update API Error Response:", errorText);
-  //       throw new Error(`Error updating chat data: ${errorText}`);
-  //     }
-  
-  //     console.log("Chat updated successfully!");
-  //     fetchBotResponse(); // Refresh chat history
-  //     setEditIndex(null);
-  //   } catch (error) {
-  //     console.error("Error updating chat:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const handleCopy = async (text, index) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedIndex(index);
+      setTimeout(() => setCopiedIndex(null), 2000); // Reset after 2s
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+ 
+
   const handleSaveEdit = async (index) => {
     if (!editMessage.trim()) return;
   
@@ -193,12 +137,12 @@ const ChatPage = ({ params }) => {
   };
   
 
-  const handleCopy = (code, index) => {
-    navigator.clipboard.writeText(code).then(() => {
-      setCopiedIndex(index);
-      setTimeout(() => setCopiedIndex(null), 2000);
-    });
-  };
+  // const handleCopy = (code, index) => {
+  //   navigator.clipboard.writeText(code).then(() => {
+  //     setCopiedIndex(index);
+  //     setTimeout(() => setCopiedIndex(null), 2000);
+  //   });
+  // };
 
   useEffect(() => setisLoading(true), [id]);
 
@@ -349,7 +293,6 @@ const ChatPage = ({ params }) => {
         setGeneratedImage(imageData.imageUrl);
         setImgLoading(false)
       } else {
-        console.log("Fetching bot response for message:", moreChat);
         const searchRes = await fetch(
           `${
             process.env.NEXT_PUBLIC_BASE_URL
@@ -358,12 +301,15 @@ const ChatPage = ({ params }) => {
           )}&message=${encodeURIComponent(moreChat)}`
         );
 
+
+
+
         if (!searchRes.ok) throw new Error("Error fetching bot response");
 
         const data = await searchRes.json();
         console.log("Bot response received:", data);
-// Store remaining credits in localStorage
-if (data?.remainingCredits !== undefined) {
+
+    if (data?.remainingCredits !== undefined) {
   localStorage.setItem("remainingCredits", data.remainingCredits);
 }
         const responseText =
@@ -697,21 +643,25 @@ if (data?.remainingCredits !== undefined) {
         ).map((part, i) =>
           part.type === "code" ? (
             <div key={i} className="relative">
-              <pre className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto relative">
-                <code>{part.content}</code>
-              </pre>
-              {/* <button
-                onClick={() => handleCopy(part.content, i)}
-                className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white p-1 rounded"
-              >
-                <Clipboard size={16} />
-              </button> */}
-              {/* {copiedIndex === i && (
-                <span className="absolute top-2 right-10 bg-gray-700 text-white px-2 py-1 text-xs rounded">
-                  Copied!
-                </span>
-              )} */}
-            </div>
+            <pre className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto relative">
+              <code>{part.content}</code>
+            </pre>
+      
+           
+            <button
+              onClick={() => handleCopy(part.content, i)}
+              className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white p-1 rounded"
+            >
+              {copiedIndex === i ? <Check size={16} /> : <Clipboard size={16} />}
+            </button>
+      
+            {/* "Copied!" Message */}
+            {copiedIndex === i && (
+              <span className="absolute top-2 right-10 bg-gray-700 text-white px-2 py-1 text-xs rounded">
+                Copied!
+              </span>
+            )}
+          </div>
           ) : (
             <span key={i}>{part.content}</span>
           )
@@ -785,7 +735,7 @@ if (data?.remainingCredits !== undefined) {
         </p>
         <div className=" p-2 mt-4">
           <button
-            onClick={() => handleRedirect("/plans")}
+            onClick={() => router.push("/plans")}
             className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
           >
             Show Plans

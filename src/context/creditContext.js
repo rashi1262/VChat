@@ -4,30 +4,33 @@ import { createContext, useContext, useState, useEffect } from "react";
 const CreditContext = createContext();
 
 export function CreditProvider({ children }) {
-  const [hasCredits, setHasCredits] = useState(true);
- 
-  const freeCredits = localStorage.getItem("credits")
-
-
+  const storedCredits = localStorage.getItem("remainingCredits");
+  const parsedCredits = storedCredits ? JSON.parse(storedCredits) : 0;
+  
+  const [credits, setCredits] = useState(parsedCredits);
+  const [hasCredits, setHasCredits] = useState(parsedCredits !== 0);
+  
   useEffect(() => {
     const checkLocalStorage = () => {
-      const storedCredits = localStorage.getItem("credits");
+      const storedCredits = localStorage.getItem("remainingCredits");
+
       if (storedCredits) {
-       
-        if (storedCredits === '0') {
-          setHasCredits(false)
+        const parsedCredits = JSON.parse(storedCredits);
+        if (parsedCredits !== credits) {
+          setCredits(parsedCredits);
+          setHasCredits(parsedCredits !== 0); // Only false if explicitly 0
         }
       }
     };
-  
+
     checkLocalStorage();
     const interval = setInterval(checkLocalStorage, 1000);
-  
+
     return () => clearInterval(interval);
-  }, [freeCredits]);
+  }, [credits]);
 
   return (
-    <CreditContext.Provider value={{ hasCredits,setHasCredits }}>
+    <CreditContext.Provider value={{ hasCredits, setHasCredits, credits }}>
       {children}
     </CreditContext.Provider>
   );

@@ -181,7 +181,7 @@ const ChatPage = ({ params }) => {
       const searchRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${id}`
       );
-      if(searchRes.status === 402){
+      if(searchRes.ok === 402){
         toast.error("Insufficient credits");
                     
                     setMsg(null);
@@ -260,6 +260,8 @@ const ChatPage = ({ params }) => {
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${id}`
       );
       
+    
+      
      
       const chatData = await response.json();
     
@@ -269,26 +271,40 @@ const ChatPage = ({ params }) => {
 
       let newChat;
 
-      if (chatModel === "ImageGeneration") {
+      if (chatModel === "openAI") {
        
-            console.log("Fetching bot response for message:", moreChat);
-            const searchRes = await fetch(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/openai?userId=${encodeURIComponent(userId)}&message=${encodeURIComponent(moreChat)}`
+        const searchRes = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/openai?userId=${encodeURIComponent(userId)}&message=${encodeURIComponent(current)}`
 
-            );
+        );
+
+      if(searchRes.status === 402){
+        toast.error('Insufficient credits')
+        return ;
+      }
+      
+
     
-            if (!searchRes.ok) throw new Error("Error fetching bot response");
-    
-            const data = await searchRes.json();
-            console.log("Bot response received:", data);
-    
-            const responseText =
-              typeof data === "string" ? data : JSON.stringify(data);
-            newChat = {
-              userMessage: moreChat,
-              botResponse: data.botResponse,
-              // parsedResponse: extractCodeBlocks(responseText)
-            };
+        if (searchRes.message) {
+
+          toast.error('Insufficient credits');
+
+          return;
+        }
+        
+       
+        const data = await searchRes.json();
+        if (data?.remainingCredits !== undefined) {
+          localStorage.setItem("remainingCredits", data.remainingCredits);
+        }
+
+        const responseText =
+          typeof data === "string" ? data : JSON.stringify(data);
+        newChat = {
+          userMessage: moreChat,
+          botResponse: data.botResponse ||"no data found",
+         parsedResponse: extractCodeBlocks(data.botResponse)
+        };
           
       } 
       else {
@@ -301,11 +317,14 @@ const ChatPage = ({ params }) => {
           )}&message=${encodeURIComponent(moreChat)}`
         );
 
-     
+      if(searchRes.status === 402){
+        toast.error('Insufficient credits')
+        return ;
+      }
+      
 
     
-        if (searchRes.status === 402) {
-          console.log("Toast function triggered");
+        if (searchRes.message) {
 
           toast.error('Insufficient credits');
 
@@ -314,14 +333,16 @@ const ChatPage = ({ params }) => {
         
        
         const data = await searchRes.json();
-        console.log("Bot response received:", data);
+        if (data?.remainingCredits !== undefined) {
+          localStorage.setItem("remainingCredits", data.remainingCredits);
+        }
 
         const responseText =
           typeof data === "string" ? data : JSON.stringify(data);
         newChat = {
           userMessage: moreChat,
-          botResponse: data.botResponse,
-          // parsedResponse: extractCodeBlocks(responseText)
+          botResponse: data.botResponse ||"no data found",
+         parsedResponse: extractCodeBlocks(data.botResponse)
         };
       }
 
@@ -723,11 +744,11 @@ const ChatPage = ({ params }) => {
         </p>
         <div className=" p-2 mt-4">
           <button
-            onClick={() => handleRedirect("/plans")}
+            onClick={() =>  router.push("/plans")}
             className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
           >
             Show Plans
-          </button>szzx
+          </button>
           
         </div>
        

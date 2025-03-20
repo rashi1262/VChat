@@ -1,3 +1,4 @@
+
 "use client";
 
 import { usePathname } from "next/navigation";
@@ -7,13 +8,8 @@ import { useState, useEffect } from "react";
 
 const Header = () => {
   const pathname = usePathname();
-
-  const [credits, setCredits] = useState(() => {
-    // Get stored credits from localStorage on initial load
-    const storedCredits = localStorage.getItem("remainingCredits");
-    return storedCredits ? JSON.parse(storedCredits) : 0;  // Default to 0 if undefined
-  }); 
-   const [userId, setUserId] = useState()
+  const [credits, setCredits] = useState(0);
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -21,8 +17,7 @@ const Header = () => {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const user = JSON.parse(storedUser);
-
-          setUserId(user?.id);
+          setUserId(user?.id || null);
         }
       } catch (error) {
         console.error("Error parsing user data:", error);
@@ -31,55 +26,44 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    if (userId) {
-      const fetchCredits = async () => {
-        try {
-          const response = await fetch(
-            `https://chatbot-2vqr.onrender.com/chatbot/get-by-userid/${userId}`
-          );
-          if (!response.ok) throw new Error("Failed to fetch credits");
+    if (!userId) return;
 
-          const data = await response.json();
-          console.log(data,"avdhesh");
-          
-          setCredits(data?.credits);
+    const fetchCredits = async () => {
+      try {
+        const response = await fetch(
+          `https://chatbot-2vqr.onrender.com/chatbot/get-by-userid/${userId}`
+        );
+        if (!response.ok) throw new Error("Failed to fetch credits");
 
-          // Store in localStorage
-          localStorage.setItem("remainingCredits", JSON.stringify(data.credits));
-        } catch (error) {
-          console.error("Error fetching credits:", error);
-        }
-      };
-
-      fetchCredits();
-    }
-  }, [userId])
-
-  console.log(pathname, "Current Pathname");
-  const freePoints = 100;
-  if (pathname === "/login" || pathname === "/signup") {
-    return null;
-  }
-
-
-  // Watch localStorage for changes and update state
-useEffect(() => {
-  const checkLocalStorage = () => {
-    const storedCredits = localStorage.getItem("remainingCredits");
-    if (storedCredits) {
-      const parsedCredits = JSON.parse(storedCredits);
-      if (parsedCredits !== credits) {
-        setCredits(parsedCredits);
+        const data = await response.json();
+        setCredits(data?.credits || 0);
+        localStorage.setItem("remainingCredits", JSON.stringify(data.credits));
+      } catch (error) {
+        console.error("Error fetching credits:", error);
       }
-    }
-  };
+    };
 
-  // Run initially and set interval to check every second
-  checkLocalStorage();
-  const interval = setInterval(checkLocalStorage, 1000);
+    fetchCredits();
+  }, [userId]);
 
-  return () => clearInterval(interval); // Cleanup on unmount
-}, [credits]);
+  useEffect(() => {
+    const checkLocalStorage = () => {
+      const storedCredits = localStorage.getItem("remainingCredits");
+      if (storedCredits) {
+        const parsedCredits = JSON.parse(storedCredits);
+        if (parsedCredits !== credits) {
+          setCredits(parsedCredits);
+        }
+      }
+    };
+
+    checkLocalStorage();
+    const interval = setInterval(checkLocalStorage, 1000);
+    return () => clearInterval(interval);
+  }, [credits]);
+
+  if (pathname === "/login" || pathname === "/signup") return null;
+
   return (
     <header className="z-10 fixed top-0 w-full bg-white shadow-sm">
       <div className="container mx-auto flex items-center justify-between py-3 px-5">

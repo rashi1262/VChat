@@ -6,6 +6,8 @@ import Navbar from "../navbar";
 import { useChat} from ".././chatContext";
 import { useRouter } from "next/navigation";
 import { useCredits } from "@/context/creditContext";
+import { toast, Toaster } from "sonner";
+
 const page = () => {
   const {hasCredits} = useCredits()
   const [isNavVisible, setIsNavVisible] = useState(true);
@@ -73,26 +75,38 @@ const page = () => {
           }
         );
     
-        if (!response.ok) throw new Error("Error uploading file");
+        if (!response.ok) {
+          const errorResponse = await response.json(); 
+          
+    
+          if (errorResponse.error) {
+            if (errorResponse.error.includes("429 Too Many Requests")) {
+              toast.error("Too many requests! Try again later.");
+            } else if (errorResponse.error.includes("insufficient_quota")) {
+              toast.error("Quota exceeded! Check your plan.");
+            } else {
+              toast.error("Error: " + errorResponse.error);
+            }
+          } else {
+            throw new Error("Error uploading file");
+          }
+        }
+    
     
         const result = await response.json();
         console.log("API response:", result);
     
-        // Extract feedback from the result
+        
         const feedback = result.feedback || "No feedback provided";
         const modelType = result.modelType || "Unknown Model Type";
         const remainingCredits = result.remainingCredits || 0;
     
-        // Get the file name
         const fileName = file.name || "Unknown file";
     
-        // Format the feedback as needed (you can modify how it's presented)
-        setResponse(feedback); // Update the state with the feedback
+        setResponse(feedback); 
     
-        // If you want to display remaining credits, you can use it to display
         console.log(`Remaining Credits: ${remainingCredits}`);
     
-        // Create a chat entry with the user message (which is the file name)
         const createChatRes = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/create`,
           {
@@ -268,6 +282,8 @@ const page = () => {
 
   return (
     <>
+                        <Toaster position="top-center" richColors />
+    
    {hasCredits?(   <div className="flex w-full justify-between bg-gray-50">
         <Navbar/>
      {msg?  (
@@ -448,7 +464,7 @@ const page = () => {
         </p>
         <div className=" p-2 mt-4">
           <button
-            onClick={() => handleRedirect("/plans")}
+            onClick={() => router.push("/plans")}
             className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
           >
             Show Plans

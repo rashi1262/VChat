@@ -355,7 +355,7 @@ const page = () => {
         </p>
         <div className=" p-2 mt-4">
           <button
-            onClick={() => handleRedirect("/plans")}
+            onClick={() => router.push("/plans")}
             className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
           >
             Show Plans
