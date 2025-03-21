@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 
 const Header = () => {
   const pathname = usePathname();
-  const [credits, setCredits] = useState(0);
+  const [credits, setCredits] = useState(null);
   const [userId, setUserId] = useState(null);
   const[loading,setloading] = useState(false)
   const [isHydrated, setIsHydrated] = useState(false);
@@ -23,11 +23,17 @@ const Header = () => {
         if (storedUser) {
           const user = JSON.parse(storedUser);
           setUserId(user?.id || null);
+          setCredits(user?.credits)
         }
       } catch (error) {
         console.error("Error parsing user data:", error);
       }
     }
+  }, []);
+  useEffect(() => {
+    const storedCredits = localStorage.getItem("remainingCredits") || 100;
+    setCredits(storedCredits);
+    
   }, []);
 
   useEffect(() => {
@@ -325,37 +331,21 @@ const Header = () => {
               </Link>
             </button>
           )}
-          {pathname !== "/vChat" &&
-            pathname !== "/model" &&
-            pathname !== "/deepSeek" &&
-            pathname !== "/openAIGPT-4o" &&
-            pathname !== "/upload" &&
-            pathname !== "/image" && (
-              <button className="flex items-center">
-                <Link
-                  href="/vChat"
-                  className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded text-sm"
-                >
-                  <div className="w-8 h-[2%] p-1">
-                    <Image
-                      src="/assests/vlogo.avif"
-                      width={18}
-                      height={18}
-                      alt="VChat Logo"
-                    />
-                  </div>
-                  <div className="ml-1 mt-[2%]">VChat</div>
-                </Link>
-              </button>
-            )}
+          {pathname !== "/vChat" && pathname !== "/model" && pathname !== "/deepSeek" && pathname !== "/openAIGPT-4o" && pathname !== "/upload" && pathname !== "/image" && (
+            <button className="flex items-center">
+              <Link href="/vChat" className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded text-sm">
+                <div className="w-8 h-[2%] p-1">
+                  <Image src="/assests/vlogo.avif" width={18} height={18} alt="VChat Logo" />
+                </div>
+                <div className="ml-1 mt-[2%]">VChat</div>
+              </Link>
+            </button>
+          )}
+ <div className="text-gray-600 text-sm font-medium">
+    {credits !== null ? <p>Free Points: {credits}</p> :       <div className="w-20 h-4 bg-gray-300 animate-pulse rounded"></div> // Skeleton
+  }
+  </div>
 
-          <div className="text-gray-600 text-sm font-medium">
-          {loading ? (
-    <div className="w-20 h-4 bg-gray-300 animate-pulse rounded"></div> // Skeleton
-  ) : (
-    <p>Free Points: {credits}</p>
-  )}
-          </div>
         </div>
       </div>
     </header>
