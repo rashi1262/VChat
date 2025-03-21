@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 
 const Header = () => {
   const pathname = usePathname();
-  const [credits, setCredits] = useState(0);
+  const [credits, setCredits] = useState(null);
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
@@ -23,6 +23,10 @@ const Header = () => {
         console.error("Error parsing user data:", error);
       }
     }
+  }, []);
+  useEffect(() => {
+    const storedCredits = localStorage.getItem("credits") || 0;
+    setCredits(storedCredits);
   }, []);
 
   useEffect(() => {
@@ -327,11 +331,10 @@ const Header = () => {
               </Link>
             </button>
           )}
+ <div className="text-gray-600 text-sm font-medium">
+    {credits !== null ? <p>Free Points: {credits}</p> : <p>Loading...</p>}
+  </div>
 
-
-          <div className="text-gray-600 text-sm font-medium">
-          
-          </div>
         </div>
 
       </div>
