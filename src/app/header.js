@@ -330,7 +330,7 @@ const Header = () => {
 
 
           <div className="text-gray-600 text-sm font-medium">
-            Free Points: {credits}
+          
           </div>
         </div>
 

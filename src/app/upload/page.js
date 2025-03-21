@@ -56,7 +56,7 @@ const page = () => {
       e.preventDefault();
     
       if (!file) {
-        console.error('No file selected');
+        toast.error('No file selected')
         return;
       }
     
