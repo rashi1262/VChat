@@ -75,7 +75,8 @@ const page = ({ params }) => {
     
           const data = await response.json();
           console.log("Fetched data:", data); 
-    
+          localStorage.setItem("remainingCredits", JSON.stringify(data.credits));
+
           // Ensure chatMessages is an array before mapping
           setChatThread(
             Array.isArray(data?.chatMessages)

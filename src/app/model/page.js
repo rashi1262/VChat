@@ -79,6 +79,7 @@ const page = ({ params }) => {
 
         const data = await response.json();
         console.log("Fetched data:", data);
+        localStorage.setItem("remainingCredits", JSON.stringify(data.credits));
 
         setChatThread(
           Array.isArray(data?.chatMessages)

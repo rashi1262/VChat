@@ -88,6 +88,8 @@ const Login = () => {
       };
 
       localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("remainingCredits", JSON.stringify(userData.credits));
+
       localStorage.setItem("hasLoggedIn", true);
       toast.success("Login successful!");
       setIsLogin(true);

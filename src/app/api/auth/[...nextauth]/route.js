@@ -60,9 +60,10 @@ const authOptions = {
             // Store user details in localStorage
             if (typeof window !== "undefined") {
               localStorage.setItem("user", JSON.stringify(existingUser));
+              localStorage.setItem("remainingCredits", JSON.stringify(existingUser.credits));
             }
 
-            console.log("User exists, logging in...");
+            console.log(existingUser,"User exists, logging in...");
 
             const loginResponse = await fetch(
               `${process.env.NEXT_PUBLIC_BASE_URL}/login`,
