@@ -6,7 +6,6 @@ import { useChat } from "../../chatContext";
 import { useRouter } from "next/navigation";
 import { Edit, Pencil } from "lucide-react";
 import { useCredits } from "@/context/creditContext";
-import { Clipboard } from "lucide-react";
 import { toast, Toaster } from "sonner";
 
 const ChatPage = ({ params }) => {
@@ -53,9 +52,16 @@ const ChatPage = ({ params }) => {
             if (!response.ok) throw new Error("Error fetching updated bot response");
       
             const data = await response.json();
+            if (
+              typeof window !== "undefined" &&
+              data?.remainingCredits !== undefined
+            ) {
+              localStorage.setItem("remainingCredits", data.remainingCredits);
+            }
             console.log("Updated bot response received:", data);
-      
+           
             newBotResponse = data.botResponse;
+
             newParsedResponse = extractCodeBlocks(newBotResponse);
           
 

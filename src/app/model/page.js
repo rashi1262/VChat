@@ -124,8 +124,15 @@ const page = ({ params }) => {
       }
 
       if (!searchRes.ok) throw new Error("Error fetching bot response");
-
+     
       const data = await searchRes.json();
+
+      if (
+        typeof window !== "undefined" &&
+        data?.remainingCredits !== undefined
+      ) {
+        localStorage.setItem("remainingCredits", data.remainingCredits);
+      }
 
       const formattedResponse = data.botResponse;
 
@@ -147,7 +154,7 @@ const page = ({ params }) => {
       );
 
       if (!createChatRes.ok) throw new Error("Failed to create chat");
-
+      
       const chatData = await createChatRes.json();
 
       const chatHistoryRes = await fetch(

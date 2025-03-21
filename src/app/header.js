@@ -1,4 +1,3 @@
-
 "use client";
 
 import { usePathname } from "next/navigation";
@@ -10,7 +9,13 @@ const Header = () => {
   const pathname = usePathname();
   const [credits, setCredits] = useState(0);
   const [userId, setUserId] = useState(null);
+  const[loading,setloading] = useState(false)
+  const [isHydrated, setIsHydrated] = useState(false);
 
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+  
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
@@ -30,6 +35,7 @@ const Header = () => {
 
     const fetchCredits = async () => {
       try {
+        setloading(true)
         const response = await fetch(
           `https://chatbot-2vqr.onrender.com/chatbot/get-by-userid/${userId}`
         );
@@ -40,6 +46,9 @@ const Header = () => {
         localStorage.setItem("remainingCredits", JSON.stringify(data.credits));
       } catch (error) {
         console.error("Error fetching credits:", error);
+      }
+      finally{
+        setloading(false)
       }
     };
 
@@ -67,21 +76,25 @@ const Header = () => {
   return (
     <header className="z-10 fixed top-0 w-full bg-white shadow-sm">
       <div className="container mx-auto flex items-center justify-between py-3 px-5">
-
         {/* Left Side (Empty Space or Logo) */}
         <div></div>
 
         {/* Right Side: Free Points Display & Buttons */}
         <div className="flex items-center space-x-4">
-
-
-
           {/* VChat Button */}
           {pathname === "/vChat" && (
             <button className="flex items-center">
-              <Link href="/vChat" className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded text-sm">
+              <Link
+                href="/vChat"
+                className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded text-sm"
+              >
                 <div className="w-8 h-[2%] p-1">
-                  <Image src="/assests/vlogo.avif" width={18} height={18} alt="VChat Logo" />
+                  <Image
+                    src="/assests/vlogo.avif"
+                    width={18}
+                    height={18}
+                    alt="VChat Logo"
+                  />
                 </div>
                 <div className="ml-1 mt-[2%]">VChat</div>
               </Link>
@@ -136,7 +149,6 @@ const Header = () => {
                 Gemini
               </Link>
             </button>
-
           )}
           {pathname === "/deepSeek" && (
             <button className="flex items-center">
@@ -188,7 +200,6 @@ const Header = () => {
                 DeepSeek
               </Link>
             </button>
-
           )}
           {pathname === "/openAIGPT-4o" && (
             <button className="flex items-center">
@@ -237,7 +248,6 @@ const Header = () => {
                 OpenAI GPT-4o
               </Link>
             </button>
-
           )}
           {pathname === "/upload" && (
             <button className="flex items-center">
@@ -278,7 +288,6 @@ const Header = () => {
                 Upload & Ask PDF
               </Link>
             </button>
-
           )}
           {pathname === "/image" && (
             <button className="flex items-center">
@@ -315,31 +324,42 @@ const Header = () => {
                 Image Generation
               </Link>
             </button>
-
           )}
-          {pathname !== "/vChat" && pathname !== "/model" && pathname !== "/deepSeek" && pathname !== "/openAIGPT-4o" && pathname !== "/upload" && pathname !== "/image" && (
-            <button className="flex items-center">
-              <Link href="/vChat" className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded text-sm">
-                <div className="w-8 h-[2%] p-1">
-                  <Image src="/assests/vlogo.avif" width={18} height={18} alt="VChat Logo" />
-                </div>
-                <div className="ml-1 mt-[2%]">VChat</div>
-              </Link>
-            </button>
-          )}
-
+          {pathname !== "/vChat" &&
+            pathname !== "/model" &&
+            pathname !== "/deepSeek" &&
+            pathname !== "/openAIGPT-4o" &&
+            pathname !== "/upload" &&
+            pathname !== "/image" && (
+              <button className="flex items-center">
+                <Link
+                  href="/vChat"
+                  className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded text-sm"
+                >
+                  <div className="w-8 h-[2%] p-1">
+                    <Image
+                      src="/assests/vlogo.avif"
+                      width={18}
+                      height={18}
+                      alt="VChat Logo"
+                    />
+                  </div>
+                  <div className="ml-1 mt-[2%]">VChat</div>
+                </Link>
+              </button>
+            )}
 
           <div className="text-gray-600 text-sm font-medium">
-          
+          {loading ? (
+    <div className="w-20 h-4 bg-gray-300 animate-pulse rounded"></div> // Skeleton
+  ) : (
+    <p>Free Points: {credits}</p>
+  )}
           </div>
         </div>
-
       </div>
     </header>
   );
 };
 
 export default Header;
-
-
-
