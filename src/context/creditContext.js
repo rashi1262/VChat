@@ -6,10 +6,10 @@ const CreditContext = createContext();
 export function CreditProvider({ children }) {
   const [credits, setCredits] = useState(0);
   const [hasCredits, setHasCredits] = useState(true);
-  const [loading, setLoading] = useState(true); // Prevents incorrect initial state
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
-    if (typeof window !== "undefined") { // ✅ Ensure it's running in the browser
+    if (typeof window !== "undefined") { 
       const storedCredits = localStorage.getItem("remainingCredits");
       const userExists = localStorage.getItem("user") !== null;
 
@@ -18,7 +18,7 @@ export function CreditProvider({ children }) {
         setCredits(parsedCredits);
         setHasCredits(parsedCredits !== 0 || !userExists);
       } else {
-        setHasCredits(!userExists);
+        setHasCredits(true);
       }
 
       setLoading(false);
@@ -31,12 +31,12 @@ export function CreditProvider({ children }) {
         const storedCredits = localStorage.getItem("remainingCredits");
         const userExists = localStorage.getItem("user") !== null;
 
-        if (storedCredits) {
+        if (storedCredits ) {
           const parsedCredits = JSON.parse(storedCredits);
           setCredits(parsedCredits);
-          setHasCredits(parsedCredits !== 0 || !userExists);
+          setHasCredits(parsedCredits>0);
         } else {
-          setHasCredits(!userExists);
+          setHasCredits(true);
         }
       }
     };
