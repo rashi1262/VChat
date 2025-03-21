@@ -4,37 +4,37 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-
+import { useRouter } from "next/navigation";
 const Header = () => {
   const pathname = usePathname();
   const [credits, setCredits] = useState(null);
   const [userId, setUserId] = useState(null);
   const[loading,setloading] = useState(false)
   const [isHydrated, setIsHydrated] = useState(false);
+  const router = useRouter()
 
   useEffect(() => {
     setIsHydrated(true);
   }, []);
-  
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-          const user = JSON.parse(storedUser);
-          setUserId(user?.id || null);
-          setCredits(user?.credits)
-        }
-      } catch (error) {
-        console.error("Error parsing user data:", error);
+
+
+    useEffect(() => {
+      if (typeof window !== "undefined") {
+        try {
+          const storedUser = localStorage.getItem("user");
+          if (!storedUser) {
+            
+            return;
+          } else {
+            const user = JSON.parse(storedUser);
+            setUserId(user?.id)
+            setCredits(user?.credits)
+            setloading(false)
+          }
+        } catch (error) {}
       }
-    }
-  }, []);
-  useEffect(() => {
-    const storedCredits = localStorage.getItem("remainingCredits") || 100;
-    setCredits(storedCredits);
-    
-  }, []);
+    }, []);
+ 
 
   useEffect(() => {
     if (!userId) return;

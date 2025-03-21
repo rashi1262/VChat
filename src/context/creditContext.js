@@ -34,7 +34,7 @@ export function CreditProvider({ children }) {
         if (storedCredits ) {
           const parsedCredits = JSON.parse(storedCredits);
           setCredits(parsedCredits);
-          setHasCredits(parsedCredits>0);
+          setHasCredits(parsedCredits>0 || !userExists);
         } else {
           setHasCredits(true);
         }
