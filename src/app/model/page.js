@@ -37,12 +37,13 @@ const page = ({ params }) => {
   }, []);
 
   const handleRedirect = (path) => {
-    setShowPopup(false);
-    if (path === "/login") {
-      setShowPopup(false);
-    }
-    window.location.href = path;
+    localStorage.setItem("showPopup", "false"); 
+  
+    setTimeout(() => {
+      window.location.href = path; 
+    }, 100);
   };
+  
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -190,9 +191,7 @@ const page = ({ params }) => {
       handleResponse();
     }
   };
-  const getChatById = (c) => {
-    router.push(`/chat/${c}`);
-  };
+ 
 
   return (
     <>
