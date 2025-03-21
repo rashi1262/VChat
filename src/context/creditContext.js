@@ -5,7 +5,7 @@ const CreditContext = createContext();
 
 export function CreditProvider({ children }) {
   const [credits, setCredits] = useState(0);
-  const [hasCredits, setHasCredits] = useState(false);
+  const [hasCredits, setHasCredits] = useState(true);
   const [loading, setLoading] = useState(true); // Prevents incorrect initial state
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export function CreditProvider({ children }) {
         setHasCredits(!userExists);
       }
 
-      setLoading(false); // ✅ Ensure correct state before rendering
+      setLoading(false);
     }
   }, []);
 
