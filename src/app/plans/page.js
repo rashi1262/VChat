@@ -3,12 +3,17 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../Sidebar";
 import Link from "next/link";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { loadStripe } from "@stripe/stripe-js";
 import { MONTH, MONTHS, YEARLY } from "@/constants";
+import { CheckCircle2, XCircle } from "lucide-react";
+
+const stripePromise = loadStripe("pk_test_51R670dPqjLJEAu5pP6DSMUXUGK535oEdgQ9Xy1Qs0THarwksxbnRyz9OKghZIm34i1CqPYqIPs9R7Ed5lAkGX9DF00lZQhDIVu");
 
 export default function PlansPage() {
   const [selectedButton, setSelectedButton] = useState(MONTH);
   const [price, setPrice] = useState(0.67);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userDetails, setUserDetails] = useState({ name: "", email: "" });
 
   useEffect(() => {
     if (selectedButton === MONTH) {
@@ -20,22 +25,38 @@ export default function PlansPage() {
     }
   }, [selectedButton]);
 
+  const handlePayment = async () => {
+    const stripe = await stripePromise;
+    const { error } = await stripe.redirectToCheckout({
+      lineItems: [
+        {
+          price: "price_1R67m5PqjLJEAu5p2MtGBB4U", // Replace with actual price ID
+          quantity: 1,
+        },
+      ],
+      mode: "subscription",
+      customerEmail: userDetails.email,
+      successUrl: "http://localhost:3000/",
+      cancelUrl: "http://localhost:3000/plans",
+    });
+    if (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="flex w-full justify-between bg-gray-50 text-sm">
-      <div className="min-h-screen  mt-12 bg-gray-50 flex flex-col   ml-auto w-4/5">
+      <div className="min-h-screen mt-12 bg-gray-50 flex flex-col ml-auto w-4/5">
         <div className="flex gap-8 p-10">
           <Sidebar />
-
           <div className="flex-1 mr-64">
             <div className="mb-6 flex justify-between items-center">
               <div>
-              <h1 className="text-lg font-semibold text-gray-600">Plans</h1>
-              <p className="text-sm text-gray-500">
-                View and manage your subscription plans
-              </p>
-
+                <h1 className="text-lg font-semibold text-gray-600">Plans</h1>
+                <p className="text-sm text-gray-500">
+                  View and manage your subscription plans
+                </p>
               </div>
-              
               <Link
                 href="/model"
                 className="px-4 py-2 text-gray-500 border border-rounded rounded-md"
@@ -44,33 +65,6 @@ export default function PlansPage() {
               </Link>
             </div>
 
-            <div className="mb-3">
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-sm font-medium text-gray-600 mb-2">
-                  Your Plan
-                </h2>
-                <div className="flex justify-between items-center">
-                  <div className="flex">
-                    <h3 className="text-xl mr-5 font-semibold text-gray-600">
-                      Free
-                    </h3>
-                    <span className=" px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-full">
-                      Limited Used
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-2xl font-bold text-gray-600">$0</span>
-                    <span className="text-gray-500 text-sm">/ Per Day</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="text-center mb-3">
-              <div className="inline-block px-4 py-1 text-gray-400">
-                other plan
-              </div>
-            </div>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white rounded-lg shadow p-6">
                 <h3 className="text-xl font-semibold text-gray-600 mb-2">
@@ -156,9 +150,13 @@ export default function PlansPage() {
                   </span>
                   <span className="text-gray-500 text-sm">/ Per Day</span>
                 </p>
-                <button className="w-full py-2 mb-4 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800">
-                  Upgrade
-                </button>
+                <button
+  className="w-full py-2 mb-4 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800"
+  onClick={() => setIsModalOpen(true)}
+>
+  Upgrade
+</button>
+
                 <div className="space-y-3">
                   <h4 className="font-medium text-gray-600">
                     Features included in the Pro plan:
@@ -191,6 +189,39 @@ export default function PlansPage() {
           </div>
         </div>
       </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+            <h2 className="text-lg font-semibold text-gray-700">Enter Details</h2>
+            <input
+              type="text"
+              placeholder="Name"
+              className="w-full border p-2 my-2"
+              onChange={(e) => setUserDetails({ ...userDetails, name: e.target.value })}
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              className="w-full border p-2 my-2"
+              onChange={(e) => setUserDetails({ ...userDetails, email: e.target.value })}
+            />
+            <p className="text-lg">Amount: ${price * 30}</p>
+            <button
+              onClick={handlePayment}
+              className="w-full bg-blue-600 text-white p-2 mt-3 rounded-md"
+            >
+              Pay with Stripe
+            </button>
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="w-full bg-gray-300 p-2 mt-2 rounded-md"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
