@@ -128,29 +128,6 @@ const page = () => {
       <div className="relative z-40">
         <Toaster position="top-center" richColors />
 
-        {!isNavVisible && (
-          <button
-            className="block p-0.5 border text-black  ml-3 mt-5 hover:bg-gray-100 rounded"
-            onClick={() => setIsNavVisible(true)}
-          >
-            <div className="w-6 h-6 p-1 ">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 18 18"
-                className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
-                  d="M9 9h6.75M9 2.25v13.5M5.85 2.25h6.3c1.26 0 1.89 0 2.371.245.424.216.768.56.984.984.245.48.245 1.11.245 2.371v6.3c0 1.26 0 1.89-.245 2.371a2.25 2.25 0 0 1-.984.984c-.48.245-1.11.245-2.371.245h-6.3c-1.26 0-1.89 0-2.371-.245a2.25 2.25 0 0 1-.984-.984c-.245-.48-.245-1.11-.245-2.371v-6.3c0-1.26 0-1.89.245-2.371a2.25 2.25 0 0 1 .984-.984c.48-.245 1.11-.245 2.371-.245"
-                ></path>
-              </svg>
-            </div>
-          </button>
-        )}
 
         <div
           className={`h-screen  w-64 bg-white  text-black overflow-y-auto fixed left-0 top-0 flex flex-col items-center p-4 transition-transform duration-300  ${
