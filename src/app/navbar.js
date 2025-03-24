@@ -18,20 +18,15 @@ const page = () => {
   const [openMenu, setOpenMenu] = useState(null);
   const [shareLink, setShareLink] = useState("");
 
-//   const [isNavVisible, setIsNavVisible] = useState(() => {
-//   return localStorage.getItem("hasLoggedIn") === "true";
-// });
+  //   const [isNavVisible, setIsNavVisible] = useState(() => {
+  //   return localStorage.getItem("hasLoggedIn") === "true";
+  // });
 
-// useEffect(() => {
-//   localStorage.setItem("hasLoggedIn", isNavVisible);
-// }, [isNavVisible]);
+  // useEffect(() => {
+  //   localStorage.setItem("hasLoggedIn", isNavVisible);
+  // }, [isNavVisible]);
 
-const {isNavVisible,setIsNavVisible} = useNav()
-
-
-
-
-
+  const { isNavVisible, setIsNavVisible } = useNav();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -133,9 +128,32 @@ const {isNavVisible,setIsNavVisible} = useNav()
       <div className="relative z-40">
         <Toaster position="top-center" richColors />
 
-   
+        {!isNavVisible && (
+          <button
+            className="block p-0.5 border text-black  ml-3 mt-5 hover:bg-gray-100 rounded"
+            onClick={() => setIsNavVisible(true)}
+          >
+            <div className="w-6 h-6 p-1 ">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 18 18"
+                className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.5"
+                  d="M9 9h6.75M9 2.25v13.5M5.85 2.25h6.3c1.26 0 1.89 0 2.371.245.424.216.768.56.984.984.245.48.245 1.11.245 2.371v6.3c0 1.26 0 1.89-.245 2.371a2.25 2.25 0 0 1-.984.984c-.48.245-1.11.245-2.371.245h-6.3c-1.26 0-1.89 0-2.371-.245a2.25 2.25 0 0 1-.984-.984c-.245-.48-.245-1.11-.245-2.371v-6.3c0-1.26 0-1.89.245-2.371a2.25 2.25 0 0 1 .984-.984c.48-.245 1.11-.245 2.371-.245"
+                ></path>
+              </svg>
+            </div>
+          </button>
+        )}
+
         <div
-          className={`h-screen w-64 bg-white  text-black overflow-y-auto fixed left-0 top-0 flex flex-col items-center p-4 transition-transform duration-300 ${
+          className={`h-screen  w-64 bg-white  text-black overflow-y-auto fixed left-0 top-0 flex flex-col items-center p-4 transition-transform duration-300  ${
             !isNavVisible ? "-translate-x-64" : "translate-x-0 "
           }`}
         >
@@ -407,23 +425,22 @@ const {isNavVisible,setIsNavVisible} = useNav()
                   </div>
                   <div className="ml-1 mt-[2%]">Chats</div>
                 </Link>
-                <div className="md:h-56 md:max-h-56 h-32 border-t border-gray">
-                  <div className="md:max-h-[220px] max-h-40 overflow-y-auto scrollbar-none text-gray-700 bg-white p-3 rounded-lg ">
+                <div className="md:h-56 h-32">
+                  <div className="md:h-[200px] md:max-h-[200px] overflow-y-auto scrollbar-thin text-gray-600">
                     {Array.isArray(chatThread) &&
                       chatThread.map((chat) => (
                         <div
                           key={chat.chatId}
-                          className="relative flex items-center justify-between py-1 px-3 rounded-lg hover:bg-gray-100 transition duration-200"
+                          className="relative rounded-lg pl-5 flex items-center justify-between hover:bg-gray-200 mb-3"
                         >
-                          {/* Chat Message */}
                           <div
                             onClick={() => getChatById(chat.chatId)}
-                            className="flex-1 cursor-pointer truncate text-ellipsis whitespace-nowrap"
+                            className="flex-1 cursor-pointer truncate text-ellipsis whitespace-nowrap p-1"
                           >
                             {chat.message}
                           </div>
 
-                          {/* Options Button */}
+                          {/***** Options Button *****/}
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -436,7 +453,7 @@ const {isNavVisible,setIsNavVisible} = useNav()
                             <EllipsisVertical size={18} />
                           </button>
 
-                          {/* Dropdown Menu */}
+                          {/***** Dropdown Menu *****/}
                           {openMenu === chat.chatId && (
                             <div
                               ref={chatContainerRef}

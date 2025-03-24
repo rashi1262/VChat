@@ -292,7 +292,7 @@ const page = () => {
                     </defs>
                   </svg>
                 </div>
-                <p className="text-gray-500">
+                <p className="text-gray-500 text-sm">
                   "Solve a debate: which came first, the chiken or the egg?"
                 </p>
               </div>
@@ -331,7 +331,7 @@ const page = () => {
                     </defs>
                   </svg>
                 </div>
-                <p className="text-gray-500">
+                <p className="text-gray-500 text-sm">
                   "I want to get promated at work.Lat's make a detailed plan
                   together."
                 </p>
@@ -371,7 +371,7 @@ const page = () => {
                     </defs>
                   </svg>
                 </div>
-                <p className="text-gray-500">
+                <p className="text-gray-500 text-sm">
                   "Describe how blockchain technology works."
                 </p>
               </div>
@@ -411,7 +411,7 @@ const page = () => {
                     </defs>
                   </svg>
                 </div>
-                <p className="text-gray-500">
+                <p className="text-gray-500 text-sm">
                   "Can you help me brainstorm ideas for a brand campaign"
                 </p>
               </div>
