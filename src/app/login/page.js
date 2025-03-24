@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { toast, Toaster } from "sonner";
-
+import {signInWithGoogle} from '../auth'
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
@@ -39,10 +39,21 @@ const Login = () => {
     }));
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8080/auth/google/callback";
+  const handleGoogleLogin = async() => {
+   try{ 
+    const user = await signInWithGoogle();
+  if(user.error){
+    toast.error(user.error)
+    return;
+  }
 
+  router.push('/model');
+  toast.success('log in successful!')
+   }
+   catch(error){
+    console.log(error.message);
     
+   }
   };
 
   const handleSubmit = async (e) => {
@@ -123,7 +134,7 @@ const Login = () => {
 
         <div className="flex flex-col gap-2 mt-5">
           <button
-            onClick={() => signIn("google")}
+            onClick={handleGoogleLogin}
             className="flex items-center justify-center gap-2 p-2 border border-gray-300 rounded bg-white text-gray-600"
             disabled={isLoading}
           >

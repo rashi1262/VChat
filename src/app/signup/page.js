@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast, Toaster } from "sonner";
 import { Asset } from "next/font/google";
+import {signInWithGoogle} from '../auth'
 
 const Signup = () => {
   const { data: session } = useSession();
@@ -40,6 +41,15 @@ const Signup = () => {
       [name]: value,
     }));
   };
+
+
+    const handleGoogleLogin = async() => {
+     try{ const user = await signInWithGoogle();router.push('/model');toast.success('sign up successful!')}
+     catch(error){
+      console.log(error.message);
+      
+     }
+    };
  
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -174,7 +184,7 @@ const Signup = () => {
           </div>
 
           <button
-            onClick={() => signIn("google")}
+            onClick={handleGoogleLogin}
             className="flex items-center justify-center gap-2 p-2 border border-gray-300 rounded bg-white text-gray-600"
           >
             <Image
