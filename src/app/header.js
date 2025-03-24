@@ -32,6 +32,9 @@ const Header = () => {
             setloading(false)
           }
         } catch (error) {}
+        finally{
+          setloading(false)
+        }
       }
     }, []);
  

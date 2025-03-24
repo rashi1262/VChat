@@ -8,6 +8,7 @@ import { Plus } from "lucide-react";
 import { EllipsisVertical } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import Image from "next/image";
+import { useNav } from "./NavProvider";
 const page = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -17,15 +18,19 @@ const page = () => {
   const [openMenu, setOpenMenu] = useState(null);
   const [shareLink, setShareLink] = useState("");
 
-  const [isNavVisible, setIsNavVisible] = useState(false);
+//   const [isNavVisible, setIsNavVisible] = useState(() => {
+//   return localStorage.getItem("hasLoggedIn") === "true";
+// });
 
-  
+// useEffect(() => {
+//   localStorage.setItem("hasLoggedIn", isNavVisible);
+// }, [isNavVisible]);
 
-  useEffect(() => {
-    const hasLoggedIn = localStorage.getItem("hasLoggedIn") === "true";
-    setIsNavVisible(hasLoggedIn);
-  }, []);
-  
+const {isNavVisible,setIsNavVisible} = useNav()
+
+
+
+
 
 
   useEffect(() => {

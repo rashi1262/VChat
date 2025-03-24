@@ -169,7 +169,6 @@ const page = () => {
         const data = await response.json();
         console.log("Fetched data:", data);
 
-        // Ensure chatMessages is an array before mapping
         setChatThread(
           Array.isArray(data?.chatMessages)
             ? data.chatMessages.map((chat) => ({

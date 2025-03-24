@@ -291,8 +291,7 @@ const page = ({ params }) => {
                         <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center">
                           <h2 className="text-2xl  font-bold">Welcome back</h2>
                           <p className=" p-2  text-lg ">
-                            Log in or sign up to get smarter responses, upload
-                            files, and more.
+                          Log in or sign up to get smarter responses, upload files, and more with VChat, your AI assistant.
                           </p>
                           <div className=" p-2 mt-4">
                             <button
@@ -734,18 +733,18 @@ const page = ({ params }) => {
               <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center">
                 <h2 className="text-2xl  font-bold">Welcome back</h2>
                 <p className=" p-2  text-lg ">
-                  Log in or sign up to get smarter responses, upload files, and
-                  more.
+                Log in or sign up to get smarter responses, upload files, and more with VChat, your AI assistant.
+
                 </p>
                 <div className=" p-2 mt-4">
                   <button
-                    onClick={() => handleRedirect("/login")}
+                    onClick={() => router.push("/login")}
                     className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
                   >
                     Log in
                   </button>
                   <button
-                    onClick={() => handleRedirect("/signup")}
+                    onClick={() => router.push("/signup")}
                     className="  w-full px-4 py-2 bg-transparent text-white border border-white rounded-full hover:bg-gray-600"
                   >
                     Sign up
