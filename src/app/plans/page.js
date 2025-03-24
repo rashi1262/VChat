@@ -7,7 +7,9 @@ import { loadStripe } from "@stripe/stripe-js";
 import { MONTH, MONTHS, YEARLY } from "@/constants";
 import { CheckCircle2, XCircle } from "lucide-react";
 
-const stripePromise = loadStripe("pk_test_51R670dPqjLJEAu5pP6DSMUXUGK535oEdgQ9Xy1Qs0THarwksxbnRyz9OKghZIm34i1CqPYqIPs9R7Ed5lAkGX9DF00lZQhDIVu");
+const stripePromise = loadStripe(
+  "pk_test_51R670dPqjLJEAu5pP6DSMUXUGK535oEdgQ9Xy1Qs0THarwksxbnRyz9OKghZIm34i1CqPYqIPs9R7Ed5lAkGX9DF00lZQhDIVu"
+);
 
 export default function PlansPage() {
   const [selectedButton, setSelectedButton] = useState(MONTH);
@@ -34,7 +36,7 @@ export default function PlansPage() {
       });
     }
   }, []);
-  
+
   const handlePayment = async () => {
     const stripe = await stripePromise;
     const { error } = await stripe.redirectToCheckout({
@@ -161,11 +163,11 @@ export default function PlansPage() {
                   <span className="text-gray-500 text-sm">/ Per Day</span>
                 </p>
                 <button
-  className="w-full py-2 mb-4 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800"
-  onClick={() => setIsModalOpen(true)}
->
-  Upgrade
-</button>
+                  className="w-full py-2 mb-4 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800"
+                  onClick={() => setIsModalOpen(true)}
+                >
+                  Upgrade
+                </button>
 
                 <div className="space-y-3">
                   <h4 className="font-medium text-gray-600">
@@ -203,20 +205,22 @@ export default function PlansPage() {
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
-            <h2 className="text-lg font-semibold text-gray-700">Enter Details</h2>
+            <h2 className="text-lg font-semibold text-gray-700">
+              Enter Details
+            </h2>
             <input
-  type="text"
-  value={userDetails.name}
-  className="w-full border p-2 my-2 text-black bg-gray-100 cursor-not-allowed"
-  disabled
-/>
+              type="text"
+              value={userDetails.name}
+              className="w-full border p-2 my-2 text-black bg-gray-100 cursor-not-allowed"
+              disabled
+            />
 
-<input
-  type="email"
-  value={userDetails.email}
-  className="w-full border p-2 my-2 text-black bg-gray-100 cursor-not-allowed"
-  disabled
-/>
+            <input
+              type="email"
+              value={userDetails.email}
+              className="w-full border p-2 my-2 text-black bg-gray-100 cursor-not-allowed"
+              disabled
+            />
 
             <p className="text-lg text-black">Amount: ${price * 30}</p>
             <button

@@ -381,7 +381,7 @@ const page = () => {
               </li>
               <li>
                 <Link
-                  href="/model"
+                  href=""
                   className="flex  mb-2 items-center p-2 hover:bg-gray-100 rounded text-sm"
                 >
                   <div className="w-6 h-4 p-1 flex items-center ">

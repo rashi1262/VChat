@@ -48,14 +48,19 @@ export default function PlansPage() {
           <div className="flex-1 mr-64">
             <div className="mb-6 flex justify-between items-center">
               <h1 className="text-lg font-semibold text-gray-600">Plans</h1>
-              <Link href="/model" className="px-4 py-2 text-gray-500 border rounded-md">
+              <Link
+                href="/model"
+                className="px-4 py-2 text-gray-500 border rounded-md"
+              >
                 Back to Chat
               </Link>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-xl font-semibold text-gray-600 mb-2">Free</h3>
+                <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                  Free
+                </h3>
                 <p className="text-2xl font-bold text-gray-600">$0 / Per Day</p>
                 <button className="w-full py-2 mt-4 bg-gray-400 text-white rounded-md cursor-not-allowed">
                   Current Plan
@@ -63,8 +68,12 @@ export default function PlansPage() {
               </div>
 
               <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-xl font-semibold text-gray-600 mb-4">Pro</h3>
-                <p className="text-2xl font-bold text-gray-700">${price} / Per Day</p>
+                <h3 className="text-xl font-semibold text-gray-600 mb-4">
+                  Pro
+                </h3>
+                <p className="text-2xl font-bold text-gray-700">
+                  ${price} / Per Day
+                </p>
                 <button
                   className="w-full py-2 mt-4 bg-gray-900 text-white rounded-md hover:bg-gray-800"
                   onClick={() => handlePlanClick(price)}
@@ -77,7 +86,9 @@ export default function PlansPage() {
             {showPopup && (
               <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                 <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                  <h2 className="text-lg font-semibold mb-4">Confirm Payment</h2>
+                  <h2 className="text-lg font-semibold mb-4">
+                    Confirm Payment
+                  </h2>
                   <input
                     type="text"
                     name="name"
