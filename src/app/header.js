@@ -5,15 +5,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useNav } from "../app/NavProvider";
 const Header = () => {
   const pathname = usePathname();
   const [credits, setCredits] = useState(null);
   const [userId, setUserId] = useState(null);
   const[loading,setloading] = useState(false)
   const [isHydrated, setIsHydrated] = useState(false);
+  // const { isNavVisible, setIsNavVisible}=useNav()
+
   const router = useRouter()
 
-   const [isNavVisible, setIsNavVisible] = useState(false);
+  //  const [isNavVisible, setIsNavVisible] = useState(false);
 
   useEffect(() => {
     setIsHydrated(true);
