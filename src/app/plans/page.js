@@ -46,8 +46,8 @@ export default function PlansPage() {
       ],
       mode: "subscription",
       customerEmail: userDetails.email,
-      successUrl: "https://vchatai.netlify.app/",
-      cancelUrl: "https://vchatai.netlify.app/success",
+      successUrl: "https://vchatai.netlify.app/success",
+      cancelUrl: "https://vchatai.netlify.app/plans",
     });
     if (error) {
       console.error(error);
