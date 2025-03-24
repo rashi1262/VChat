@@ -83,10 +83,13 @@ const Login = () => {
       const userData = {
         email: data.email,
         name: data.name || "Guest",
-        id: data.id
+        id: data.id,
+        credits:data.credits
       };
 
       localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("remainingCredits", JSON.stringify(userData.credits));
+
       localStorage.setItem("hasLoggedIn", true);
       toast.success("Login successful!");
       setIsLogin(true);

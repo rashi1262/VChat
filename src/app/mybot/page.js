@@ -14,7 +14,7 @@ const page = () => {
         try {
           const storedUser = localStorage.getItem("user");
           if (!storedUser) {
-            router.push("/login");
+            router.push("/home");
             return;
           } else {
             const user = JSON.parse(storedUser);
@@ -433,8 +433,8 @@ const page = () => {
                     </h1>
                   </div>
                 </div>
-                 <div className="grid grid-cols-1  rounded-4xl items-center mr-10 ml-10 ">
-                  <div className="flex border rounded-md overflow-x-scroll p-4 hover:bg-white gap-6">
+                 <div className="grid grid-cols-1 rounded-4xl items-center mr-16 ml-16 ">
+                  <div className="flex border rounded-md p-4 hover:bg-white justify-center gap-6">
                     <div className="mr-3 ml-5">
                       <Link
                         href="/model"

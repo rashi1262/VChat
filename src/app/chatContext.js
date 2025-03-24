@@ -9,16 +9,28 @@ export const ChatProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
 
 
+  // const syncUserId = () => {
+  //   const storedUser = localStorage.getItem("user");
+  //   if (storedUser) {
+  //     const user = JSON.parse(storedUser);
+  //     setUserId(user?.id);
+  //   } else {
+  //     setUserId(null);
+  //   }
+  // };
+ 
   const syncUserId = () => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-      setUserId(user?.id);
-    } else {
-      setUserId(null);
+    if (typeof window !== "undefined") { // ✅ Check if window is defined
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        setUserId(user?.id);
+      } else {
+        setUserId(null);
+      }
     }
   };
-
+  
 
 
 

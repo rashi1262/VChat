@@ -30,6 +30,7 @@ const Signup = () => {
     name: "",
     email: "",
     password: "",
+    credits:20
   });
 
   const handleChange = (e) => {
@@ -39,10 +40,17 @@ const Signup = () => {
       [name]: value,
     }));
   };
-
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    
+
+    const userData = {
+      ...formData,
+      
+    };
+  
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/signup-verification`,
@@ -51,37 +59,36 @@ const Signup = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(userData),
         }
       );
-
+  
       const data = await response.json();
-
+  
       if (!response.ok) {
         const errorMessage =
           data.message ||
           (response.status === 409
             ? "Email already exists. Please log in."
             : "Signup failed! Try again.");
-
         throw new Error(errorMessage);
       }
-
+  
       if (data.token) {
         localStorage.setItem("userToken", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
       }
-
+  
       toast.success("Signup successful!");
       router.push("/verify");
-      setFormData({ email: "", password: "" });
+      setFormData({ name: "", email: "", password: "" }); // Reset form
     } catch (error) {
-     
       toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="flex justify-center items-center h-screen bg-white">
@@ -179,7 +186,7 @@ const Signup = () => {
             Continue with Google
           </button>
 
-          {/* <button
+          <button
             onClick={() => "Apple login"}
             className="flex items-center justify-center gap-2 p-2 border border-gray-300 rounded bg-white text-gray-600"
           >
@@ -190,7 +197,7 @@ const Signup = () => {
               alt="Apple logo"
             />
             Continue with Apple
-          </button> */}
+          </button>
         </div>
 
         <p className="text-center mt-4 text-sm text-gray-600">

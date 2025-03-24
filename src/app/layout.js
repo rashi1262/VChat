@@ -35,13 +35,15 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { NextAuthProvider } from "./Providers";
-import { ChatProvider } from "./chatContext"; // Import ChatProvider
+import { ChatProvider } from "./chatContext"; 
 import Header from "./header";
+import { CreditProvider } from "../context/creditContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
+
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -57,13 +59,18 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-<Header/>        
-        <NextAuthProvider>
-          <ChatProvider> 
-            {children}
-          </ChatProvider>
-        </NextAuthProvider>
+        
+          <>
+            <Header />
+            <NextAuthProvider>
+              <ChatProvider>
+               <CreditProvider>  {children}</CreditProvider>
+                </ChatProvider>
+            </NextAuthProvider>
+          </>
+        
       </body>
     </html>
   );
 }
+
