@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useNav } from "./NavProvider";
 const Header = () => {
   const pathname = usePathname();
   const [credits, setCredits] = useState(null);
@@ -12,9 +13,9 @@ const Header = () => {
   const[loading,setloading] = useState(false)
   const [isHydrated, setIsHydrated] = useState(false);
   const router = useRouter()
-
-   const [isNavVisible, setIsNavVisible] = useState(false);
-
+  
+  //  const [isNavVisible, setIsNavVisible] = useState(false);
+ const {isNavVisible,setIsNavVisible} = useNav()
   useEffect(() => {
     setIsHydrated(true);
   }, []);
@@ -91,7 +92,9 @@ const Header = () => {
         <div>
         <button
             className="block p-0.5 border text-black  ml-3 mt-5 hover:bg-gray-100 rounded"
-            onClick={() => setIsNavVisible(true)}
+            onClick={() => {
+              
+              setIsNavVisible(!isNavVisible)}}
           >
             <div className="w-6 h-6 p-1 ">
               <svg
