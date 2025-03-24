@@ -207,18 +207,18 @@ export default function PlansPage() {
             <input
   type="text"
   value={userDetails.name}
-  className="w-full border p-2 my-2 bg-gray-100 cursor-not-allowed"
+  className="w-full border p-2 my-2 text-black bg-gray-100 cursor-not-allowed"
   disabled
 />
 
 <input
   type="email"
   value={userDetails.email}
-  className="w-full border p-2 my-2 bg-gray-100 cursor-not-allowed"
+  className="w-full border p-2 my-2 text-black bg-gray-100 cursor-not-allowed"
   disabled
 />
 
-            <p className="text-lg">Amount: ${price * 30}</p>
+            <p className="text-lg text-black">Amount: ${price * 30}</p>
             <button
               onClick={handlePayment}
               className="w-full bg-[black] text-white p-2 mt-3 rounded-md"
@@ -227,7 +227,7 @@ export default function PlansPage() {
             </button>
             <button
               onClick={() => setIsModalOpen(false)}
-              className="w-full bg-gray-300 p-2 mt-2 rounded-md"
+              className="w-full bg-gray-300 text-black p-2 mt-2 rounded-md"
             >
               Cancel
             </button>

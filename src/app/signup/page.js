@@ -196,7 +196,7 @@ const Signup = () => {
             Continue with Google
           </button>
 
-          <button
+          {/* <button
             onClick={() => "Apple login"}
             className="flex items-center justify-center gap-2 p-2 border border-gray-300 rounded bg-white text-gray-600"
           >
@@ -207,7 +207,7 @@ const Signup = () => {
               alt="Apple logo"
             />
             Continue with Apple
-          </button>
+          </button> */}
         </div>
 
         <p className="text-center mt-4 text-sm text-gray-600">
