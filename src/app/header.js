@@ -12,6 +12,8 @@ const Header = () => {
   const [userId, setUserId] = useState(null);
   const[loading,setloading] = useState(false)
   const [isHydrated, setIsHydrated] = useState(false);
+  // const { isNavVisible, setIsNavVisible}=useNav()
+
   const router = useRouter()
   
   //  const [isNavVisible, setIsNavVisible] = useState(false);
@@ -91,7 +93,7 @@ const Header = () => {
         {/* Left Side (Empty Space or Logo) */}
         <div>
         <button
-            className="block p-0.5 border text-black  ml-3 mt-5 hover:bg-gray-100 rounded"
+            className="block p-0.5 border text-black   hover:bg-gray-100 rounded"
             onClick={() => {
               
               setIsNavVisible(!isNavVisible)}}

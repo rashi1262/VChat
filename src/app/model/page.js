@@ -278,7 +278,7 @@ const page = ({ params }) => {
               </>
             ) : (
               <>
-                <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center  md:hidden">
+                <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center  hidden">
                   <div className="max-w-4xl w-full  rounded-md p-6 text-center">
                     <button
                       className="h-6 mt-10 flex w-full justify-center items-center text-center text-black rounded"
@@ -463,12 +463,12 @@ const page = ({ params }) => {
                     </div>
                   </div>
                 </div>
-                <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  ml-auto w-full max-w-[calc(100%-256px)]">
+                <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  md:ml-auto md:w-full md:max-w-[calc(100%-256px)]">
                   <div className="max-w-4xl w-full rounded-md p-6 text-center ">
                     <h1 className="text-3xl  text-gray-600 mb-16">
-                      How can I help you today?
+                      How can I help you today ?
                     </h1>
-                    <div className="grid grid-cols-4 gap-6">
+                    <div className="grid md:grid-cols-4 grid-cols-2 gap-6">
                       <div
                         className="relative border rounded-md p-4 hover:bg-white cursor-pointer"
                         onClick={() =>
@@ -652,7 +652,7 @@ const page = ({ params }) => {
                         </p>
                       </div>
                     </div>
-                    <div className="mb-5 ml-20 w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
+                    <div className="mb-5 w-full md:ml-20 md:w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2 rounded-l-full rounded-r-full">
                       {/* <button className="ml-2 p-2 rounded-full bg-white">
                 <div className="w-7 h-6 p-1 ">
                   <svg
