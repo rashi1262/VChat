@@ -24,7 +24,17 @@ export default function PlansPage() {
       setPrice(0.16);
     }
   }, [selectedButton]);
-
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUserDetails({
+        name: parsedUser.name || "",
+        email: parsedUser.email || "",
+      });
+    }
+  }, []);
+  
   const handlePayment = async () => {
     const stripe = await stripePromise;
     const { error } = await stripe.redirectToCheckout({
@@ -36,8 +46,8 @@ export default function PlansPage() {
       ],
       mode: "subscription",
       customerEmail: userDetails.email,
-      successUrl: "http://localhost:3000/",
-      cancelUrl: "http://localhost:3000/plans",
+      successUrl: "https://vchatai.netlify.app/",
+      cancelUrl: "https://vchatai.netlify.app/success",
     });
     if (error) {
       console.error(error);
@@ -195,21 +205,23 @@ export default function PlansPage() {
           <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
             <h2 className="text-lg font-semibold text-gray-700">Enter Details</h2>
             <input
-              type="text"
-              placeholder="Name"
-              className="w-full border p-2 my-2"
-              onChange={(e) => setUserDetails({ ...userDetails, name: e.target.value })}
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              className="w-full border p-2 my-2"
-              onChange={(e) => setUserDetails({ ...userDetails, email: e.target.value })}
-            />
+  type="text"
+  value={userDetails.name}
+  className="w-full border p-2 my-2 bg-gray-100 cursor-not-allowed"
+  disabled
+/>
+
+<input
+  type="email"
+  value={userDetails.email}
+  className="w-full border p-2 my-2 bg-gray-100 cursor-not-allowed"
+  disabled
+/>
+
             <p className="text-lg">Amount: ${price * 30}</p>
             <button
               onClick={handlePayment}
-              className="w-full bg-blue-600 text-white p-2 mt-3 rounded-md"
+              className="w-full bg-[black] text-white p-2 mt-3 rounded-md"
             >
               Pay with Stripe
             </button>
