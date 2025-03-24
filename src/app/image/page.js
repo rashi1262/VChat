@@ -247,10 +247,10 @@ const page = () => {
    
    </div>
  </>): (
-  <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center ml-auto w-4/5">
+  <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  md:ml-auto md:w-full md:max-w-[calc(100%-256px)]">
           <div className="flex justify-center items-center h-screen">
-            <div className="max-w-4xl w-full rounded-md p-6 text-center">
-              <div className="w-16 h-16 rounded-full ml-[240px] mb-10 ">
+            <div className="md:max-w-4xl w-full rounded-md p-6 text-center">
+              <div className="w-16 h-16 rounded-full md:ml-[240px] mx-auto mb-10 ">
                 <svg
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -282,7 +282,7 @@ const page = () => {
                 words!
               </h1>
             </div>
-            <div className="mb-5 ml-20 w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
+            <div className="mb-5 md:ml-20 md:w-2/4 p-1 flex w-full bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full px-4">
               {/* <button className="ml-2 p-2 rounded-full bg-gray-200">
                 <div className="w-7 h-6 p-1 ">
                   <svg

@@ -37,6 +37,7 @@ import "./globals.css";
 import { NextAuthProvider } from "./Providers";
 import { ChatProvider } from "./chatContext"; 
 import Header from "./header";
+// import Navbar from "./navbar";
 import { CreditProvider } from "../context/creditContext";
 import { NavProvider } from "./NavProvider";
 const geistSans = Geist({
@@ -62,6 +63,7 @@ export default function RootLayout({ children }) {
         
           <>
             <Header />
+            {/* <Navbar/> */}
             <NextAuthProvider>
               <ChatProvider>
                <CreditProvider>

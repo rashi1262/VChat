@@ -463,9 +463,9 @@ const page = ({ params }) => {
                     </div>
                   </div>
                 </div>
-                <div className="h-screen md:block bg-gray-50   items-center justify-center ml-auto w-full hidden">
-                  <div className="max-w-4xl w-full rounded-md p-6 text-center ml-auto mr-auto">
-                    <h1 className="text-3xl mt-48 text-gray-600 mb-16">
+                <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  ml-auto w-full max-w-[calc(100%-256px)]">
+                  <div className="max-w-4xl w-full rounded-md p-6 text-center ">
+                    <h1 className="text-3xl  text-gray-600 mb-16">
                       How can I help you today?
                     </h1>
                     <div className="grid grid-cols-4 gap-6">
@@ -509,7 +509,7 @@ const page = ({ params }) => {
                             </defs>
                           </svg>
                         </div>
-                        <p className="text-gray-500">
+                        <p className="text-gray-500 text-base">
                           "Solve a debate: is a hot dog a sandwich?"
                         </p>
                       </div>
@@ -555,7 +555,7 @@ const page = ({ params }) => {
                             </defs>
                           </svg>
                         </div>
-                        <p className="text-gray-500  ">
+                        <p className="text-gray-500 text-base">
                           "I'm thinking about moving to a new city. Can you help
                           me plan the move?"
                         </p>
@@ -600,7 +600,7 @@ const page = ({ params }) => {
                             </defs>
                           </svg>
                         </div>
-                        <p className="text-gray-500">
+                        <p className="text-gray-500 text-base">
                           "Can you help me write a bedtime story?"
                         </p>
                       </div>
@@ -647,7 +647,7 @@ const page = ({ params }) => {
                             </defs>
                           </svg>
                         </div>
-                        <p className="text-gray-500">
+                        <p className="text-gray-500 text-base">
                           "Get advice on preparing for a job interview."
                         </p>
                       </div>

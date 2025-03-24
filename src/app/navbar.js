@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect , useRef} from "react";
+import { useState, useEffect, useRef } from "react";
 import React from "react";
 import Link from "next/link";
 import { useChat } from "./chatContext";
@@ -12,7 +12,7 @@ import { useNav } from "./NavProvider";
 const page = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const { chatThread, setChatThread ,fetchChats } = useChat();
+  const { chatThread, setChatThread, fetchChats } = useChat();
   const [userId, setUserId] = useState(null);
   const router = useRouter();
   const [openMenu, setOpenMenu] = useState(null);
@@ -50,12 +50,14 @@ const {isNavVisible,setIsNavVisible} = useNav()
     }
   }, []);
 
-
   const chatContainerRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (chatContainerRef.current && !chatContainerRef.current.contains(event.target)) {
+      if (
+        chatContainerRef.current &&
+        !chatContainerRef.current.contains(event.target)
+      ) {
         setOpenMenu(null);
       }
     };
@@ -65,33 +67,29 @@ const {isNavVisible,setIsNavVisible} = useNav()
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
- 
 
-  const getChatById = async(c) => {
-   const response = await fetch(`https://chatbot-2vqr.onrender.com/chatbot/get-By/${c}`);
+  const getChatById = async (c) => {
+    const response = await fetch(
+      `https://chatbot-2vqr.onrender.com/chatbot/get-By/${c}`
+    );
     if (!response.ok) throw new Error("Failed to fetch chat data");
 
     const chatData = await response.json();
     if (!chatData || !chatData.type) throw new Error("Invalid chat data");
 
-    
-
     switch (chatData.type) {
       case "Gemini":
-     router.push(`/chat/${chatData.id}`);
+        router.push(`/chat/${chatData.id}`);
         break;
       case "ImageGeneration":
-         router.push(`/imageChat/${chatData.id}`);
+        router.push(`/imageChat/${chatData.id}`);
         break;
       case "openAI":
-         router.push(`/openAIchat/${chatData.id}`);
+        router.push(`/openAIchat/${chatData.id}`);
         break;
       default:
         router.push(`/chat/${chatData.id}`);
-
     }
-
-    
   };
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -118,7 +116,9 @@ const {isNavVisible,setIsNavVisible} = useNav()
         throw new Error(data.message || "Failed to delete chats");
       }
       toast.success(" Chat deleted successfully!");
-      setChatThread((prevChats) => prevChats.filter((chat) => chat.chatId !== id));
+      setChatThread((prevChats) =>
+        prevChats.filter((chat) => chat.chatId !== id)
+      );
       router.push("/model");
     } catch (error) {
       toast.error(`Error: ${error.message}`);
@@ -127,8 +127,7 @@ const {isNavVisible,setIsNavVisible} = useNav()
       duration: Infinity;
     }
   };
-  
-  
+
   return (
     <div>
       <div className="relative z-40">
@@ -136,10 +135,10 @@ const {isNavVisible,setIsNavVisible} = useNav()
 
         {!isNavVisible && (
           <button
-            className="block p-0.5 border text-black mt-[30%] ml-3 hover:bg-gray-100 rounded"
+            className="block p-0.5 border text-black  ml-3 mt-5 hover:bg-gray-100 rounded"
             onClick={() => setIsNavVisible(true)}
           >
-            <div className="w-7 h-[2%] p-1 ">
+            <div className="w-6 h-6 p-1 ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -157,10 +156,10 @@ const {isNavVisible,setIsNavVisible} = useNav()
             </div>
           </button>
         )}
- 
+
         <div
-          className={`h-screen w-64 bg-white md:block text-black overflow-y-auto fixed left-0 top-0 flex flex-col items-center p-4 transition-transform duration-300 ${
-            !isNavVisible ? "-translate-x-64" : "translate-x-0 hidden"
+          className={`h-screen w-64 bg-white  text-black overflow-y-auto fixed left-0 top-0 flex flex-col items-center p-4 transition-transform duration-300 ${
+            !isNavVisible ? "-translate-x-64" : "translate-x-0 "
           }`}
         >
           <nav className="w-full flex flex-col justify-between flex-grow">
@@ -168,16 +167,16 @@ const {isNavVisible,setIsNavVisible} = useNav()
               <li className=" flex rounded items-center  ">
                 <Link
                   href="/model"
-                  className="flex block p-1 border text-2/3sm text-gray-700 hover:bg-gray-100 rounded mr-2 pl-2 pr-20 "
+                  className="flex w-full p-1 border  text-gray-700 hover:bg-gray-100 rounded mr-2 pl-2 items-center"
                 >
-                  <Plus size={12} className="mt-[5%]" />
+                  <Plus size={12} />
                   <div className="ml-2 text-sm ">New Chat</div>
                 </Link>
                 <button
                   onClick={() => setIsNavVisible(false)}
                   className="block p-0.5 border hover:bg-gray-100 rounded"
                 >
-                  <div className="w-7 h-[2%] p-1 ">
+                  <div className="w-6 h-6 p-1 ">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -232,12 +231,12 @@ const {isNavVisible,setIsNavVisible} = useNav()
                   className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded text-sm"
                 >
                   <div className="w-8  h-[2%] p-1 ">
-                   <Image
-                                 src="/assests/vlogo.avif"
-                                 width={18}
-                                 height={18}
-                                 alt="logo"
-                               />
+                    <Image
+                      src="/assests/vlogo.avif"
+                      width={18}
+                      height={18}
+                      alt="logo"
+                    />
                   </div>
                   <div className="ml-1 mt-[2%]">VChat</div>
                 </Link>
@@ -335,55 +334,7 @@ const {isNavVisible,setIsNavVisible} = useNav()
                   <div className="ml-1 mt-[2%]">OpenAI</div>
                 </Link>
               </li>
-              {/* <li>
-                <Link
-                  href="/deepSeek"
-                  className="flex items-center p-2 text-gray-600  hover:bg-gray-100 rounded text-sm"
-                >
-                  <div className="w-8  h-[2%] p-1 ">
-                    <svg
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 42 42"
-                      className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
-                    >
-                      <path
-                        d="M.5 21C.5 9.678 9.678.5 21 .5S41.5 9.678 41.5 21 32.322 41.5 21 41.5.5 32.322.5 21Z"
-                        fill="#fff"
-                      ></path>
-                      <rect
-                        x="0.656"
-                        y="0.656"
-                        width="40.688"
-                        height="40.688"
-                        rx="20.344"
-                        stroke="#EEE"
-                        strokeWidth="1.313"
-                      ></rect>
-                      <g clipPath="url(#a)">
-                        <path
-                          d="M33 13.674v.53c-.197.576-.272 1.192-.581 1.73-.61 1.064-1.534 1.676-2.732 1.908-.291.057-.59.07-.584.518.018 1.56-.442 3.02-1.07 4.427-.466 1.04-1.167 1.929-1.949 2.76-.42.444-.396.47.164.676.414.153.825.318 1.225.503.244.112.584.18.515.569-.067.37-.36.501-.688.569a5.912 5.912 0 0 1-2.996-.15c-.332-.104-.522-.034-.752.14a8.46 8.46 0 0 1-1.295.818c-1.662.84-3.474.892-5.212.634-3.484-.519-5.893-2.569-7.344-5.745-.36-.79-.44-1.653-.702-2.466V19.08c.125-.084.087-.22.108-.336.359-1.94 1.297-3.53 2.939-4.661 1.578-1.086 3.37-1.225 5.206-1.004.43.052.797-.01 1.188-.142.938-.315 1.863-.71 2.893-.557.173.026.396.006.439.215.037.185-.192.223-.309.313-.649.503-.729 1.264-.097 1.686 1.191.797 2.149 1.84 3.166 2.822.485.469 1.004.893 1.636 1.159.146.061.286.159.44.02.345-.308.31-1.116-.061-1.41-1.492-1.18-1.987-3.152-1.23-4.854.108-.244.215-.452.536-.393.16.156.202.368.262.567.13.426.37.777.776.954.787.344 1.456.784 1.647 1.747.595-.56 1.228-.846 1.962-.837.681.007 1.252-.202 1.68-.734.298-.367.562-.35.818.036l.001.002ZM22.651 27.467c.094.36.205.644.537.143.044-.067.14-.1.21-.15.162-.158-.015-.216-.098-.275-1.334-.978-2.329-2.253-3.217-3.621-1.268-1.954-2.767-3.668-4.971-4.622-1.248-.54-2.538-.89-3.923-.71-.419.054-.635.238-.595.693.072.81.19 1.61.439 2.386.692 2.16 1.938 3.904 3.896 5.105.585.359 1.22.588 1.916.404.386-.103.572-.325.297-.745-.19-.292-.351-.613-.371-.98-.018-.32.116-.454.444-.415.292.036.54.17.784.312.612.359 1.209.741 1.754 1.194.847.7 1.749 1.267 2.9 1.282l-.002-.001Zm.089-6.797c-.192 1.174 1.195 1.769 1.91 1.325.267-.165.345-.32.214-.6-.371-.792-.864-1.498-1.54-2.058-.403-.334-.866-.566-1.418-.427-.207.052-.432.154-.442.4-.011.295.25.28.456.325.727.151.842.303.821 1.036l-.001-.001Zm-.58-.272c-.023-.18-.128-.301-.308-.292-.15.008-.266.12-.254.282.011.17.101.301.302.287.166-.011.243-.117.26-.276v-.001Z"
-                          fill="#506BFC"
-                        ></path>
-                        <path
-                          d="m22.652 27.469.746-.007c-.07.05-.165.084-.209.15-.332.501-.443.216-.537-.143Z"
-                          fill="#4C6EF2"
-                        ></path>
-                      </g>
-                      <defs>
-                        <clipPath id="a">
-                          <path
-                            fill="#fff"
-                            transform="translate(9 11.933)"
-                            d="M0 0h24v17.513H0z"
-                          ></path>
-                        </clipPath>
-                      </defs>
-                    </svg>
-                  </div>
-                  <div className="ml-1 mt-[2%]">DeepSeek</div>
-                </Link>
-              </li> */}
+
               <li>
                 <Link
                   href="/image"
@@ -459,9 +410,9 @@ const {isNavVisible,setIsNavVisible} = useNav()
               <li>
                 <Link
                   href="/model"
-                  className="flex  mb-2 block p-2 hover:bg-gray-100 rounded text-sm"
+                  className="flex  mb-2 items-center p-2 hover:bg-gray-100 rounded text-sm"
                 >
-                  <div className="w-6 h-4 p-1 mt-1 ">
+                  <div className="w-6 h-4 p-1 flex items-center ">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -479,71 +430,74 @@ const {isNavVisible,setIsNavVisible} = useNav()
                   </div>
                   <div className="ml-1 mt-[2%]">Chats</div>
                 </Link>
-                <div className="md:h-72 h-32">
-                <div className="md:max-h-72 overflow-y-scroll scrollbar-thin max-h-40  text-gray-600">
-                  {Array.isArray(chatThread) &&
-                    chatThread.map((chat) => (
-                      <div
-                        key={chat.chatId}
-                        className="relative rounded-lg pl-5 flex items-center justify-between  hover:bg-gray-200 mb-3"
-                      >
-                        
+                <div className="md:h-56 md:max-h-56 h-32 border-t border-gray">
+                  <div className="md:max-h-[220px] max-h-40 overflow-y-auto scrollbar-none text-gray-700 bg-white p-3 rounded-lg ">
+                    {Array.isArray(chatThread) &&
+                      chatThread.map((chat) => (
                         <div
-                          onClick={() => getChatById(chat.chatId)}
-                          className="flex-1  cursor-pointer truncate text-ellipsis whitespace-nowrap p-1"
+                          key={chat.chatId}
+                          className="relative flex items-center justify-between py-1 px-3 rounded-lg hover:bg-gray-100 transition duration-200"
                         >
-                          {chat.message}
-                        </div>
-
-                        {/* Options Button */}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setOpenMenu(
-                              openMenu === chat.chatId ? null : chat.chatId
-                            );
-                          }}
-                          className=" rounded-full "
-                        >
-                       <EllipsisVertical size={15} />
-
-                        </button>
-
-                       
-                        {openMenu === chat.chatId && (
-                          <div ref={chatContainerRef} className="absolute right-2 z-50 top-8 sticky  bg-white shadow-md rounded-lg w-32">
-                            <button
-                              onClick={() => {
-                                deleteChat(chat.chatId);
-                                setOpenMenu(null);
-                              }}
-                              className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                            >
-                              Delete
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                const generatedLink = `${window.location.origin}/share/chat/${chat.chatId}`;
-                                setShareLink(generatedLink);
-                                navigator.clipboard.writeText(generatedLink);
-                                toast.success("Link copied: " + generatedLink);
-                              }}
-                              className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                            >
-                              Share
-                            </button>
+                          {/* Chat Message */}
+                          <div
+                            onClick={() => getChatById(chat.chatId)}
+                            className="flex-1 cursor-pointer truncate text-ellipsis whitespace-nowrap"
+                          >
+                            {chat.message}
                           </div>
-                        )}
-                      </div>
-                    ))}
+
+                          {/* Options Button */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenMenu(
+                                openMenu === chat.chatId ? null : chat.chatId
+                              );
+                            }}
+                            className="rounded-full p-2 hover:bg-gray-200 transition duration-200"
+                          >
+                            <EllipsisVertical size={18} />
+                          </button>
+
+                          {/* Dropdown Menu */}
+                          {openMenu === chat.chatId && (
+                            <div
+                              ref={chatContainerRef}
+                              className="absolute right-3 top-10 z-50 bg-white shadow-lg rounded-lg w-36 py-2 transition-all duration-300"
+                            >
+                              <button
+                                onClick={() => {
+                                  deleteChat(chat.chatId);
+                                  setOpenMenu(null);
+                                }}
+                                className="block w-full text-left px-4 py-2 text-red-500 hover:bg-red-50 transition duration-200"
+                              >
+                                Delete
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  const generatedLink = `${window.location.origin}/share/chat/${chat.chatId}`;
+                                  setShareLink(generatedLink);
+                                  navigator.clipboard.writeText(generatedLink);
+                                  toast.success(
+                                    "Link copied: " + generatedLink
+                                  );
+                                }}
+                                className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition duration-200"
+                              >
+                                Share
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                  </div>
                 </div>
-                </div>
-                
               </li>
             </ul>
-            <ul>
+            <ul className="">
               <li>
                 <Link
                   href="/explore"
@@ -588,7 +542,6 @@ const {isNavVisible,setIsNavVisible} = useNav()
               </li>
             </ul>
           </nav>
-         
         </div>
       </div>
     </div>
