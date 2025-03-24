@@ -337,9 +337,9 @@ const page = () => {
               <div className="fixed top-3 right-5 flex items-center "></div>
             </>
           ) : (
-            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center ml-auto w-4/5">
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  md:ml-auto md:w-full md:max-w-[calc(100%-256px)]">
               <div className="max-w-3xl    rounded-md  text-center ">
-                <div className="w-16 h-16 rounded-full ml-72 mb-10 ">
+                <div className="w-16 h-16 rounded-full md:ml-72 md:mb-10 mx-auto mb-4">
                   <svg
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
@@ -369,12 +369,12 @@ const page = () => {
                     ></path>
                   </svg>
                 </div>
-                <h1 className="text-3xl  text-gray-900">Upload & Ask PDF</h1>
-                <h1 className="text-xl mt-5 text-gray-400">
+                <h1 className="md:text-3xl text-lg  text-gray-900">Upload & Ask PDF</h1>
+                <p className="md:text-xl text-base mt-5 text-gray-400">
                   Get instant answers and insights from your documents—just
                   upload and ask!
-                </h1>
-                <div className="mb-5 ml-20 w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2 rounded-l-full rounded-r-full">
+                </p>
+                <div className="mb-5 w-full md:ml-20 md:w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2 rounded-l-full rounded-r-full">
                   <button
                     type="button"
                     onClick={() => fileInputRef.current.click()}

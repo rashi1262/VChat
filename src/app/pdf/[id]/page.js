@@ -542,7 +542,7 @@ const ChatPage = ({ params }) => {
             </div>
           </div>
         </div>
-        <div className="min-h-screen md:block relative bg-gray-50  flex-col items-center justify-center  w-4/5 hidden">
+        <div className="min-h-screen bg-gray-50 md:flex flex-col items-center justify-center  ml-auto w-full max-w-[calc(100%-256px) hidden]">
           <div
             className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  "
             ref={chatContainerRef}
