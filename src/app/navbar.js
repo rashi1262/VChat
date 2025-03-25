@@ -154,8 +154,8 @@ const page = () => {
         )}
  
         <div
-          className={`h-screen w-64 bg-white md:block text-black overflow-y-auto fixed left-0 top-0 flex flex-col items-center p-4 transition-transform duration-300 ${
-            !isNavVisible ? "-translate-x-64" : "translate-x-0 hidden"
+          className={`h-screen w-64 bg-white  text-black overflow-y-auto fixed left-0 top-0 flex flex-col items-center p-4 transition-transform duration-300 ${
+            !isNavVisible ? "-translate-x-64" : "translate-x-0 "
           }`}
         >
           <nav className="w-full flex flex-col justify-between flex-grow">
