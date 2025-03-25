@@ -7,6 +7,7 @@ import { toast, Toaster } from "sonner";
 import Link from "next/link";
 import { useChat } from "../chatContext";
 import { useRouter } from "next/navigation";
+import { BackButton } from "../profile/page";
 
 export default function DangerZonePage() {
   const [loadingChats, setLoadingChats] = useState(false);
@@ -75,10 +76,7 @@ export default function DangerZonePage() {
   const confirmDeleteChats = async () => {
     setLoadingChats(true);
     try {
-      console.log(
-        "process.env.NEXT_PUBLIC_VCHAT_API_URL",
-        process.env.NEXT_PUBLIC_BASE_URL
-      );
+    
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/delete-ByUserId/${id}`,
@@ -96,11 +94,9 @@ export default function DangerZonePage() {
         throw new Error(data.message || "Failed to delete chats");
       }
 
-      //  toast.success("All chats deleted successfully!");
       setChatThread([]);
       setLoadingChats(false);
     } catch (error) {
-      // toast.error(`Error: ${error.message}`);
     } finally {
       setLoadingChats(false);
     }
@@ -174,7 +170,7 @@ export default function DangerZonePage() {
 
       router.push("/login");
     } catch (error) {
-      // toast.error(`Error: ${error.message}`);
+   
     } finally {
       setLoadingAccount(false);
     }
@@ -198,58 +194,22 @@ export default function DangerZonePage() {
                 </p>
               </div>
 
-              <Link
-                href="/model"
-                className="px-4 py-2 text-gray-500 border border-rounded rounded-md"
-              >
-                Back to Chat
-              </Link>
+              <BackButton />
             </div>
 
             <div className="rounded-lg border p-6 space-y-6">
-              <div className="flex items-center justify-between py-4 border-b">
-                <div>
-                  <h3 className="text-base font-medium text-gray-900">
-                    Clear All Chats
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    Your chat history will be permanently deleted
-                  </p>
-                </div>
-                <button
-                  className="px-4 py-2 text-sm bg-white border border-red-300 text-red-600 rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center"
-                  onClick={handleDeleteChats}
-                  disabled={loadingChats}
-                >
-                  {loadingChats ? (
-                    <span className="animate-spin h-4 w-4 border-2 border-t-transparent border-red-600 rounded-full"></span>
-                  ) : (
-                    "Delete Chats"
-                  )}
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between py-4">
-                <div>
-                  <h3 className="text-base font-medium text-gray-900">
-                    Delete Account
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    Your account and all data will be permanently deleted
-                  </p>
-                </div>
-                <button
-                  className="px-4 py-2 text-sm bg-white border border-red-300 text-red-600 rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center"
-                  onClick={handleDeleteAccount}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <span className="animate-spin h-4 w-4 border-2 border-t-transparent border-red-600 rounded-full"></span>
-                  ) : (
-                    "Delete Account"
-                  )}
-                </button>
-              </div>
+              <ActionButton
+                label="Clear All Chats"
+                description="Your chat history will be permanently deleted"
+                onClick={handleDeleteChats}
+                loading={loadingChats}
+              />
+              <ActionButton
+                label="Delete Account"
+                description="Your account and all data will be permanently deleted"
+                onClick={handleDeleteAccount}
+                loading={loading}
+              />
             </div>
           </div>
         </div>
@@ -257,3 +217,23 @@ export default function DangerZonePage() {
     </div>
   );
 }
+
+const ActionButton = ({ label, description, onClick, loading }) => (
+  <div className="flex items-center justify-between py-4 border-b last:border-b-0">
+    <div>
+      <h3 className="text-base font-medium text-gray-900">{label}</h3>
+      <p className="text-sm text-gray-500">{description}</p>
+    </div>
+    <button
+      className="px-4 py-2 text-sm bg-white border border-red-300 text-red-600 rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center"
+      onClick={onClick}
+      disabled={loading}
+    >
+      {loading ? (
+        <span className="animate-spin h-4 w-4 border-2 border-t-transparent border-red-600 rounded-full"></span>
+      ) : (
+        label
+      )}
+    </button>
+  </div>
+);
