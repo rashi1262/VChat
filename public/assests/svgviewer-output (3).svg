@@ -1,0 +1,28 @@
+ <svg
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 42 42"
+                      className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
+                    >
+                      <path
+                        d="M.5 21C.5 9.678 9.678.5 21 .5S41.5 9.678 41.5 21 32.322 41.5 21 41.5.5 32.322.5 21Z"
+                        fill="#fff"
+                      ></path>
+                      <rect
+                        x="0.656"
+                        y="0.656"
+                        width="40.688"
+                        height="40.688"
+                        rx="20.344"
+                        stroke="#EEE"
+                        strokeWidth="1.313"
+                      ></rect>
+                      <path
+                        d="M27.918 17.253 22.7 12.036v5.217h5.217Z"
+                        fill="#D47070"
+                      ></path>
+                      <path
+                        d="M22.7 18.744c-.822 0-1.49-.669-1.49-1.491v-5.217h-5.217a1.49 1.49 0 0 0-1.491 1.49v14.907a1.49 1.49 0 0 0 1.49 1.49l10.435.002c.823 0 1.491-.668 1.491-1.49v-9.691h-5.217Z"
+                        fill="#D47070"
+                      ></path>
+                    </svg>

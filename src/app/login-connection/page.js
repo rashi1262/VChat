@@ -5,6 +5,8 @@ import Sidebar from "../Sidebar";
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { BackButton } from "../profile/page";
+import { CONNECT, DISCONNECT } from "@/constants";
 
 export default function LoginConnectionPage() {
   const { data: session } = useSession();
@@ -60,12 +62,7 @@ export default function LoginConnectionPage() {
                   Manage your login connections and authentication methods
                 </p>
               </div>
-              <Link
-                href="/model"
-                className="px-4 py-2 text-sm border rounded-md text-gray-500"
-              >
-                Back to Chat
-              </Link>
+              <BackButton />
             </div>
 
             <div className="rounded-lg p-6 space-y-6">
@@ -127,9 +124,9 @@ export default function LoginConnectionPage() {
                   {loading ? (
                     <span className="animate-spin h-4 w-4 border-2 border-t-transparent border-red-600 rounded-full"></span>
                   ) : isGmailUser ? (
-                    "DISCONNECT"
+                    DISCONNECT
                   ) : (
-                    "CONNECT"
+                    CONNECT
                   )}
                 </button>
               </div>

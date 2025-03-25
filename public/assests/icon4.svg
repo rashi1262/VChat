@@ -1,0 +1,32 @@
+  <svg
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 46 46"
+                    className="_container__icon_1n4zg_21"
+                  >
+                    <g opacity="0.9">
+                      <path
+                        d="M0 23C0 10.297 10.297 0 23 0s23 10.297 23 23-10.297 23-23 23S0 35.703 0 23Z"
+                        fill="#FFF4FF"
+                      ></path>
+                      <g
+                        clipPath="url(#clipPath)"
+                        stroke="#AF1CA1"
+                        strokeWidth="1.833"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M23 32.167a9.167 9.167 0 1 0 0-18.334 9.167 9.167 0 0 0 0 18.334Z"></path>
+                        <path d="M25.495 19.577c.448-.15.672-.224.82-.17.13.046.232.148.279.277.053.149-.022.373-.171.82l-1.364 4.091a.997.997 0 0 1-.1.245.459.459 0 0 1-.12.12c-.052.036-.116.057-.243.1l-4.091 1.363c-.448.15-.672.224-.82.17a.458.458 0 0 1-.279-.277c-.053-.149.022-.373.171-.82l1.364-4.091a.996.996 0 0 1 .1-.245.457.457 0 0 1 .12-.12c.052-.035.116-.057.243-.1l4.091-1.363Z"></path>
+                      </g>
+                    </g>
+                    <defs>
+                      <clipPath id="clipPath">
+                        <path
+                          fill="#fff"
+                          transform="translate(12 12)"
+                          d="M0 0h22v22H0z"
+                        ></path>
+                      </clipPath>
+                    </defs>
+                  </svg>

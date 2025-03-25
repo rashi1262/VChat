@@ -1,5 +1,6 @@
+import { BackButton } from "../profile/page";
 import Sidebar from "../Sidebar";
-import Link from "next/link";
+
 export default function InvoicePage() {
   return (
     <div className="flex w-full justify-between bg-gray-50 text-sm">
@@ -8,21 +9,17 @@ export default function InvoicePage() {
           <Sidebar />
 
           <div className="flex-1 mr-64">
-          <div className="mb-6 flex justify-between items-center">
+            <div className="mb-6 flex justify-between items-center">
               <div>
-              <h1 className="text-lg font-semibold text-gray-600">Invoices</h1>
-              <p className="text-sm text-gray-500">
-              Access your billing history and invoices
-              </p>
-
+                <h1 className="text-lg font-semibold text-gray-600">
+                  Invoices
+                </h1>
+                <p className="text-sm text-gray-500">
+                  Access your billing history and invoices
+                </p>
               </div>
-              
-              <Link
-                href="/model"
-                className="px-4 py-2 text-gray-500 border border-rounded rounded-md"
-              >
-                Back to Chat
-              </Link>
+
+              <BackButton />
             </div>
 
             <div className=" rounded-lg p-6 space-y-6">

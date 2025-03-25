@@ -7,14 +7,13 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { toast, Toaster } from "sonner";
-
+import { signInWithGoogle } from "../auth";
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [isLogin, setIsLogin] = useState(false);
 
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -39,10 +38,17 @@ const Login = () => {
     }));
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8080/auth/google/callback";
+  const handleGoogleLogin = async () => {
+    try {
+      const user = await signInWithGoogle();
+      if (user.error) {
+        toast.error(user.error);
+        return;
+      }
 
-    
+      router.push("/model");
+      toast.success("log in successful!");
+    } catch (error) {}
   };
 
   const handleSubmit = async (e) => {
@@ -84,15 +90,18 @@ const Login = () => {
         email: data.email,
         name: data.name || "Guest",
         id: data.id,
-        credits:data.credits
+        credits: data.credits,
       };
 
       localStorage.setItem("user", JSON.stringify(userData));
-      localStorage.setItem("remainingCredits", JSON.stringify(userData.credits));
+      localStorage.setItem(
+        "remainingCredits",
+        JSON.stringify(userData.credits)
+      );
 
       localStorage.setItem("hasLoggedIn", true);
       toast.success("Login successful!");
-      setIsLogin(true);
+
       router.push("/model");
     } catch (error) {
       toast.error(
@@ -103,16 +112,14 @@ const Login = () => {
     }
   };
 
-  const handleAppleLogin = () => {
-    console.log("Apple login");
-  };
+  const handleAppleLogin = () => {};
 
   return (
     <div className="flex justify-center items-center h-screen bg-white">
       <Toaster position="top-center" richColors />
       <div className="w-full max-w-md p-5 bg-white rounded-lg">
         <img
-         src="assests/vlogo.avif"
+          src="assests/vlogo.avif"
           className="w-16 h-16 rounded-full flex justify-center items-center mx-auto mb-8"
           alt="logo"
         />
@@ -123,7 +130,7 @@ const Login = () => {
 
         <div className="flex flex-col gap-2 mt-5">
           <button
-            onClick={() => signIn("google")}
+            onClick={handleGoogleLogin}
             className="flex items-center justify-center gap-2 p-2 border border-gray-300 rounded bg-white text-gray-600"
             disabled={isLoading}
           >
@@ -190,13 +197,14 @@ const Login = () => {
             />
           </div>
 
-          
           <button
             type="submit"
             className={`w-full p-2 text-base text-white border-none rounded cursor-pointer mt-2 ${
-              isLoading ? "bg-gray-500 cursor-not-allowed" : "bg-gray-800 hover:bg-gray-900"
+              isLoading
+                ? "bg-gray-500 cursor-not-allowed"
+                : "bg-gray-800 hover:bg-gray-900"
             }`}
-            disabled={isLoading} 
+            disabled={isLoading}
           >
             {isLoading ? (
               <div className="flex items-center justify-center">
@@ -204,7 +212,7 @@ const Login = () => {
                   className="animate-spin h-5 w-5 mr-2 border-t-2 border-white rounded-full"
                   viewBox="0 0 24 24"
                 ></svg>
-               Logging in...
+                Logging in...
               </div>
             ) : (
               "Log In"

@@ -5,7 +5,13 @@ import Sidebar from "../Sidebar";
 import Link from "next/link";
 import axios from "axios";
 import { toast, Toaster } from "sonner";
-
+export const BackButton = () => {
+  return (
+    <Link href="/model" className="px-4 py-2 text-gray-500 border rounded-md">
+      Back to Chat
+    </Link>
+  );
+};
 export default function ProfilePage() {
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -122,12 +128,7 @@ export default function ProfilePage() {
                   Manage your personal information
                 </p>
               </div>
-              <Link
-                href="/model"
-                className="px-4 py-2 text-gray-500 border rounded-md"
-              >
-                Back to Chat
-              </Link>
+              <BackButton />
             </div>
 
             <div className="rounded-lg border p-6 space-y-6">

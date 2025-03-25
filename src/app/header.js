@@ -5,14 +5,19 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useNav } from "./NavProvider";
 const Header = () => {
   const pathname = usePathname();
   const [credits, setCredits] = useState(null);
   const [userId, setUserId] = useState(null);
   const[loading,setloading] = useState(false)
   const [isHydrated, setIsHydrated] = useState(false);
-  const router = useRouter()
+  // const { isNavVisible, setIsNavVisible}=useNav()
 
+  const router = useRouter()
+  
+  //  const [isNavVisible, setIsNavVisible] = useState(false);
+ const {isNavVisible,setIsNavVisible} = useNav()
   useEffect(() => {
     setIsHydrated(true);
   }, []);
@@ -32,6 +37,9 @@ const Header = () => {
             setloading(false)
           }
         } catch (error) {}
+        finally{
+          setloading(false)
+        }
       }
     }, []);
  
@@ -83,7 +91,31 @@ const Header = () => {
     <header className="z-10 fixed top-0 w-full bg-white shadow-sm">
       <div className="container mx-auto flex items-center justify-between py-3 px-5">
         {/* Left Side (Empty Space or Logo) */}
-        <div></div>
+        <div>
+        <button
+            className="block p-0.5 border text-black   hover:bg-gray-100 rounded"
+            onClick={() => {
+              
+              setIsNavVisible(!isNavVisible)}}
+          >
+            <div className="w-6 h-6 p-1 ">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 18 18"
+                className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.5"
+                  d="M9 9h6.75M9 2.25v13.5M5.85 2.25h6.3c1.26 0 1.89 0 2.371.245.424.216.768.56.984.984.245.48.245 1.11.245 2.371v6.3c0 1.26 0 1.89-.245 2.371a2.25 2.25 0 0 1-.984.984c-.48.245-1.11.245-2.371.245h-6.3c-1.26 0-1.89 0-2.371-.245a2.25 2.25 0 0 1-.984-.984c-.245-.48-.245-1.11-.245-2.371v-6.3c0-1.26 0-1.89.245-2.371a2.25 2.25 0 0 1 .984-.984c.48-.245 1.11-.245 2.371-.245"
+                ></path>
+              </svg>
+            </div>
+          </button>
+        </div>
 
         {/* Right Side: Free Points Display & Buttons */}
         <div className="flex items-center space-x-4">

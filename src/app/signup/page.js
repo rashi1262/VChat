@@ -8,12 +8,12 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast, Toaster } from "sonner";
 import { Asset } from "next/font/google";
+import { signInWithGoogle } from "../auth";
 
 const Signup = () => {
   const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const [loading, setLoading] = useState(false); 
 
   useEffect(() => {
     if (session?.user) {
@@ -30,7 +30,7 @@ const Signup = () => {
     name: "",
     email: "",
     password: "",
-    credits:20
+    credits: 20,
   });
 
   const handleChange = (e) => {
@@ -40,17 +40,23 @@ const Signup = () => {
       [name]: value,
     }));
   };
- 
+
+  const handleGoogleLogin = async () => {
+    try {
+      const user = await signInWithGoogle();
+      router.push("/model");
+      toast.success("sign up successful!");
+    } catch (error) {}
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
 
     const userData = {
       ...formData,
-      
     };
-  
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/signup-verification`,
@@ -62,9 +68,9 @@ const Signup = () => {
           body: JSON.stringify(userData),
         }
       );
-  
+
       const data = await response.json();
-  
+
       if (!response.ok) {
         const errorMessage =
           data.message ||
@@ -73,31 +79,29 @@ const Signup = () => {
             : "Signup failed! Try again.");
         throw new Error(errorMessage);
       }
-  
+
       if (data.token) {
         localStorage.setItem("userToken", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
       }
-  
+
       toast.success("Signup successful!");
       router.push("/verify");
-      setFormData({ name: "", email: "", password: "" }); // Reset form
+      setFormData({ name: "", email: "", password: "" }); 
     } catch (error) {
       toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
   };
-  
 
   return (
     <div className="flex justify-center items-center h-screen bg-white">
       <Toaster position="top-center" richColors />
       <div className="w-full max-w-md p-5 bg-white rounded-lg">
         <img
-        // style={globe.svg}
-        src="assests/vlogo.avif"
-        className="w-16 h-16 rounded-full flex justify-center items-center mx-auto mb-8"
+          src="assests/vlogo.avif"
+          className="w-16 h-16 rounded-full flex justify-center items-center mx-auto mb-8"
           alt="logo"
         />
 
@@ -174,7 +178,7 @@ const Signup = () => {
           </div>
 
           <button
-            onClick={() => signIn("google")}
+            onClick={handleGoogleLogin}
             className="flex items-center justify-center gap-2 p-2 border border-gray-300 rounded bg-white text-gray-600"
           >
             <Image
@@ -186,7 +190,7 @@ const Signup = () => {
             Continue with Google
           </button>
 
-          <button
+          {/* <button
             onClick={() => "Apple login"}
             className="flex items-center justify-center gap-2 p-2 border border-gray-300 rounded bg-white text-gray-600"
           >
@@ -197,7 +201,7 @@ const Signup = () => {
               alt="Apple logo"
             />
             Continue with Apple
-          </button>
+          </button> */}
         </div>
 
         <p className="text-center mt-4 text-sm text-gray-600">

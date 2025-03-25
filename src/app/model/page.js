@@ -37,13 +37,12 @@ const page = ({ params }) => {
   }, []);
 
   const handleRedirect = (path) => {
-    localStorage.setItem("showPopup", "false"); 
-  
+    localStorage.setItem("showPopup", "false");
+
     setTimeout(() => {
-      window.location.href = path; 
+      window.location.href = path;
     }, 100);
   };
-  
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -124,7 +123,7 @@ const page = ({ params }) => {
       }
 
       if (!searchRes.ok) throw new Error("Error fetching bot response");
-     
+
       const data = await searchRes.json();
 
       if (
@@ -154,7 +153,7 @@ const page = ({ params }) => {
       );
 
       if (!createChatRes.ok) throw new Error("Failed to create chat");
-      
+
       const chatData = await createChatRes.json();
 
       const chatHistoryRes = await fetch(
@@ -198,7 +197,6 @@ const page = ({ params }) => {
       handleResponse();
     }
   };
- 
 
   return (
     <>
@@ -278,7 +276,7 @@ const page = ({ params }) => {
               </>
             ) : (
               <>
-                <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center  md:hidden">
+                <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center  hidden">
                   <div className="max-w-4xl w-full  rounded-md p-6 text-center">
                     <button
                       className="h-6 mt-10 flex w-full justify-center items-center text-center text-black rounded"
@@ -286,13 +284,15 @@ const page = ({ params }) => {
                     >
                       Gemini <ChevronDown />
                     </button>
+                    
                     {showPopup && (
                       <div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
                         <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center">
                           <h2 className="text-2xl  font-bold">Welcome back</h2>
                           <p className=" p-2  text-lg ">
-                            Log in or sign up to get smarter responses, upload
-                            files, and more.
+                            Log in or sign up to unlock smarter responses,
+                            upload files, and make the most of VChat—your AI
+                            assistant.
                           </p>
                           <div className=" p-2 mt-4">
                             <button
@@ -464,12 +464,12 @@ const page = ({ params }) => {
                     </div>
                   </div>
                 </div>
-                <div className="h-screen md:block bg-gray-50   items-center justify-center ml-auto w-full hidden">
-                  <div className="max-w-4xl w-full rounded-md p-6 text-center ml-auto mr-auto">
-                    <h1 className="text-3xl mt-48 text-gray-600 mb-16">
-                      How can I help you today?
+                <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  md:ml-auto md:w-full md:max-w-[calc(100%-256px)]">
+                  <div className="max-w-4xl w-full rounded-md p-6 text-center ">
+                    <h1 className="text-3xl  text-gray-600 mb-16">
+                      How can I help you today ?
                     </h1>
-                    <div className="grid grid-cols-4 gap-6">
+                    <div className="grid md:grid-cols-4 grid-cols-2 gap-6">
                       <div
                         className="relative border rounded-md p-4 hover:bg-white cursor-pointer"
                         onClick={() =>
@@ -510,7 +510,7 @@ const page = ({ params }) => {
                             </defs>
                           </svg>
                         </div>
-                        <p className="text-gray-500">
+                        <p className="text-gray-500 text-sm">
                           "Solve a debate: is a hot dog a sandwich?"
                         </p>
                       </div>
@@ -556,7 +556,7 @@ const page = ({ params }) => {
                             </defs>
                           </svg>
                         </div>
-                        <p className="text-gray-500  ">
+                        <p className="text-gray-500 text-sm">
                           "I'm thinking about moving to a new city. Can you help
                           me plan the move?"
                         </p>
@@ -601,7 +601,7 @@ const page = ({ params }) => {
                             </defs>
                           </svg>
                         </div>
-                        <p className="text-gray-500">
+                        <p className="text-gray-500 text-sm">
                           "Can you help me write a bedtime story?"
                         </p>
                       </div>
@@ -648,12 +648,12 @@ const page = ({ params }) => {
                             </defs>
                           </svg>
                         </div>
-                        <p className="text-gray-500">
+                        <p className="text-gray-500 text-sm">
                           "Get advice on preparing for a job interview."
                         </p>
                       </div>
                     </div>
-                    <div className="mb-5 ml-20 w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
+                    <div className="mb-5 w-full md:ml-20 md:w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2 rounded-l-full rounded-r-full">
                       {/* <button className="ml-2 p-2 rounded-full bg-white">
                 <div className="w-7 h-6 p-1 ">
                   <svg
@@ -734,18 +734,18 @@ const page = ({ params }) => {
               <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center">
                 <h2 className="text-2xl  font-bold">Welcome back</h2>
                 <p className=" p-2  text-lg ">
-                  Log in or sign up to get smarter responses, upload files, and
-                  more.
+                  Log in or sign up to unlock smarter responses, upload files,
+                  and make the most of VChat—your AI assistant.
                 </p>
                 <div className=" p-2 mt-4">
                   <button
-                    onClick={() => handleRedirect("/login")}
+                    onClick={() => router.push("/login")}
                     className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
                   >
                     Log in
                   </button>
                   <button
-                    onClick={() => handleRedirect("/signup")}
+                    onClick={() => router.push("/signup")}
                     className="  w-full px-4 py-2 bg-transparent text-white border border-white rounded-full hover:bg-gray-600"
                   >
                     Sign up

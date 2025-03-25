@@ -49,8 +49,7 @@ const page = () => {
               }
         
               const data = await response.json();
-              console.log("Fetched data:", data); 
-        
+           
               
               setChatThread(
                 Array.isArray(data?.chatMessages)
@@ -61,7 +60,7 @@ const page = () => {
                   : []
               );
             } catch (error) {
-              console.error("Error fetching user chats:", error);
+            
               setChatThread([]); 
             }
           };
@@ -179,10 +178,9 @@ const page = () => {
    .fill(0)
    .map((_, index) => (
      <div key={index} className="animate-pulse flex flex-col gap-1 mr-36">
-       {/* User Message Skeleton */}
+      
        <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
 
-       {/* Response Skeleton */}
        <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
      </div>
    ))}
@@ -244,24 +242,7 @@ const page = () => {
   </h1>
 
   <div className="mb-5 ml-5 w-3/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
-    {/* <button className="ml-2 p-2 rounded-full bg-white">
-      <div className="w-7 h-6 p-1 ">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 18 18"
-          className="text-gray-400 CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
-        >
-          <path
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.5"
-            d="M9 3.75v10.5M3.75 9h10.5"
-          ></path>
-        </svg>
-      </div>
-    </button> */}
+  
 
     <input
       type="text"
@@ -271,24 +252,7 @@ const page = () => {
       placeholder="Send a message..."
       className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
     />
-    {/* <button className="p-1 rounded-full bg-gray-200">
-      <div className="w-7 h-6 p-1 ">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 18 18"
-          className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
-        >
-          <path
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.5"
-            d="M2.25 7.5v3m3.375-6v9M9 2.25v13.5M12.375 4.5v9m3.375-6v3"
-          ></path>
-        </svg>
-      </div>
-    </button> */}
+    
     <button
       onClick={handleResponse}
       className="p-1 mr-2 rounded-full bg-gray-200 flex items-center justify-center bg-white"
@@ -317,7 +281,7 @@ const page = () => {
 </div>
 </div>
   <div className="min-h-screen md:block bg-gray-50 flex flex-col items-center justify-center  ml-auto w-4/5 hidden">
-  <div className="max-w-4xl w-full rounded-md p-6 text-center ml-auto mr-auto ">
+  <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  ml-auto w-4/5 ">
   <h1 className="text-3xl mt-48  text-gray-600 mb-16">
               How can I help you today?
             </h1>

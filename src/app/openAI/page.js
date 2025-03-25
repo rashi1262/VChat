@@ -251,12 +251,12 @@ const page = () => {
            <div className="fixed top-3 right-5 flex items-center ">
            
            </div>
-         </>):(<div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  ml-auto w-4/5">
+         </>):(<div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  ml-auto w-full md:max-w-[calc(100%-256px)]">
           <div className="max-w-4xl w-full rounded-md p-6 text-center ">
-            <h1 className="text-3xl  text-gray-600 mb-16">
+            <h1 className="md:text-3xl mb-5 text-lg text-gray-600 md:mb-16 text-center">
               How can I help you today?
             </h1>
-            <div className="grid grid-cols-4 gap-6">
+            <div className="grid md:grid-cols-4 grid-cols-2 gap-6">
               <div className="relative border rounded-md p-4 hover:shadow-lg " >
                 <div className="w-10 h-10 mb-2" >
                   {" "}
@@ -292,7 +292,7 @@ const page = () => {
                     </defs>
                   </svg>
                 </div>
-                <p className="text-gray-500">
+                <p className="text-gray-500 text-sm">
                   "Solve a debate: which came first, the chiken or the egg?"
                 </p>
               </div>
@@ -331,7 +331,7 @@ const page = () => {
                     </defs>
                   </svg>
                 </div>
-                <p className="text-gray-500">
+                <p className="text-gray-500 text-sm">
                   "I want to get promated at work.Lat's make a detailed plan
                   together."
                 </p>
@@ -371,7 +371,7 @@ const page = () => {
                     </defs>
                   </svg>
                 </div>
-                <p className="text-gray-500">
+                <p className="text-gray-500 text-sm">
                   "Describe how blockchain technology works."
                 </p>
               </div>
@@ -411,12 +411,12 @@ const page = () => {
                     </defs>
                   </svg>
                 </div>
-                <p className="text-gray-500">
+                <p className="text-gray-500 text-sm">
                   "Can you help me brainstorm ideas for a brand campaign"
                 </p>
               </div>
-              <div className="mb-5 ml-20 w-2/5 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
-              <button className="ml-2 p-2 rounded-full bg-gray-200">
+              <div className="mb-5 md:ml-20 md:w-2/5 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  w-full rounded-l-full rounded-r-full md:mt-0 mt-5">
+              <button className="ml-2 p-2 rounded-full bg-gray-200 ">
                 <div className="w-7 h-6 p-1 ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

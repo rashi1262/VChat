@@ -11,7 +11,7 @@ const VerifyEmailContent = () => {
   const [verify, setVerified] = useState(false);
 
   useEffect(() => {
-    console.log("Token:", token);
+  
 
     if (token) {
       fetch(`https://chatbot-2vqr.onrender.com/verify-link?token=${token}`, {
@@ -22,7 +22,7 @@ const VerifyEmailContent = () => {
       })
         .then((response) => response.text())
         .then((text) => {
-          console.log("Raw API Response:", text);
+        
 
           if (text.includes("Email verified successfully!")) {
             setMessage("Your email has been successfully verified! You can now login.");
