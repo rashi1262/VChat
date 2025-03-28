@@ -26,7 +26,7 @@ const page = () => {
         <Navbar />
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  ml-auto w-full max-w-[calc(100%-256px)]">
           <div className="max-w-4xl w-full rounded-md p-6 text-center ">
-            <h1 className="text-3xl  text-gray-600 mb-16">
+            <h1 className="md:text-3xl mb-5 text-lg text-gray-600 md:mb-16 text-center">
               How can I help you today?
             </h1>
             <div className="grid md:grid-cols-4 grid-cols-2 gap-6">

@@ -77,9 +77,7 @@ const page = ({ params }) => {
           setName(user?.name || "No Name");
           setUserId(user?.id);
         }
-      } catch (error) {
-       
-      }
+      } catch (error) {}
     }
   }, []);
 
@@ -97,7 +95,7 @@ const page = ({ params }) => {
         }
 
         const data = await response.json();
-       localStorage.setItem("remainingCredits", JSON.stringify(data.credits));
+        localStorage.setItem("remainingCredits", JSON.stringify(data.credits));
 
         setChatThread(
           Array.isArray(data?.chatMessages)
@@ -108,7 +106,6 @@ const page = ({ params }) => {
             : []
         );
       } catch (error) {
-      
         setChatThread([]);
       }
     };
@@ -244,7 +241,13 @@ const page = ({ params }) => {
                               >
                                 <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
 
-                                <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
+                                <div className="self-start bg-white shadow-lg  py-2 rounded-2xl flex items-center w-[50px] px-3">
+              <div className="flex space-x-1">
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+              </div>
+            </div>
                               </div>
                             ))}
                         </div>
@@ -301,8 +304,6 @@ const page = ({ params }) => {
                     >
                       Gemini <ChevronDown />
                     </button>
-
-                
 
                     {showButtons && (
                       <div className="flex flex-col  items-center justify-center  ">
@@ -405,7 +406,7 @@ const page = ({ params }) => {
                 </div>
                 <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  md:ml-auto md:w-full md:max-w-[calc(100%-256px)]">
                   <div className="max-w-4xl w-full rounded-md p-6 text-center ">
-                    <h1 className="text-3xl  text-gray-600 mb-16">
+                    <h1 className="md:text-3xl mb-5 text-lg text-gray-600 md:mb-16 text-center">
                       How can I help you today ?
                     </h1>
                     <div className="grid md:grid-cols-4 grid-cols-2 gap-6">

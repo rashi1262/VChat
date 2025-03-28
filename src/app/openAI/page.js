@@ -209,7 +209,13 @@ const page = () => {
                             >
                               <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
 
-                              <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
+                              <div className="self-start bg-white shadow-lg  py-2 rounded-2xl flex items-center w-[50px] px-3">
+              <div className="flex space-x-1">
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+              </div>
+            </div>
                             </div>
                           ))}
                       </div>

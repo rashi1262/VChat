@@ -580,7 +580,7 @@ const ChatPage = ({ params }) => {
                           className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${
                             editIndex === index
                               ? "bg-gray-500 w-[70%]"
-                              : "bg-gray-600"
+                              : "bg-gray-200"
                           }`}
                         >
                           {editIndex === index ? (
@@ -621,7 +621,7 @@ const ChatPage = ({ params }) => {
                               </div>
                             </div>
                           ) : (
-                            <span className="break-words w-full  text-white">
+                            <span className="break-words w-full  text-[#3d3d3d]">
                               {chat.userMessage}
                             </span>
                           )}

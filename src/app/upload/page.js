@@ -337,7 +337,7 @@ const page = () => {
             </>
           ) : (
             <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  md:ml-auto md:w-full md:max-w-[calc(100%-256px)]">
-              <div className="max-w-3xl    rounded-md  text-center ">
+              <div className="max-w-3xl rounded-md  text-center  px-3">
                 <div className="w-16 h-16 rounded-full md:ml-72 md:mb-10 mx-auto mb-4">
                   <svg
                     fill="none"

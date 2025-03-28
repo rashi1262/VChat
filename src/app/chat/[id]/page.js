@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation";
 import { Edit, Pencil } from "lucide-react";
 import { Check, Clipboard } from "lucide-react";
 import { useCredits } from "@/context/creditContext";
-
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 const ChatPage = ({ params }) => {
   const { hasCredits, setHasCredits } = useCredits();
   const { id } = use(params);
@@ -403,7 +404,13 @@ const ChatPage = ({ params }) => {
                         >
                           <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
 
-                          <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
+                          <div className="self-start bg-white shadow-lg  py-2 rounded-2xl flex items-center w-[50px] px-3">
+              <div className="flex space-x-1">
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+              </div>
+            </div>
                         </div>
                       ))}
                   </div>
@@ -427,8 +434,8 @@ const ChatPage = ({ params }) => {
                           <div
                             className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${
                               editIndex === index
-                                ? "bg-gray-500 w-[70%]"
-                                : "bg-gray-600"
+                                ? "bg-gray-200 w-[70%]"
+                                : "bg-gray-200"
                             }`}
                           >
                             {editIndex === index ? (
@@ -548,7 +555,13 @@ const ChatPage = ({ params }) => {
                         >
                           <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
 
-                          <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
+                          <div className="self-start bg-white shadow-lg  py-2 rounded-2xl flex items-center w-[50px] px-3">
+              <div className="flex space-x-1">
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+              </div>
+            </div>
                         </div>
                       ))}
                   </div>
@@ -572,8 +585,8 @@ const ChatPage = ({ params }) => {
                           <div
                             className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${
                               editIndex === index
-                                ? "bg-gray-500 w-[70%]"
-                                : "bg-gray-600"
+                                ? "bg-gray-200 w-[70%]"
+                                : "bg-gray-200"
                             }`}
                           >
                             {editIndex === index ? (
@@ -591,14 +604,14 @@ const ChatPage = ({ params }) => {
                                       setEditIndex(null);
                                     }
                                   }}
-                                  className="w-full bg-transparent text-white p-2 rounded-md outline-none "
+                                  className="w-full bg-transparent text-[#3d3d3d] p-2 rounded-md outline-none "
                                   autoFocus
                                 />
 
                                 <div className="flex justify-end gap-2 mt-2">
                                   <button
                                     onClick={() => setEditIndex(null)}
-                                    className="px-3 py-1 bg-gray-400 text-white rounded-md"
+                                    className="px-3 py-1 bg-black text-white rounded-md"
                                   >
                                     Cancel
                                   </button>
@@ -616,7 +629,7 @@ const ChatPage = ({ params }) => {
                                 </div>
                               </div>
                             ) : (
-                              <span className="break-words w-full  text-white">
+                              <span className="break-words w-full  text-[#3d3d3d]-">
                                 {chat.userMessage}
                               </span>
                             )}
@@ -639,41 +652,53 @@ const ChatPage = ({ params }) => {
                           )}
                         </div>
                       ) : (
-                        <div className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
-                          {(chat.parsedResponse &&
-                          chat.parsedResponse.length > 0
-                            ? chat.parsedResponse
-                            : [{ type: "text", content: chat.botResponse }]
-                          ).map((part, i) =>
-                            part.type === "code" ? (
-                              <div key={i} className="relative">
-                                <pre className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto relative">
-                                  <code>{part.content}</code>
-                                </pre>
-
-                                <button
-                                  onClick={() => handleCopy(part.content, i)}
-                                  className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white p-1 rounded"
-                                >
-                                  {copiedIndex === i ? (
-                                    <Check size={16} />
-                                  ) : (
-                                    <Clipboard size={16} />
-                                  )}
-                                </button>
-
-                                {/* "Copied!" Message */}
-                                {copiedIndex === i && (
-                                  <span className="absolute top-2 right-10 bg-gray-700 text-white px-2 py-1 text-xs rounded">
-                                    Copied!
-                                  </span>
-                                )}
-                              </div>
-                            ) : (
-                              <span key={i}>{part.content}</span>
-                            )
-                          )}
-                        </div>
+                        <div className="ml-36 self-start text-left  text-black px-4 py-3 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
+                        {(chat.parsedResponse && chat.parsedResponse.length > 0
+                          ? chat.parsedResponse
+                          : [{ type: "text", content: chat.botResponse }]
+                        ).map((part, i) =>
+                          part.type === "code" ? (
+                            <div key={i} className="relative">
+                              <pre className="bg-gray-900 text-green-300 px-4 py-3 rounded-md overflow-x-auto relative">
+                                <code>{part.content}</code>
+                              </pre>
+                  
+                              <button
+                                onClick={() => handleCopy(part.content, i)}
+                                className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white p-1 rounded"
+                              >
+                                {copiedIndex === i ? <Check size={16} /> : <Clipboard size={16} />}
+                              </button>
+                  
+                              {copiedIndex === i && (
+                                <span className="absolute top-2 right-10 bg-gray-700 text-white px-2 py-1 text-xs rounded">
+                                  Copied!
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <ReactMarkdown
+                              key={i}
+                              remarkPlugins={[remarkGfm]}
+                              components={{
+                                p: ({ children }) => <p className="mb-2 text-gray-800">{children}</p>,
+                                code: ({ children }) => (
+                                  <code className="bg-gray-100 text-red-600 px-1 py-0.5 rounded">
+                                    {children}
+                                  </code>
+                                ),
+                                pre: ({ children }) => (
+                                  <pre className="bg-gray-900 text-green-300 px-4 py-3 rounded-md overflow-x-auto">
+                                    {children}
+                                  </pre>
+                                ),
+                              }}
+                            >
+                              {part.content}
+                            </ReactMarkdown>
+                          )
+                        )}
+                      </div>
                       )}
                     </div>
                   ))

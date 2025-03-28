@@ -221,29 +221,30 @@ const page = ({ params }) => {
                   <Navbar />
 
                   <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center w-[80%]">
-                    {loading && (
-                      <div className="max-w absolute top-4 overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center mt-20">
-                        <div className="flex flex-col sticky h-full w-full">
-                          {responses.length === 0 && (
-                            <div className="flex flex-col gap-1 mr-36">
-                              {Array(1)
-                                .fill(0)
-                                .map((_, index) => (
-                                  <div
-                                    key={index}
-                                    className="animate-pulse flex flex-col gap-1 mr-36"
-                                  >
-                                    {/* User Message Skeleton */}
-                                    <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
-                                    {/* Response Skeleton */}
-                                    <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
-                                  </div>
-                                ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
+                  {loading && (
+  <div className="absolute top-4 overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center mt-20">
+    <div className="flex flex-col sticky h-full w-full">
+      {responses.length === 0 && (
+        <div className="flex flex-col gap-1 mr-36">
+          <div className="animate-pulse flex flex-col gap-1">
+            {/* User Message Skeleton */}
+            <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
+
+            {/* Typing Loader */}
+            <div className="self-start bg-white shadow-lg  py-2 rounded-2xl flex items-center w-[50px] px-3">
+              <div className="flex space-x-1">
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
 
                     {responses.length > 0 && (
                       <div className="w-full flex flex-col items-center mt-5">
@@ -414,14 +415,14 @@ const page = ({ params }) => {
                         </ul>
                       </div>
                     )}
-                    <h1 className="text-3xl mt-48 text-gray-600 ">
+                    <h1 className="md:text-3xl mb-5 text-lg text-gray-600 md:mb-16 text-center">
                       How can I help you today?
                     </h1>
                   </div>
                 </div>
                 <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  md:ml-auto md:w-full md:max-w-[calc(100%-256px)]">
                   <div className="max-w-4xl w-full rounded-md p-6 text-center  ">
-                    <h1 className="text-3xl mb-16 text-gray-600 ">
+                    <h1 className="md:text-3xl mb-5 text-lg text-gray-600 md:mb-16 text-center ">
                       How can I help you today?
                     </h1>
                     <div className="grid md:grid-cols-4 grid-cols-2 gap-6">
