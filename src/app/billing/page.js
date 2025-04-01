@@ -16,42 +16,26 @@ export default function BillingPage() {
 
         const userDetails = JSON.parse(localStorage.getItem("user"));
 
-        if (!userDetails?.email) {
-          setError("User email not found.");
+        if (!userDetails?.id || !userDetails?.email) {
+          setError("User details not found.");
           setLoading(false);
           return;
         }
 
-        // Step 1: Fetch initial billing details
-        const response1 = await fetch(
-          `https://chatbot-2vqr.onrender.com/api/stripe/payments-getby-email?email=${userDetails.email}`
-        );
-        const initialData = await response1.json();
+        // Call process-payment API
+        const response = await fetch("https://chatbot-2vqr.onrender.com/api/stripe/process-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: userDetails.id,
+            email: userDetails.email,
+          }),
+        });
 
-        if (!response1.ok) throw new Error(initialData.error || "Failed to fetch billing details");
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || "Failed to process payment");
 
-        const paymentIds = initialData.map((detail) => detail.paymentId).filter(Boolean);
-
-        // Step 2: Update status for each payment ID
-        await Promise.all(
-          paymentIds.map((paymentId) =>
-            fetch("https://chatbot-2vqr.onrender.com/api/stripe/update-status", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ paymentId }),
-            })
-          )
-        );
-
-        // Step 3: Fetch updated billing details
-        const response2 = await fetch(
-          `https://chatbot-2vqr.onrender.com/api/stripe/payments-getby-email?email=${userDetails.email}`
-        );
-        const updatedData = await response2.json();
-
-        if (!response2.ok) throw new Error(updatedData.error || "Failed to fetch updated billing details");
-
-        setBillingDetails(Array.isArray(updatedData) ? updatedData : []);
+        setBillingDetails(data.payments || []);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -78,7 +62,6 @@ export default function BillingPage() {
 
             <div className="rounded-lg p-6 space-y-6">
               {loading ? (
-                // Skeleton Loader (Shimmer effect)
                 <div className="p-4 border rounded-lg bg-white shadow-sm space-y-4 animate-pulse">
                   {[...Array(3)].map((_, index) => (
                     <div key={index} className="border-b py-2 space-y-2">
@@ -94,10 +77,10 @@ export default function BillingPage() {
                 <div className="p-4 border rounded-lg bg-white shadow-sm">
                   <h2 className="text-md font-semibold text-gray-700 mb-2">Payment Details</h2>
                   {billingDetails.map((detail, index) => (
-                    <div key={detail._id || index} className="border-b py-2">
+                    <div key={detail.id || index} className="border-b py-2">
                       <p><strong>Payment ID:</strong> {detail.paymentId}</p>
                       <p><strong>Name:</strong> {detail.name}</p>
-                      <p><strong>Email:</strong> {detail.customerEmail}</p>
+                      <p><strong>Email:</strong> {detail.customerEmail.replace("mailto:", "")}</p>
                       <p><strong>Amount:</strong> ${(detail.amount / 100).toFixed(2)}</p>
                       <p><strong>Status:</strong> 
                         <span className={`text-${detail.status === "succeeded" ? "green" : "red"}-500`}>

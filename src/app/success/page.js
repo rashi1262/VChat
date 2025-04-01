@@ -20,9 +20,9 @@ export default function SuccessPage() {
         </p>
         <button
           className="mt-5 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/billing")}
         >
-          Go to Homepage
+          Go to Billig Details
         </button>
       </div>
     </div>

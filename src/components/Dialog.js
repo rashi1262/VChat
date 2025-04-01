@@ -160,7 +160,7 @@ export default function PlansPage() {
               <div className="bg-white rounded-lg shadow p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-xl font-semibold text-gray-600 mb-0">
-                    plus
+                    Plus
                   </h3>
                   <div className="flex gap-1 bg-gray-50 py-1 px-1 rounded-full">
                     <button
