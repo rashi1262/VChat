@@ -2,22 +2,21 @@
 import { useEffect, useState } from "react";
 import { BackButton } from "../profile/page";
 import Sidebar from "../Sidebar";
+import { toast } from "sonner";
 
 export default function BillingPage() {
   const [billingDetails, setBillingDetails] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchBillingDetails = async () => {
       try {
         setLoading(true);
-        setError(null);
 
         const userDetails = JSON.parse(localStorage.getItem("user"));
 
         if (!userDetails?.id || !userDetails?.email) {
-          setError("User details not found.");
+          toast.error("User details not found.");
           setLoading(false);
           return;
         }
@@ -37,7 +36,7 @@ export default function BillingPage() {
 
         setBillingDetails(data.payments || []);
       } catch (err) {
-        setError(err.message);
+        toast.error(err.message);
       } finally {
         setLoading(false);
       }
@@ -71,18 +70,16 @@ export default function BillingPage() {
                     </div>
                   ))}
                 </div>
-              ) : error ? (
-                <p className="text-red-500 text-sm">{error}</p>
               ) : billingDetails.length > 0 ? (
                 <div className="p-4 border rounded-lg bg-white shadow-sm">
                   <h2 className="text-md font-semibold text-gray-700 mb-2">Payment Details</h2>
                   {billingDetails.map((detail, index) => (
-                    <div key={detail.id || index} className="border-b py-2">
+                    <div key={detail.id || index} className="border-b py-2 text-gray-500">
                       <p><strong>Payment ID:</strong> {detail.paymentId}</p>
                       <p><strong>Name:</strong> {detail.name}</p>
                       <p><strong>Email:</strong> {detail.customerEmail.replace("mailto:", "")}</p>
                       <p><strong>Amount:</strong> ${(detail.amount / 100).toFixed(2)}</p>
-                      <p><strong>Status:</strong> 
+                      <p><strong>Status: </strong> 
                         <span className={`text-${detail.status === "succeeded" ? "green" : "red"}-500`}>
                           {detail.status}
                         </span>
