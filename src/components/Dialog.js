@@ -335,6 +335,7 @@ export default function PlansPage() {
             <button
               onClick={handlePayment}
               className="w-full bg-black text-white p-2 mt-3 rounded-md"
+              disabled={isPaymentLoading}
             >
               {isPaymentLoading ? <Spinner /> : "Pay with Stripe"}
             </button>
