@@ -81,7 +81,7 @@ const Header = () => {
     return () => clearInterval(interval);
   }, [credits]);
 
-  if (pathname === "/login" || pathname === "/signup") return null;
+  if (pathname === "/login" || pathname === "/signup" || pathname === "/verify-email" || pathname === "/verify") return null;
 
   return (
     <header className="z-10 fixed top-0 w-full bg-white shadow-sm">
