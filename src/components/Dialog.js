@@ -1,29 +1,16 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import Sidebar from "../../src/app/Sidebar";
-import {
-  MONTH,
-  MONTHS,
-  YEARLY,
-  MONTHFORPLUS,
-  MONTHSFORPLUS,
-  YEARLYFORPLUS,
-} from "@/constants";
+import Link from "next/link";
+import { loadStripe } from "@stripe/stripe-js";
+import { MONTH, MONTHS, YEARLY, MONTHFORPLUS, MONTHSFORPLUS, YEARLYFORPLUS } from "@/constants";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { BackButton } from "../../src/app/profile/page";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
-import { toast } from "sonner";
-import { Spinner } from "./commonFunc";
-
-const priceMap = {
-  MONTH: 0.67,
-  MONTHS: 0.44,
-  DEFAULT: 0.16,
-
-  MONTHFORPLUS: 1.2,
-  MONTHSFORPLUS: 0.9,
-  DEFAULT_PLUS: 0.5,
-};
+const stripePromise = loadStripe(
+  "pk_test_51R670dPqjLJEAu5pP6DSMUXUGK535oEdgQ9Xy1Qs0THarwksxbnRyz9OKghZIm34i1CqPYqIPs9R7Ed5lAkGX9DF00lZQhDIVu"
+);
 
 export default function PlansPage() {
   const stripe = useStripe();
@@ -33,7 +20,25 @@ export default function PlansPage() {
   const [plusprice, setPriceForPlus] = useState(0.67);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userDetails, setUserDetails] = useState({ name: "", email: "" });
-  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
+
+  useEffect(() => {
+    if (selectedButton === MONTH) {
+      setPrice(0.67);
+    } else if (selectedButton === MONTHS) {
+      setPrice(0.44);
+    } else {
+      setPrice(0.16);
+    }
+  }, [selectedButton]);
+  useEffect(() => {
+    if (selectedButton === MONTHFORPLUS) {
+      setPriceForPlus(1.2);
+    } else if (selectedButton === MONTHSFORPLUS) {
+      setPriceForPlus(0.9);
+    } else {
+      setPriceForPlus(0.5);
+    }
+  }, [selectedButton]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -46,13 +51,9 @@ export default function PlansPage() {
     }
   }, []);
 
-  useEffect(() => {
-    setPrice(priceMap[selectedButton] ?? priceMap.DEFAULT);
-    setPriceForPlus(priceMap[selectedButton] ?? priceMap.DEFAULT_PLUS);
-  }, [selectedButton]);
+
 
   const handlePayment = async () => {
-    setIsPaymentLoading(true);
     if (!stripe || !elements) {
       console.error("Stripe or Elements not loaded.");
       return;
@@ -65,20 +66,17 @@ export default function PlansPage() {
     }
 
     try {
-      const response = await fetch(
-        "https://chatbot-2vqr.onrender.com/api/stripe/create-payment-intent",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            amount: price * 30 * 100, // Convert to cents
-            email: userDetails.email,
-            name: userDetails.name,
-          }),
-        }
-      );
+      const response = await fetch("https://chatbot-2vqr.onrender.com/api/stripe/create-payment-intent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: price * 30 * 100, // Convert to cents
+          email: userDetails.email,
+          name: userDetails.name,
+        }),
+      });
 
       const data = await response.json();
 
@@ -86,43 +84,39 @@ export default function PlansPage() {
         throw new Error(data.error || "Payment intent creation failed");
       }
 
-      const { paymentMethod, error: paymentMethodError } =
-        await stripe.createPaymentMethod({
-          type: "card",
-          card: cardElement,
-        });
+      const { paymentMethod, error: paymentMethodError } = await stripe.createPaymentMethod({
+        type: "card",
+        card: cardElement,
+      });
 
       if (paymentMethodError) {
         console.error("Payment Method Error:", paymentMethodError.message);
         return;
       }
 
-      const { paymentIntent, error } = await stripe.confirmCardPayment(
-        data.clientSecret,
-        {
-          payment_method: paymentMethod.id,
-        }
-      );
+      const { paymentIntent, error } = await stripe.confirmCardPayment(data.clientSecret, {
+        payment_method: paymentMethod.id,
+      });
 
       if (error) {
-        toast.error("Payment failed");
+        console.error("Payment failed:", error.message);
       } else {
-        setIsPaymentLoading(false);
+        console.log("Payment successful!");
 
-        localStorage.setItem(
-          "paymentId",
-          paymentIntent?.id || paymentMethod.id
-        );
+        // ✅ Save Payment ID in localStorage
+        localStorage.setItem("paymentId", paymentIntent?.id || paymentMethod.id);
 
         window.location.href = "https://vchatai.netlify.app/success";
       }
     } catch (error) {
-      setIsPaymentLoading(false);
-      toast.error("Payment failed");
+      console.error("Error processing payment:", error.message);
     }
   };
 
+
+
   return (
+
     <div className="flex w-full justify-between bg-gray-50 text-sm">
       <div className="min-h-screen mt-12 bg-gray-50 flex flex-col ml-auto w-4/5">
         <div className="flex gap-8 p-10">
@@ -170,31 +164,28 @@ export default function PlansPage() {
                   </h3>
                   <div className="flex gap-1 bg-gray-50 py-1 px-1 rounded-full">
                     <button
-                      className={`px-1 text-sm rounded-full whitespace-nowrap text-gray-500 hover:text-gray-500 ${
-                        selectedButton === MONTH
+                      className={`px-1 text-sm rounded-full whitespace-nowrap text-gray-500 hover:text-gray-500 ${selectedButton === MONTH
                           ? "bg-white border "
                           : "text-gray-200 "
-                      }`}
+                        }`}
                       onClick={() => setSelectedButton(MONTHFORPLUS)}
                     >
                       1 Month
                     </button>
                     <button
-                      className={`px-1  text-sm font-medium rounded-full whitespace-nowrap text-gray-500 hover:text-gray-500 ${
-                        selectedButton === MONTHS
+                      className={`px-1  text-sm font-medium rounded-full whitespace-nowrap text-gray-500 hover:text-gray-500 ${selectedButton === MONTHS
                           ? "bg-white border"
                           : "text-gray-200 "
-                      }`}
+                        }`}
                       onClick={() => setSelectedButton(MONTHSFORPLUS)}
                     >
                       3 Months
                     </button>
                     <button
-                      className={`px-1 text-sm font-medium rounded-full whitespace-nowrap text-gray-500 hover:text-gray-500 ${
-                        selectedButton === YEARLY
+                      className={`px-1 text-sm font-medium rounded-full whitespace-nowrap text-gray-500 hover:text-gray-500 ${selectedButton === YEARLY
                           ? "bg-white border"
                           : "text-gray-200 "
-                      }`}
+                        }`}
                       onClick={() => setSelectedButton(YEARLYFORPLUS)}
                     >
                       Yearly
@@ -211,9 +202,7 @@ export default function PlansPage() {
                   className="w-full py-2 mb-4 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800"
                   onClick={() => {
                     const selectedPlanPrice =
-                      selectedButton === MONTHFORPLUS ||
-                      selectedButton === MONTHSFORPLUS ||
-                      selectedButton === YEARLYFORPLUS
+                      selectedButton === MONTHFORPLUS || selectedButton === MONTHSFORPLUS || selectedButton === YEARLYFORPLUS
                         ? plusprice
                         : price;
                     setPrice(selectedPlanPrice); // Update the price state
@@ -222,6 +211,7 @@ export default function PlansPage() {
                 >
                   Upgrade
                 </button>
+
 
                 <div className="space-y-3">
                   <h4 className="font-medium text-gray-600">
@@ -243,31 +233,28 @@ export default function PlansPage() {
                   </h3>
                   <div className="flex gap-1 bg-gray-50 py-1 px-1 rounded-full">
                     <button
-                      className={`px-1 text-sm rounded-full whitespace-nowrap text-gray-500 hover:text-gray-500 ${
-                        selectedButton === MONTH
+                      className={`px-1 text-sm rounded-full whitespace-nowrap text-gray-500 hover:text-gray-500 ${selectedButton === MONTH
                           ? "bg-white border "
                           : "text-gray-200 "
-                      }`}
+                        }`}
                       onClick={() => setSelectedButton(MONTH)}
                     >
                       1 Month
                     </button>
                     <button
-                      className={`px-1  text-sm font-medium rounded-full whitespace-nowrap text-gray-500 hover:text-gray-500 ${
-                        selectedButton === MONTHS
+                      className={`px-1  text-sm font-medium rounded-full whitespace-nowrap text-gray-500 hover:text-gray-500 ${selectedButton === MONTHS
                           ? "bg-white border"
                           : "text-gray-200 "
-                      }`}
+                        }`}
                       onClick={() => setSelectedButton(MONTHS)}
                     >
                       3 Months
                     </button>
                     <button
-                      className={`px-1 text-sm font-medium rounded-full whitespace-nowrap text-gray-500 hover:text-gray-500 ${
-                        selectedButton === YEARLY
+                      className={`px-1 text-sm font-medium rounded-full whitespace-nowrap text-gray-500 hover:text-gray-500 ${selectedButton === YEARLY
                           ? "bg-white border"
                           : "text-gray-200 "
-                      }`}
+                        }`}
                       onClick={() => setSelectedButton(YEARLY)}
                     >
                       Yearly
@@ -307,9 +294,7 @@ export default function PlansPage() {
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
-            <h2 className="text-lg font-semibold text-gray-700">
-              Enter Details
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-700">Enter Details</h2>
 
             <input
               type="text"
@@ -335,9 +320,8 @@ export default function PlansPage() {
             <button
               onClick={handlePayment}
               className="w-full bg-black text-white p-2 mt-3 rounded-md"
-              disabled={isPaymentLoading}
             >
-              {isPaymentLoading ? <Spinner /> : "Pay with Stripe"}
+              Pay with Stripe
             </button>
 
             <button
@@ -349,7 +333,9 @@ export default function PlansPage() {
           </div>
         </div>
       )}
+
     </div>
+
   );
 }
 const featureDetails = [
