@@ -39,6 +39,7 @@ export default function LoginConnectionPage() {
     if (isGmailUser) {
       await signOut({ redirect: false });
       localStorage.removeItem("user");
+      localStorage.setItem("hasLoggedIn", false);
       router.push("/model");
     } else {
       await signIn("google");

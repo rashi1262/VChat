@@ -38,13 +38,17 @@ const VerifyEmailContent = () => {
   }, [token]);
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h2>{message}</h2>
-      {verify && (
-        <h2 className="text-green-400 font-bold">
-          <Link href="/login">Login</Link>
-        </h2>
-      )}
+    <div className="flex items-center justify-center h-screen">
+      <div className="bg-white shadow-lg rounded-2xl p-6 text-center">
+        <h2 className="text-xl text-black font-semibold">{message}</h2>
+        {verify && (
+          <h2 className="text-green-400 font-bold mt-4">
+            <Link href="/login" className="hover:underline">
+              back to login
+            </Link>
+          </h2>
+        )}
+      </div>
     </div>
   );
 };
