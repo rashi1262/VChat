@@ -85,7 +85,7 @@ const Header = () => {
 
   return (
     <header className="z-10 fixed top-0 w-full bg-white shadow-sm">
-      <div className="container mx-auto flex items-center justify-between py-3 px-5">
+      <div className="container mx-2 flex items-center justify-between py-3 px-5">
         <div>
           <button
             className="block p-0.5 border text-black   hover:bg-gray-100 rounded"

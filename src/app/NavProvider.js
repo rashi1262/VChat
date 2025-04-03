@@ -4,7 +4,7 @@ import { createContext, useState, useEffect, useContext } from "react";
 const NavContext = createContext();
 
 export const NavProvider = ({ children }) => {
-  const [isNavVisible, setIsNavVisible] = useState(false);
+  const [isNavVisible, setIsNavVisible] = useState(true);
  
   const syncNavState = () => {
     if (typeof window !== "undefined") {
