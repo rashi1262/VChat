@@ -227,9 +227,8 @@ const page = ({ params }) => {
       {responses.length === 0 && (
         <div className="flex flex-col gap-1 mr-36">
           <div className="animate-pulse flex flex-col gap-1">
-            {/* User Message Skeleton */}
-            <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
-
+           
+<p>{msg}</p>
             {/* Typing Loader */}
             <div className="self-start bg-white shadow-lg  py-2 rounded-2xl flex items-center w-[50px] px-3">
               <div className="flex space-x-1">

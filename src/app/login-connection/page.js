@@ -48,11 +48,11 @@ export default function LoginConnectionPage() {
 
   return (
     <div className="flex w-full justify-between bg-gray-50 text-sm">
-      <div className="min-h-screen  mt-12 bg-gray-50 flex flex-col ml-auto w-4/5">
-        <div className="flex gap-7 p-6">
+      <div className="min-h-screen  py-14 bg-gray-50 flex flex-col mx-auto w-3/5">
+        <div className="flex gap-8 p-10">
           <Sidebar />
 
-          <div className="flex-1 mr-64">
+          <div className="flex-1 ">
             <div className="mb-6 flex justify-between items-center">
               <div>
                 <h1 className="text-lg font-semibold text-gray-700">

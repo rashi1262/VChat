@@ -239,8 +239,8 @@ const page = ({ params }) => {
                                 key={index}
                                 className="animate-pulse flex flex-col gap-1 mr-36"
                               >
-                                <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
-
+                                {/* <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div> */}
+                                <p>{msg}</p>
                                 <div className="self-start bg-white shadow-lg  py-2 rounded-2xl flex items-center w-[50px] px-3">
               <div className="flex space-x-1">
                 <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
