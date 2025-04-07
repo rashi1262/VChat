@@ -7,8 +7,8 @@ import { useRouter } from "next/navigation";
 import { Edit, Pencil } from "lucide-react";
 import { Check, Clipboard } from "lucide-react";
 import { useCredits } from "@/context/creditContext";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import InsufficientBalance from "@/components/InsufficientBalance";
+
 const ChatPage = ({ params }) => {
   const { hasCredits, setHasCredits } = useCredits();
   const { id } = use(params);
@@ -760,23 +760,7 @@ const ChatPage = ({ params }) => {
           </div>
         </div>
       ) : (
-        <div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
-          <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center">
-            <h2 className="text-2xl  font-bold">Insufficient Credit</h2>
-            <p className=" p-2  text-lg ">
-              You hit your free credit limit .Please Consider buying our plans
-              for uninterrupted services
-            </p>
-            <div className=" p-2 mt-4">
-              <button
-                onClick={() => router.push("/plans")}
-                className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
-              >
-                Show Plans
-              </button>
-            </div>
-          </div>
-        </div>
+        <InsufficientBalance />
       )}
     </>
   );

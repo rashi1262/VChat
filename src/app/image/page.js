@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useChat } from ".././chatContext";
 import { toast, Toaster } from "sonner";
 import { useCredits } from "@/context/creditContext";
+import InsufficientBalance from "@/components/InsufficientBalance";
 
 const page = () => {
   const { hasCredits } = useCredits();
@@ -232,7 +233,7 @@ const page = () => {
             <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  md:ml-auto md:w-full md:max-w-[calc(100%-256px)]">
               <div className="flex justify-center items-center h-screen">
                 <div className="md:max-w-4xl w-full rounded-md p-6 text-center">
-                  <div className="w-16 h-16 rounded-full md:ml-[240px] mx-auto mb-10 ">
+                  <div className="w-16 h-16 rounded-full  mx-auto mb-6 ">
                     <svg
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -259,12 +260,12 @@ const page = () => {
                     </svg>
                   </div>
                   <h1 className="text-2xl text-gray-900">Image Generation</h1>
-                  <h1 className="text-[18px] mt-5 text-gray-400">
+                  <p className="md:text-xl text-base mt-5 text-gray-400">
                     Bring your ideas to life—create stunning images from just a
                     few words!
-                  </h1>
+                  </p>
                 </div>
-                <div className="mb-5 md:ml-20 md:w-2/4 p-1 flex w-full bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full px-4">
+                <div className="mb-5 p-1 flex bg-gray-100 justify-between items-center mx-auto fixed bottom-0 rounded-l-full rounded-r-full md:w-[600px] ">
                   <input
                     type="text"
                     value={prompt}
@@ -300,23 +301,7 @@ const page = () => {
           )}
         </div>
       ) : (
-        <div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
-          <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center">
-            <h2 className="text-2xl  font-bold">Insufficient Credit</h2>
-            <p className=" p-2  text-lg ">
-              You hit your free credit limit .Please Consider buying our plans
-              for uninterrupted services
-            </p>
-            <div className=" p-2 mt-4">
-              <button
-                onClick={() => router.push("/plans")}
-                className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
-              >
-                Show Plans
-              </button>
-            </div>
-          </div>
-        </div>
+        <InsufficientBalance />
       )}
     </>
   );

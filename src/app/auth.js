@@ -35,13 +35,6 @@ export const signInWithGoogle = async () => {
 
       const signupData = await signupResponse.json();
       userId = signupData.id;
-      const data = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: user.email, googleLogin: true }),
-      });
-      const res = await data.json();
-      userCredits = res.credits;
     } else {
       const { user: existingUser } = await checkUserResponse.json();
       userId = existingUser.id;
@@ -51,15 +44,14 @@ export const signInWithGoogle = async () => {
             "Your account is not linked with Google. Please sign in using your original method.",
         };
       }
-
-      const data = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: user.email, googleLogin: true }),
-      });
-      const res = await data.json();
-      userCredits = res.credits;
     }
+    const data = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: user.email, googleLogin: true }),
+    });
+    const res = await data.json();
+    userCredits = res.credits;
 
     if (typeof window !== "undefined") {
       localStorage.setItem(

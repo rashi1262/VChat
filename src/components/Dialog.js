@@ -1,41 +1,87 @@
 "use client";
-
-import { useState } from "react";
-import Sidebar from "../Sidebar";
-import Link from "next/link";
+import { useState, useEffect } from "react";
+import Sidebar from "../../src/app/Sidebar";
 import { CheckCircle2, XCircle } from "lucide-react";
-import { MONTH, MONTHS, YEARLY } from "@/constants";
-import { loadStripe } from "@stripe/stripe-js";
-
-const stripePromise = loadStripe("your-stripe-public-key");
+import { BackButton } from "../../src/app/profile/page";
+import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { toast } from "sonner";
+import { Spinner } from "./commonFunc";
 
 export default function PlansPage() {
-  const [selectedButton, setSelectedButton] = useState(MONTH);
-  const [price, setPrice] = useState(0.67);
-  const [showPopup, setShowPopup] = useState(false);
-  const [formData, setFormData] = useState({ name: "", email: "" });
+  const stripe = useStripe();
+  const elements = useElements();
+  const [plans, setPlans] = useState([]);
+  
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userDetails, setUserDetails] = useState({ name: "", email: "" });
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
 
-  const handlePlanClick = (planPrice) => {
-    setPrice(planPrice);
-    setShowPopup(true);
-  };
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUserDetails({ name: parsedUser.name || "", email: parsedUser.email || "" });
+    }
+  }, []);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  useEffect(() => {
+    async function fetchPlans() {
+      try {
+        const response = await fetch("https://chatbot-2vqr.onrender.com/plans/getall");
+        const data = await response.json();
+        setPlans(data);
+      } catch (error) {
+        console.error("Error fetching plans:", error);
+      }
+    }
+    fetchPlans();
+  }, []);
 
   const handlePayment = async () => {
-    const stripe = await stripePromise;
-    const { error } = await stripe.redirectToCheckout({
-      lineItems: [{ price: "your-stripe-price-id", quantity: 1 }],
-      mode: "subscription",
-      successUrl: "https://your-site.com/success",
-      cancelUrl: "https://your-site.com/cancel",
-      customerEmail: formData.email,
-    });
+    setIsPaymentLoading(true);
+    if (!stripe || !elements || !selectedPlan) {
+      console.error("Stripe, Elements, or Plan not selected.");
+      return;
+    }
 
-    if (error) {
-   
+    const cardElement = elements.getElement(CardElement);
+    if (!cardElement) {
+      console.error("CardElement not found.");
+      return;
+    }
+
+    try {
+      const response = await fetch("https://chatbot-2vqr.onrender.com/api/stripe/create-payment-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: selectedPlan.pricePerDay * 30 * 100, // Convert to cents
+          email: userDetails.email,
+          name: userDetails.name,
+          planId:selectedPlan.id
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Payment intent creation failed");
+
+      const { paymentMethod, error: paymentMethodError } = await stripe.createPaymentMethod({
+        type: "card",
+        card: cardElement,
+      });
+      if (paymentMethodError) throw new Error(paymentMethodError.message);
+
+      const { paymentIntent, error } = await stripe.confirmCardPayment(data.clientSecret, {
+        payment_method: paymentMethod.id,
+      });
+      if (error) throw new Error("Payment failed");
+
+      setIsPaymentLoading(false);
+      localStorage.setItem("paymentId", paymentIntent?.id || paymentMethod.id);
+      window.location.href = "https://vchatai.netlify.app/success";
+    } catch (error) {
+      setIsPaymentLoading(false);
+      toast.error(error.message || "Payment failed");
     }
   };
 
@@ -44,86 +90,64 @@ export default function PlansPage() {
       <div className="min-h-screen mt-12 bg-gray-50 flex flex-col ml-auto w-4/5">
         <div className="flex gap-8 p-10">
           <Sidebar />
-
           <div className="flex-1 mr-64">
             <div className="mb-6 flex justify-between items-center">
-              <h1 className="text-lg font-semibold text-gray-600">Plans</h1>
-              <Link
-                href="/model"
-                className="px-4 py-2 text-gray-500 border rounded-md"
-              >
-                Back to Chat
-              </Link>
+              <div>
+                <h1 className="text-lg font-semibold text-gray-600">Plans</h1>
+                <p className="text-sm text-gray-500">View and manage your subscription plans</p>
+              </div>
+              <BackButton />
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-xl font-semibold text-gray-600 mb-2">
-                  Free
-                </h3>
-                <p className="text-2xl font-bold text-gray-600">$0 / Per Day</p>
-                <button className="w-full py-2 mt-4 bg-gray-400 text-white rounded-md cursor-not-allowed">
-                  Current Plan
-                </button>
-              </div>
-
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-xl font-semibold text-gray-600 mb-4">
-                  Pro
-                </h3>
-                <p className="text-2xl font-bold text-gray-700">
-                  ${price} / Per Day
-                </p>
-                <button
-                  className="w-full py-2 mt-4 bg-gray-900 text-white rounded-md hover:bg-gray-800"
-                  onClick={() => handlePlanClick(price)}
-                >
-                  Upgrade
-                </button>
-              </div>
-            </div>
-
-            {showPopup && (
-              <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                  <h2 className="text-lg font-semibold mb-4">
-                    Confirm Payment
-                  </h2>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Enter Name"
-                    className="w-full p-2 border rounded mb-2"
-                  />
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Enter Email"
-                    className="w-full p-2 border rounded mb-4"
-                  />
-                  <p className="mb-4 text-lg font-bold">Amount: ${price}</p>
+              {plans.map((plan) => (
+                <div key={plan.id} className="bg-white rounded-lg shadow p-6">
+                  <h3 className="text-xl font-semibold text-gray-600 mb-2">{plan.name}</h3>
+                  <p className="text-lg mb-5">
+                    <span className="text-2xl font-bold text-gray-700">${plan.pricePerDay}</span>
+                    <span className="text-gray-500 text-sm">/ Per Day</span>
+                  </p>
                   <button
-                    className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                    onClick={handlePayment}
+                    className="w-full py-2 mb-4 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800"
+                    onClick={() => {
+                      setSelectedPlan(plan);
+                      setIsModalOpen(true);
+                    }}
                   >
-                    Pay with Stripe
+                    {plan.pricePerDay === 0 ? "Current Plan" : "Upgrade"}
                   </button>
-                  <button
-                    className="w-full py-2 mt-2 bg-gray-400 text-white rounded-md"
-                    onClick={() => setShowPopup(false)}
-                  >
-                    Cancel
-                  </button>
+
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-gray-600">Features:</h4>
+                    {plan.features.map((feature, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-green-500" />
+                        <span className="text-gray-600">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
         </div>
       </div>
+
+      {isModalOpen && selectedPlan && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+            <h2 className="text-lg font-semibold text-gray-700">Enter Details</h2>
+            <input type="text" value={userDetails.name} className="w-full border p-2 my-2 text-black bg-gray-100" disabled />
+            <input type="email" value={userDetails.email} className="w-full border p-2 my-2 text-black bg-gray-100" disabled />
+            <div className="border p-2 my-2"><CardElement /></div>
+            <p className="text-lg text-black">Amount: ${selectedPlan.pricePerDay * 30}</p>
+            <button onClick={handlePayment} className="w-full bg-black text-white p-2 mt-3 rounded-md" disabled={isPaymentLoading}>
+              {isPaymentLoading ? <Spinner /> : "Pay with Stripe"}
+            </button>
+            <button onClick={() => setIsModalOpen(false)} className="w-full bg-gray-300 text-black p-2 mt-2 rounded-md">Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -8,6 +8,8 @@ import { signIn } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { toast, Toaster } from "sonner";
 import { signInWithGoogle } from "../auth";
+import { Spinner } from "@/components/commonFunc";
+
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
@@ -112,8 +114,6 @@ const Login = () => {
     }
   };
 
-  const handleAppleLogin = () => {};
-
   return (
     <div className="flex justify-center items-center h-screen bg-white">
       <Toaster position="top-center" richColors />
@@ -206,17 +206,7 @@ const Login = () => {
             }`}
             disabled={isLoading}
           >
-            {isLoading ? (
-              <div className="flex items-center justify-center">
-                <svg
-                  className="animate-spin h-5 w-5 mr-2 border-t-2 border-white rounded-full"
-                  viewBox="0 0 24 24"
-                ></svg>
-                Logging in...
-              </div>
-            ) : (
-              "Log In"
-            )}
+            {isLoading ? <Spinner /> : "Log In"}
           </button>
         </form>
 

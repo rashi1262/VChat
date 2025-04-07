@@ -17,12 +17,13 @@ export default function SuccessPage() {
         <h1 className="text-3xl font-semibold text-green-600">Payment Successful 🎉</h1>
         <p className="mt-3 text-gray-600">
           Thank you for your purchase! Your subscription is now active.
+          Check you payment Details In Billing Section
         </p>
         <button
           className="mt-5 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/model")}
         >
-          Go to Homepage
+          Go to Chats
         </button>
       </div>
     </div>

@@ -13,6 +13,7 @@ import { toast, Toaster } from "sonner";
 
 import { useCredits } from "@/context/creditContext";
 import { cards } from "../model/page";
+import InsufficientBalance from "@/components/InsufficientBalance";
 
 const page = ({ params }) => {
   const { hasCredits } = useCredits();
@@ -46,9 +47,7 @@ const page = ({ params }) => {
           setName(user?.name || "No Name");
           setUserId(user?.id);
         }
-      } catch (error) {
-      
-      }
+      } catch (error) {}
     }
   }, []);
 
@@ -66,7 +65,7 @@ const page = ({ params }) => {
         }
 
         const data = await response.json();
-   
+
         localStorage.setItem("remainingCredits", JSON.stringify(data.credits));
 
         setChatThread(
@@ -78,7 +77,6 @@ const page = ({ params }) => {
             : []
         );
       } catch (error) {
-      
         setChatThread([]);
       }
     };
@@ -125,13 +123,13 @@ const page = ({ params }) => {
         toast.error("Insufficient credits");
         setMsg(null);
         setLoading(false);
-        return; 
+        return;
       }
       if (!geminiRes.ok || !openAIRes.ok)
         throw new Error("Error fetching bot response");
 
-      const geminiData = await geminiRes.json(); 
-      const openAIData = await openAIRes.json(); 
+      const geminiData = await geminiRes.json();
+      const openAIData = await openAIRes.json();
 
       setResponses([
         { text: geminiData.botResponse, type: "Gemini" },
@@ -147,8 +145,6 @@ const page = ({ params }) => {
 
   const chooseResponse = async (chosenResponse, modelType) => {
     try {
-  
-
       const createChatRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/create`,
 
@@ -218,32 +214,30 @@ const page = ({ params }) => {
             {msg ? (
               <>
                 <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
-                  <Navbar />
+                  {/* <Navbar /> */}
 
-                  <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center w-[80%]">
-                  {loading && (
-  <div className="absolute top-4 overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center mt-20">
-    <div className="flex flex-col sticky h-full w-full">
-      {responses.length === 0 && (
-        <div className="flex flex-col gap-1 mr-36">
-          <div className="animate-pulse flex flex-col gap-1">
-           
-<p>{msg}</p>
-            {/* Typing Loader */}
-            <div className="self-start bg-white shadow-lg  py-2 rounded-2xl flex items-center w-[50px] px-3">
-              <div className="flex space-x-1">
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  </div>
-)}
-
+                  <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center w-[80%] ms-auto">
+                    {loading && (
+                      <div className="absolute top-4 overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center mt-20">
+                        <div className="flex flex-col sticky h-full w-full">
+                          {responses.length === 0 && (
+                            <div className="flex flex-col gap-1 mr-36">
+                              <div className="animate-pulse flex flex-col gap-1">
+                                <p>{msg}</p>
+                                {/* Typing Loader */}
+                                <div className="self-start bg-white shadow-lg  py-2 rounded-2xl flex items-center w-[50px] px-3">
+                                  <div className="flex space-x-1">
+                                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     {responses.length > 0 && (
                       <div className="w-full flex flex-col items-center mt-5">
@@ -271,7 +265,8 @@ const page = ({ params }) => {
                       </div>
                     )}
 
-                    <div className="mb-5 w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2 rounded-full">
+                  <div className="md:w-3xl w-full mx-auto justify-center w-full flex">
+                  <div className="mb-5 p-1 flex bg-gray-100 justify-between items-center mx-auto fixed bottom-0 rounded-l-full rounded-r-full md:w-[600px]  md:w-[600px] ">
                       <input
                         type="text"
                         value={prompt}
@@ -307,6 +302,7 @@ const page = ({ params }) => {
                       </button>
                     </div>
                   </div>
+                  </div>
                 </div>
               </>
             ) : (
@@ -321,7 +317,7 @@ const page = ({ params }) => {
                     </button>
 
                     {showButtons && (
-                      <div className="flex flex-col  items-center justify-center  ">
+                      <div className="flex flex-col  items-center justify-center">
                         <ul className="bg-gray-200  rounded-lg w-4/5">
                           <li className="text-center">
                             <Link
@@ -435,10 +431,8 @@ const page = ({ params }) => {
                         />
                       ))}
                     </div>
-
-                    <div className="mb-5 w-full md:ml-20 md:w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2 rounded-l-full rounded-r-full">
-                     
-
+                    <div className="md:w-3xl w-full mx-auto justify-center w-full flex">
+                    <div className="mb-5 p-1 flex bg-gray-100 justify-between items-center mx-auto fixed bottom-0 rounded-l-full rounded-r-full md:w-[600px]  md:w-[600px] ">
                       <input
                         type="text"
                         value={prompt}
@@ -472,7 +466,8 @@ const page = ({ params }) => {
                           </div>
                         )}
                       </button>
-                    </div>
+                    </div> 
+                    </div> 
                   </div>
                 </div>
               </>
@@ -480,23 +475,7 @@ const page = ({ params }) => {
           </div>
         </div>
       ) : (
-        <div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
-          <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center">
-            <h2 className="text-2xl  font-bold">Insufficient Credit</h2>
-            <p className=" p-2  text-lg ">
-              You hit your free credit limit .Please Consider buying our plans
-              for uninterrupted services
-            </p>
-            <div className=" p-2 mt-4">
-              <button
-                onClick={() => router.push("/plans")}
-                className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
-              >
-                Show Plans
-              </button>
-            </div>
-          </div>
-        </div>
+        <InsufficientBalance />
       )}
     </>
   );

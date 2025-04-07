@@ -7,6 +7,7 @@ import { useChat } from ".././chatContext";
 import { useRouter } from "next/navigation";
 import { useCredits } from "@/context/creditContext";
 import { toast, Toaster } from "sonner";
+import InsufficientBalance from "@/components/InsufficientBalance";
 
 const page = () => {
   const { hasCredits } = useCredits();
@@ -338,7 +339,7 @@ const page = () => {
           ) : (
             <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  md:ml-auto md:w-full md:max-w-[calc(100%-256px)]">
               <div className="max-w-3xl rounded-md  text-center  px-3">
-                <div className="w-16 h-16 rounded-full md:ml-72 md:mb-10 mx-auto mb-4">
+                <div className="w-16 h-16 rounded-full md:mb-5 mx-auto mb-4">
                   <svg
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
@@ -368,16 +369,16 @@ const page = () => {
                     ></path>
                   </svg>
                 </div>
-                <h1 className="md:text-3xl text-lg  text-gray-900">Upload & Ask PDF</h1>
+                <h1 className="text-2xl text-gray-900">Upload & Ask PDF</h1>
                 <p className="md:text-xl text-base mt-5 text-gray-400">
                   Get instant answers and insights from your documents—just
                   upload and ask!
                 </p>
-                <div className="mb-5 w-full md:ml-20 md:w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2 rounded-l-full rounded-r-full">
+                <div className="mb-5 p-1 flex bg-gray-100 justify-between items-center mx-auto fixed bottom-0 rounded-l-full rounded-r-full md:w-[600px] ">
                   <button
                     type="button"
                     onClick={() => fileInputRef.current.click()}
-                    className="ml-2 p-2 rounded-full bg-white"
+                    className="ml-2 p-1 rounded-full bg-white"
                   >
                     <div className="w-7 h-6 p-1">
                       <svg
@@ -439,23 +440,7 @@ const page = () => {
           )}
         </div>
       ) : (
-        <div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
-          <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center">
-            <h2 className="text-2xl  font-bold">Insufficient Credit</h2>
-            <p className=" p-2  text-lg ">
-              You hit your free credit limit .Please Consider buying our plans
-              for uninterrupted services
-            </p>
-            <div className=" p-2 mt-4">
-              <button
-                onClick={() => router.push("/plans")}
-                className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
-              >
-                Show Plans
-              </button>
-            </div>
-          </div>
-        </div>
+        <InsufficientBalance />
       )}
     </>
   );

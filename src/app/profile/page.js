@@ -5,6 +5,7 @@ import Sidebar from "../Sidebar";
 import Link from "next/link";
 import axios from "axios";
 import { toast, Toaster } from "sonner";
+import { Spinner } from "@/components/commonFunc";
 export const BackButton = () => {
   return (
     <Link href="/model" className="px-4 py-2 text-gray-500 border rounded-md">
@@ -17,6 +18,7 @@ export default function ProfilePage() {
   const [email, setEmail] = useState("");
   const [profileImage, setProfileImage] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [isSaving, setisSaving] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -84,6 +86,7 @@ export default function ProfilePage() {
   };
 
   const handleSave = async () => {
+    setisSaving(true);
     if (!userId) {
       toast.error("User not found.");
       return;
@@ -105,9 +108,10 @@ export default function ProfilePage() {
         "user",
         JSON.stringify({ ...updatedUser, id: userId })
       );
-
+      setisSaving(false);
       toast.success("Profile updated successfully!");
     } catch (error) {
+      setisSaving(false);
       toast.error("Failed to update profile.");
     }
   };
@@ -179,7 +183,7 @@ export default function ProfilePage() {
                   type="text"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-2/5 max-w-md px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700"
+                  className="w-2/5 max-w-md px-3 py-2 border border-gray-300 text-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700"
                 />
               </div>
 
@@ -201,7 +205,7 @@ export default function ProfilePage() {
                 onClick={handleSave}
                 className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 mt-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                Save
+                {isSaving ? <Spinner /> : "Save"}
               </button>
             </div>
           </div>

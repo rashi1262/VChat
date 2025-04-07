@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import { useChat } from "../chatContext";
 import { toast, Toaster } from "sonner";
 import { useCredits } from "@/context/creditContext";
+import InsufficientBalance from "@/components/InsufficientBalance";
+
 export const cards = [
   {
     prompt: "Solve a debate: which came first, the chiken or the egg?",
@@ -71,7 +73,6 @@ const page = () => {
         }
 
         const data = await response.json();
-       
 
         setChatThread(
           Array.isArray(data?.chatMessages)
@@ -82,7 +83,6 @@ const page = () => {
             : []
         );
       } catch (error) {
-      
         setChatThread([]);
       }
     };
@@ -210,12 +210,12 @@ const page = () => {
                               {/* <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div> */}
                               <p>{msg}</p>
                               <div className="self-start bg-white shadow-lg  py-2 rounded-2xl flex items-center w-[50px] px-3">
-              <div className="flex space-x-1">
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
-              </div>
-            </div>
+                                <div className="flex space-x-1">
+                                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+                                </div>
+                              </div>
                             </div>
                           ))}
                       </div>
@@ -279,7 +279,8 @@ const page = () => {
                     />
                   ))}
                 </div>
-                <div className="mb-5 w-full md:ml-20 md:w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2 rounded-l-full rounded-r-full">
+              <div className="md:w-3xl  mx-auto justify-center w-full flex">
+              <div className="mb-5 p-1 flex bg-gray-100 justify-between items-center mx-auto fixed bottom-0 rounded-l-full rounded-r-full md:w-[600px] ">
                   <input
                     type="text"
                     value={prompt}
@@ -315,22 +316,12 @@ const page = () => {
                   </button>
                 </div>
               </div>
+              </div>
             </div>
           )}
         </div>
       ) : (
-        <div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
-          <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center">
-            <h2 className="text-2xl  font-bold">Insufficient Credit</h2>
-            <p className=" p-2  text-lg ">
-              You hit your free credit limit .Please Consider buying our plans
-              for uninterrupted services
-            </p>
-            <div className=" p-2 mt-4">
-              <Link href="/plans">Show Plans</Link>
-            </div>
-          </div>
-        </div>
+        <InsufficientBalance />
       )}
     </>
   );

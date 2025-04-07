@@ -10,6 +10,8 @@ import { useCredits } from "@/context/creditContext";
 
 import Navbar from "../navbar";
 import { ChevronDown } from "lucide-react";
+import InsufficientBalance from "@/components/InsufficientBalance";
+
 export const cards = [
   {
     prompt: "Solve a debate: is a hot dog a sandwich?",
@@ -218,7 +220,6 @@ const page = ({ params }) => {
     <>
       {hasCredits ? (
         <div className="bg-gray-50">
-          ``
           <Toaster position="top-center" richColors />
           <div className="flex w-full justify-between bg-gray-50 text-sm">
             <Navbar />
@@ -228,9 +229,9 @@ const page = ({ params }) => {
                 <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
                   <Navbar />
 
-                  <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center  w-[80%]">
+                  <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center w-[80%] ms-auto">
                     <div className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  ">
-                      <div className="flex flex-col sticky  h-full w-full ">
+                      <div className="flex flex-col sticky   w-full ">
                         <div className="flex flex-col gap-1 mr-36">
                           {Array(1)
                             .fill(0)
@@ -239,15 +240,15 @@ const page = ({ params }) => {
                                 key={index}
                                 className="animate-pulse flex flex-col gap-1 mr-36"
                               >
-                                {/* <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div> */}
+                           
                                 <p>{msg}</p>
                                 <div className="self-start bg-white shadow-lg  py-2 rounded-2xl flex items-center w-[50px] px-3">
-              <div className="flex space-x-1">
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
-              </div>
-            </div>
+                                  <div className="flex space-x-1">
+                                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+                                  </div>
+                                </div>
                               </div>
                             ))}
                         </div>
@@ -306,7 +307,7 @@ const page = ({ params }) => {
                     </button>
 
                     {showButtons && (
-                      <div className="flex flex-col  items-center justify-center  ">
+                      <div className="flex flex-col  items-center justify-center">
                         <ul className="bg-gray-200  rounded-lg w-4/5">
                           <li className="text-center">
                             <Link
@@ -399,7 +400,7 @@ const page = ({ params }) => {
                         </ul>
                       </div>
                     )}
-                    <h1 className="text-3xl mt-48 text-gray-600 ">
+                    <h1 className="md:text-3xl mb-5 text-lg text-gray-600 md:mb-16 text-center">
                       How can I help you today?
                     </h1>
                   </div>
@@ -420,8 +421,8 @@ const page = ({ params }) => {
                         />
                       ))}
                     </div>
-
-                    <div className="mb-5 w-full md:ml-20 md:w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2 rounded-l-full rounded-r-full">
+                    <div className="md:w-3xl w-full mx-auto justify-center w-full flex">
+                    <div className="mb-5 p-1 flex bg-gray-100 justify-between items-center mx-auto fixed bottom-0 rounded-l-full rounded-r-full md:w-[600px] ">
                       <input
                         type="text"
                         value={prompt}
@@ -455,6 +456,7 @@ const page = ({ params }) => {
                         )}
                       </button>
                     </div>
+                    </div>
                   </div>
                 </div>
               </>
@@ -462,11 +464,11 @@ const page = ({ params }) => {
           </div>
           {showPopup && (
             <div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
-              <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center">
+              <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center text-white">
                 <h2 className="text-2xl  font-bold">Welcome back</h2>
                 <p className=" p-2  text-lg ">
                   Log in or sign up to unlock smarter responses, upload files,
-                  and make the most of VChat—your AI assistant.
+                  and make the most of VChat — your AI assistant.
                 </p>
                 <div className=" p-2 mt-4">
                   <button
@@ -487,23 +489,7 @@ const page = ({ params }) => {
           )}
         </div>
       ) : (
-        <div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
-          <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center">
-            <h2 className="text-2xl  font-bold">Insufficient Credit</h2>
-            <p className=" p-2  text-lg ">
-              You hit your free credit limit .Please Consider buying our plans
-              for uninterrupted services
-            </p>
-            <div className=" p-2 mt-4">
-              <button
-                onClick={() => handleRedirect("/plans")}
-                className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
-              >
-                Show Plans
-              </button>
-            </div>
-          </div>
-        </div>
+        <InsufficientBalance />
       )}
     </>
   );

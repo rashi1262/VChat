@@ -81,11 +81,11 @@ const Header = () => {
     return () => clearInterval(interval);
   }, [credits]);
 
-  if (pathname === "/login" || pathname === "/signup") return null;
+  if (pathname === "/login" || pathname === "/signup" || pathname === "/verify-email" || pathname === "/verify") return null;
 
   return (
     <header className="z-10 fixed top-0 w-full bg-white shadow-sm">
-      <div className="container mx-auto flex items-center justify-between py-3 px-5">
+      <div className="container mx-2 flex items-center justify-between py-3 px-5">
         <div>
           <button
             className="block p-0.5 border text-black   hover:bg-gray-100 rounded"
@@ -117,9 +117,9 @@ const Header = () => {
             <button className="flex items-center">
               <Link
                 href="/vChat"
-                className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded text-sm"
+                className="flex items-center hover:bg-gray-200 rounded text-black text-base p-2"
               >
-                <div className="w-8 h-[2%] p-1">
+                <div className="w-7 h-7 mr-1 flex items-center justify-center">
                   <Image
                     src="/assests/vlogo.avif"
                     width={18}
@@ -127,7 +127,7 @@ const Header = () => {
                     alt="VChat Logo"
                   />
                 </div>
-                <div className="ml-1 mt-[2%]">VChat</div>
+                VChat
               </Link>
             </button>
           )}
@@ -138,7 +138,7 @@ const Header = () => {
                 href="/model"
                 className="flex items-center hover:bg-gray-200 rounded text-black text-base p-2"
               >
-                <div className="w-7 h-6 p-1 ">
+                <div className="w-7 h-7 mr-1 ">
                   <svg
                     viewBox="0 0 42 42"
                     fill="none"
@@ -187,7 +187,7 @@ const Header = () => {
                 href="/deepSeek"
                 className="flex items-center hover:bg-gray-200 rounded text-black text-base p-2"
               >
-                <div className="w-8 h-7 pl-1 pr-1 ">
+                <div className="w-7 h-7 mr-1">
                   <svg
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
@@ -238,7 +238,7 @@ const Header = () => {
                 href="/openAI"
                 className="flex items-center hover:bg-gray-200 rounded text-black text-base p-2"
               >
-                <div className="w-8 h-7 pl-1 pr-1  ">
+                <div className="w-7 h-7 mr-1">
                   <svg
                     viewBox="0 0 42 42"
                     fill="none"
@@ -276,7 +276,7 @@ const Header = () => {
                     </defs>
                   </svg>
                 </div>
-                openAI
+                Open AI
               </Link>
             </button>
           )}
@@ -286,7 +286,7 @@ const Header = () => {
                 href="/openAIGPT-4o "
                 className="flex items-center hover:bg-gray-200 rounded text-black text-base p-2"
               >
-                <div className="w-8 h-7 pl-1 pr-1  ">
+                <div className="w-7 h-7 mr-1">
                   <svg
                     viewBox="0 0 42 42"
                     fill="none"
@@ -334,7 +334,7 @@ const Header = () => {
                 href="/upload"
                 className="flex items-center hover:bg-gray-200 rounded text-black text-base p-2"
               >
-                <div className="w-8 h-7 pl-1 pr-1  ">
+                <div className="w-7 h-7 mr-1">
                   <svg
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
@@ -372,9 +372,9 @@ const Header = () => {
             <button className="flex items-center">
               <Link
                 href="/image"
-                className="flex hover:bg-gray-200 rounded text-black text-base p-2"
+                className="flex items-center hover:bg-gray-200 rounded text-black text-base p-2"
               >
-                <div className="w-8 h-7 pl-1 pr-1 ">
+                <div className="w-7 h-7 mr-1">
                   <svg
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
@@ -414,9 +414,9 @@ const Header = () => {
               <button className="flex items-center">
                 <Link
                   href="/vChat"
-                  className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded text-sm"
+                  className="flex items-center hover:bg-gray-200 rounded text-black text-base p-2"
                 >
-                  <div className="w-8 h-[2%] p-1">
+                  <div className="w-7 h-7 mr-1 flex justify-center items-center ">
                     <Image
                       src="/assests/vlogo.avif"
                       width={18}
@@ -424,7 +424,7 @@ const Header = () => {
                       alt="VChat Logo"
                     />
                   </div>
-                  <div className="ml-1 mt-[2%]">VChat</div>
+                 VChat
                 </Link>
               </button>
             )}
