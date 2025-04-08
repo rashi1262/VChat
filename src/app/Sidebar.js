@@ -91,7 +91,7 @@ export default function Sidebar() {
               Danger Zone
             </Link>
             <Link
-              href="mailto:support@yourdomain.com?subject=Support Request&body=Hello, I need help with..."
+              href="mailto:viddeveloper111@gmail.com?subject=Support Request&body=Hello, I need help with..."
               className="flex items-center gap-2 px-4 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
             >
               <HelpCircle size={13} />

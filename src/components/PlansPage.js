@@ -11,7 +11,8 @@ export default function PlansPage() {
   const stripe = useStripe();
   const elements = useElements();
   const [plans, setPlans] = useState([]);
-  
+  const [activePlanId, setActivePlanId] = useState("");
+
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userDetails, setUserDetails] = useState({ name: "", email: "" });
@@ -24,7 +25,12 @@ export default function PlansPage() {
       setUserDetails({ name: parsedUser.name || "", email: parsedUser.email || "" });
     }
   }, []);
-
+  useEffect(() => {
+    const storedPlanId = localStorage.getItem("planId");
+    if (storedPlanId) {
+      setActivePlanId(storedPlanId);
+    }
+  }, []);
   useEffect(() => {
     async function fetchPlans() {
       try {
@@ -59,7 +65,7 @@ export default function PlansPage() {
           amount: selectedPlan.pricePerDay * 30 * 100, // Convert to cents
           email: userDetails.email,
           name: userDetails.name,
-          planId:selectedPlan.id
+          planId: selectedPlan.id
         }),
       });
       const data = await response.json();
@@ -102,29 +108,43 @@ export default function PlansPage() {
             <div className="grid md:grid-cols-2 gap-6">
               {plans.map((plan) => (
                 <div key={plan.id} className="bg-white rounded-lg shadow p-6">
-                  <h3 className="text-xl font-semibold text-gray-600 mb-2">{plan.name}</h3>
+                  <h3 className="text-xl font-semibold text-gray-600 mb-2">{plan.name} ({plan.duration})</h3>
                   <p className="text-lg mb-5">
                     <span className="text-2xl font-bold text-gray-700">${plan.pricePerDay}</span>
                     <span className="text-gray-500 text-sm">/ Per Day</span>
                   </p>
                   <button
-                    className="w-full py-2 mb-4 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800"
+                    className={`w-full py-2 mb-4 text-sm font-medium text-white rounded-md 
+  ${plan.id === activePlanId ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-gray-800'}`}
                     onClick={() => {
-                      setSelectedPlan(plan);
-                      setIsModalOpen(true);
+                      if (plan.id !== activePlanId) {
+                        setSelectedPlan(plan);
+                        setIsModalOpen(true);
+                      }
                     }}
+                    disabled={plan.id === activePlanId}
                   >
-                    {plan.pricePerDay === 0 ? "Current Plan" : "Upgrade"}
+                    {plan.id === activePlanId ? "Current Plan" : "Upgrade"}
                   </button>
+
 
                   <div className="space-y-3">
                     <h4 className="font-medium text-gray-600">Features:</h4>
-                    {plan.features.map((feature, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <CheckCircle2 className="w-5 h-5 text-green-500" />
-                        <span className="text-gray-600">{feature}</span>
-                      </div>
-                    ))}
+                    {plan.features.map((feature, index) => {
+  const isNegative = /(no|not)/i.test(feature) && !/no limits/i.test(feature);
+
+  return (
+    <div key={index} className="flex items-center gap-2">
+      {isNegative ? (
+        <XCircle className="w-5 h-5 text-red-500" />
+      ) : (
+        <CheckCircle2 className="w-5 h-5 text-green-500" />
+      )}
+      <span className="text-gray-600">{feature}</span>
+    </div>
+  );
+})}
+
                   </div>
                 </div>
               ))}
