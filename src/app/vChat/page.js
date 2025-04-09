@@ -13,6 +13,7 @@ import { toast, Toaster } from "sonner";
 
 import { useCredits } from "@/context/creditContext";
 import { cards } from "../model/page";
+import InsufficientBalance from "@/components/InsufficientBalance";
 
 const page = ({ params }) => {
   const { hasCredits } = useCredits();
@@ -480,23 +481,7 @@ const page = ({ params }) => {
           </div>
         </div>
       ) : (
-        <div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
-          <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center">
-            <h2 className="text-2xl  font-bold">Insufficient Credit</h2>
-            <p className=" p-2  text-lg ">
-              You hit your free credit limit .Please Consider buying our plans
-              for uninterrupted services
-            </p>
-            <div className=" p-2 mt-4">
-              <button
-                onClick={() => router.push("/plans")}
-                className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
-              >
-                Show Plans
-              </button>
-            </div>
-          </div>
-        </div>
+        <InsufficientBalance />
       )}
     </>
   );

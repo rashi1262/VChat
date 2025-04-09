@@ -63,7 +63,7 @@ export default function ChatInputBox() {
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-center">
             <h2 className="text-xl font-semibold mb-4">Welcome back</h2>
             <p className="mb-4">
-            Log in or sign up to unlock smarter responses, upload files, and make the most of VChat—your AI assistant.
+            Log in or sign up to unlock smarter responses, upload files, and make the most of VChat — your AI assistant.
             </p>
             <button
               onClick={() => handleRedirect("/login")}

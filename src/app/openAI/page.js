@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import { useChat } from "../chatContext";
 import { toast, Toaster } from "sonner";
 import { useCredits } from "@/context/creditContext";
+import InsufficientBalance from "@/components/InsufficientBalance";
+
 export const cards = [
   {
     prompt: "Solve a debate: which came first, the chiken or the egg?",
@@ -319,18 +321,7 @@ const page = () => {
           )}
         </div>
       ) : (
-        <div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
-          <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center">
-            <h2 className="text-2xl  font-bold">Insufficient Credit</h2>
-            <p className=" p-2  text-lg ">
-              You hit your free credit limit .Please Consider buying our plans
-              for uninterrupted services
-            </p>
-            <div className=" p-2 mt-4">
-              <Link href="/plans">Show Plans</Link>
-            </div>
-          </div>
-        </div>
+      <InsufficientBalance />
       )}
     </>
   );

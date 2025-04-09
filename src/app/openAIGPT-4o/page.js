@@ -7,6 +7,8 @@ import Navbar from "../navbar";
 import { cards } from "../openAI/page";
 
 const page = () => {
+  const [prompt, setPrompt] = useState("");
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {

@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { toast, Toaster } from "sonner";
 import { Asset } from "next/font/google";
 import { signInWithGoogle } from "../auth";
+import { Spinner } from "@/components/commonFunc";
 
 const Signup = () => {
   const { data: session } = useSession();
@@ -87,7 +88,7 @@ const Signup = () => {
 
       toast.success("Signup successful!");
       router.push("/verify");
-      setFormData({ name: "", email: "", password: "" }); 
+      setFormData({ name: "", email: "", password: "" });
     } catch (error) {
       toast.error(error.message);
     } finally {
@@ -160,13 +161,7 @@ const Signup = () => {
             disabled={isLoading}
             className="w-full p-2 text-base bg-gray-800 text-white border-none  rounded cursor-pointer mt-2 hover:bg-gray-900"
           >
-            {isLoading ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent items-center rounded-full animate-spin"></div>
-              </>
-            ) : (
-              "Sign up"
-            )}
+            {isLoading ? <Spinner /> : "Sign up"}
           </button>
         </form>
 
