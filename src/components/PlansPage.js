@@ -17,6 +17,8 @@ export default function PlansPage() {
   const [userDetails, setUserDetails] = useState({ name: "", email: "" });
   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
   const [showPlanAlert, setShowPlanAlert] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -24,12 +26,14 @@ export default function PlansPage() {
       setUserDetails({ name: parsedUser.name || "", email: parsedUser.email || "" });
     }
   }, []);
+
   useEffect(() => {
     const storedPlanId = localStorage.getItem("planId");
     if (storedPlanId) {
       setActivePlanId(storedPlanId);
     }
   }, []);
+
   useEffect(() => {
     async function fetchPlans() {
       try {
@@ -38,6 +42,8 @@ export default function PlansPage() {
         setPlans(data);
       } catch (error) {
         console.error("Error fetching plans:", error);
+      } finally {
+        setLoading(false);
       }
     }
     fetchPlans();
@@ -61,11 +67,10 @@ export default function PlansPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: selectedPlan.pricePerDay * 30 * 100, // Convert to cents
+          amount: selectedPlan.pricePerDay * 30 * 100,
           email: userDetails.email,
           name: userDetails.name,
           planId: selectedPlan.id
-         
         }),
       });
       const data = await response.json();
@@ -82,8 +87,7 @@ export default function PlansPage() {
       });
       if (error) throw new Error("Payment failed");
 
-      setIsPaymentLoading(false); 
-      console.log("Selected Plan ID:", selectedPlan.id)  
+      setIsPaymentLoading(false);
       localStorage.setItem("paymentId", paymentIntent?.id || paymentMethod.id);
       localStorage.setItem("planId", selectedPlan.id);
       window.location.href = "https://vchatai.netlify.app/success";
@@ -98,7 +102,7 @@ export default function PlansPage() {
       <div className="min-h-screen mt-12 bg-gray-50 flex flex-col ml-auto w-[90%]">
         <div className="flex gap-5 p-10">
           <Sidebar />
-          <div className="flex-1 ">
+          <div className="flex-1">
             <div className="mb-6 flex justify-between items-center">
               <div>
                 <h1 className="text-lg font-semibold text-gray-600">Plans</h1>
@@ -108,54 +112,68 @@ export default function PlansPage() {
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">
-              {plans.map((plan) => (
-                <div key={plan.id} className="bg-white rounded-lg shadow p-6 w-[280px] h-[370px]  ">
-                  <h3 className="text-xl font-semibold text-gray-600 mb-2">{plan.name} ({plan.duration})</h3>
-                  <p className="text-lg mb-5">
-                    <span className="text-2xl font-bold text-gray-700">${plan.pricePerDay}</span>
-                    <span className="text-gray-500 text-sm">/ Per Day</span>
-                  </p>
-                  <button
-                    className={`w-full py-2 mb-4 text-sm font-medium text-white rounded-md 
-                      ${plan.id === activePlanId ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-gray-800'}`}
-                    onClick={() => {
-                      if (plan.pricePerDay>0){
-                      if (plan.id === activePlanId) return;
+              {loading
+                ? Array(3).fill(null).map((_, index) => (
+                    <div
+                      key={index}
+                      className="bg-gray-200 animate-pulse rounded-lg shadow p-6 w-[280px] h-[370px] flex flex-col justify-between"
+                    >
+                      <div className="h-6 bg-gray-300 rounded w-2/3 mb-4"></div>
+                      <div className="h-4 bg-gray-300 rounded w-1/2 mb-6"></div>
+                      <div className="h-10 bg-gray-300 rounded w-full mb-6"></div>
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+                        <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                        <div className="h-4 bg-gray-300 rounded w-4/6"></div>
+                      </div>
+                    </div>
+                  ))
+                : plans.map((plan) => (
+                    <div key={plan.id} className="bg-white rounded-lg shadow p-6 w-[280px] h-[370px]">
+                      <h3 className="text-xl font-semibold text-gray-600 mb-2">{plan.name} ({plan.duration})</h3>
+                      <p className="text-lg mb-5">
+                        <span className="text-2xl font-bold text-gray-700">${plan.pricePerDay}</span>
+                        <span className="text-gray-500 text-sm">/ Per Day</span>
+                      </p>
+                      <button
+                        className={`w-full py-2 mb-4 text-sm font-medium text-white rounded-md 
+                          ${plan.id === activePlanId ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-gray-800'}`}
+                        onClick={() => {
+                          if (plan.pricePerDay > 0) {
+                            if (plan.id === activePlanId) return;
 
-                      if (activePlanId && plan.id !== activePlanId) {
-                        setShowPlanAlert(true); 
-                        return;
-                      }
+                            if (activePlanId && plan.id !== activePlanId) {
+                              setShowPlanAlert(true);
+                              return;
+                            }
 
-                      setSelectedPlan(plan);
-                      setIsModalOpen(true);
-                    }}}
-                    disabled={plan.id === activePlanId}
-                  >
-                    {plan.id === activePlanId ? "Current Plan" : "Upgrade"}
-                  </button>
+                            setSelectedPlan(plan);
+                            setIsModalOpen(true);
+                          }
+                        }}
+                        disabled={plan.id === activePlanId}
+                      >
+                        {plan.id === activePlanId ? "Current Plan" : "Upgrade"}
+                      </button>
 
-
-                  <div className="space-y-3">
-                    <h4 className="font-medium text-gray-600">Features:</h4>
-                    {plan.features.map((feature, index) => {
-  const isNegative = /(no|not)/i.test(feature) && !/no limits/i.test(feature);
-
-  return (
-    <div key={index} className="flex items-center gap-2">
-      {isNegative ? (
-        <XCircle className="w-5 h-5 text-red-500" />
-      ) : (
-        <CheckCircle2 className="w-5 h-5 text-green-500" />
-      )}
-      <span className="text-gray-600">{feature}</span>
-    </div>
-  );
-})}
-
-                  </div>
-                </div>
-              ))}
+                      <div className="space-y-3">
+                        <h4 className="font-medium text-gray-600">Features:</h4>
+                        {plan.features.map((feature, index) => {
+                          const isNegative = /(no|not)/i.test(feature) && !/no limits/i.test(feature);
+                          return (
+                            <div key={index} className="flex items-center gap-2">
+                              {isNegative ? (
+                                <XCircle className="w-5 h-5 text-red-500" />
+                              ) : (
+                                <CheckCircle2 className="w-5 h-5 text-green-500" />
+                              )}
+                              <span className="text-gray-600">{feature}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
             </div>
           </div>
         </div>
@@ -176,21 +194,21 @@ export default function PlansPage() {
           </div>
         </div>
       )}
-      {showPlanAlert && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-    <div className="bg-white rounded-lg shadow-lg p-6 w-[300px] text-center">
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">Plan Already Active</h2>
-      <p className="text-gray-600 mb-6">You already have a plan. You can't purchase a new one until it ends.</p>
-      <button
-        className="bg-black text-white px-4 py-2 rounded-md hover:bg-red-800"
-        onClick={() => setShowPlanAlert(false)}
-      >
-        close
-      </button>
-    </div>
-  </div>
-)}
 
+      {showPlanAlert && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-[300px] text-center">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Plan Already Active</h2>
+            <p className="text-gray-600 mb-6">You already have a plan. You can't purchase a new one until it ends.</p>
+            <button
+              className="bg-black text-white px-4 py-2 rounded-md hover:bg-red-800"
+              onClick={() => setShowPlanAlert(false)}
+            >
+              close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
