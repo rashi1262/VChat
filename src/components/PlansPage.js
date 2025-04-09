@@ -12,12 +12,11 @@ export default function PlansPage() {
   const elements = useElements();
   const [plans, setPlans] = useState([]);
   const [activePlanId, setActivePlanId] = useState("");
-
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userDetails, setUserDetails] = useState({ name: "", email: "" });
   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
-
+  const [showPlanAlert, setShowPlanAlert] = useState(false);
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -66,6 +65,7 @@ export default function PlansPage() {
           email: userDetails.email,
           name: userDetails.name,
           planId: selectedPlan.id
+         
         }),
       });
       const data = await response.json();
@@ -82,8 +82,10 @@ export default function PlansPage() {
       });
       if (error) throw new Error("Payment failed");
 
-      setIsPaymentLoading(false);
+      setIsPaymentLoading(false); 
+      console.log("Selected Plan ID:", selectedPlan.id)  
       localStorage.setItem("paymentId", paymentIntent?.id || paymentMethod.id);
+      localStorage.setItem("planId", selectedPlan.id);
       window.location.href = "https://vchatai.netlify.app/success";
     } catch (error) {
       setIsPaymentLoading(false);
@@ -93,10 +95,10 @@ export default function PlansPage() {
 
   return (
     <div className="flex w-full justify-between bg-gray-50 text-sm">
-      <div className="min-h-screen mt-12 bg-gray-50 flex flex-col ml-auto w-4/5">
-        <div className="flex gap-8 p-10">
+      <div className="min-h-screen mt-12 bg-gray-50 flex flex-col ml-auto w-[90%]">
+        <div className="flex gap-5 p-10">
           <Sidebar />
-          <div className="flex-1 mr-64">
+          <div className="flex-1 ">
             <div className="mb-6 flex justify-between items-center">
               <div>
                 <h1 className="text-lg font-semibold text-gray-600">Plans</h1>
@@ -105,9 +107,9 @@ export default function PlansPage() {
               <BackButton />
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-3 gap-6">
               {plans.map((plan) => (
-                <div key={plan.id} className="bg-white rounded-lg shadow p-6">
+                <div key={plan.id} className="bg-white rounded-lg shadow p-6 w-[280px] h-[370px]  ">
                   <h3 className="text-xl font-semibold text-gray-600 mb-2">{plan.name} ({plan.duration})</h3>
                   <p className="text-lg mb-5">
                     <span className="text-2xl font-bold text-gray-700">${plan.pricePerDay}</span>
@@ -115,13 +117,19 @@ export default function PlansPage() {
                   </p>
                   <button
                     className={`w-full py-2 mb-4 text-sm font-medium text-white rounded-md 
-  ${plan.id === activePlanId ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-gray-800'}`}
+                      ${plan.id === activePlanId ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-gray-800'}`}
                     onClick={() => {
-                      if (plan.id !== activePlanId) {
-                        setSelectedPlan(plan);
-                        setIsModalOpen(true);
+                      if (plan.pricePerDay>0){
+                      if (plan.id === activePlanId) return;
+
+                      if (activePlanId && plan.id !== activePlanId) {
+                        setShowPlanAlert(true); 
+                        return;
                       }
-                    }}
+
+                      setSelectedPlan(plan);
+                      setIsModalOpen(true);
+                    }}}
                     disabled={plan.id === activePlanId}
                   >
                     {plan.id === activePlanId ? "Current Plan" : "Upgrade"}
@@ -168,6 +176,21 @@ export default function PlansPage() {
           </div>
         </div>
       )}
+      {showPlanAlert && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="bg-white rounded-lg shadow-lg p-6 w-[300px] text-center">
+      <h2 className="text-lg font-semibold text-gray-800 mb-4">Plan Already Active</h2>
+      <p className="text-gray-600 mb-6">You already have a plan. You can't purchase a new one until it ends.</p>
+      <button
+        className="bg-black text-white px-4 py-2 rounded-md hover:bg-red-800"
+        onClick={() => setShowPlanAlert(false)}
+      >
+        close
+      </button>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
