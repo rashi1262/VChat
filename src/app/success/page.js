@@ -9,6 +9,8 @@ export default function SuccessPage() {
   useEffect(() => {
     
     localStorage.removeItem("checkout-session");
+   
+
   }, []);
 
   return (

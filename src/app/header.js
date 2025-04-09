@@ -133,10 +133,10 @@ const Header = () => {
           )}
 
           {pathname === "/model" && (
-            <button className="flex md:block items-center ">
+            <button className="flex  items-center text-sm text-gray-600">
               <Link
                 href="/model"
-                className="flex items-center hover:bg-gray-200 rounded text-black text-base p-2"
+                className="flex items-center hover:bg-gray-200 "
               >
                 <div className="w-7 h-6 p-1 ">
                   <svg
@@ -182,7 +182,7 @@ const Header = () => {
             </button>
           )}
           {pathname === "/deepSeek" && (
-            <button className="flex items-center">
+            <button className="flex items-center ">
               <Link
                 href="/deepSeek"
                 className="flex items-center hover:bg-gray-200 rounded text-black text-base p-2"
@@ -236,7 +236,7 @@ const Header = () => {
             <button className="flex items-center">
               <Link
                 href="/openAI"
-                className="flex items-center hover:bg-gray-200 rounded text-black text-base p-2"
+                className="flex  items-center text-sm text-gray-600"
               >
                 <div className="w-8 h-7 pl-1 pr-1  ">
                   <svg
