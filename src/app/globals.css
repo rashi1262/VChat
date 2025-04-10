@@ -19,3 +19,17 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+@layer utilities {
+  .fade-line {
+    opacity: 0;
+    animation: fadeInLine 0.3s ease forwards;
+  }
+
+  @keyframes fadeInLine {
+    to {
+      opacity: 1;
+    }
+  }
+}

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useChat } from ".././chatContext";
 import { toast, Toaster } from "sonner";
 import { useCredits } from "@/context/creditContext";
+import ReactMarkdown from 'react-markdown'
 
 import Navbar from "../navbar";
 import { ChevronDown } from "lucide-react";
@@ -132,7 +133,7 @@ const page = ({ params }) => {
           process.env.NEXT_PUBLIC_BASE_URL
         }/chatbot/search?userId=${encodeURIComponent(
           userId
-        )}&message=${encodeURIComponent(msg)}`
+        )}&message=${encodeURIComponent(current)}`
       );
       if (searchRes.status === 402) {
         setShowCreditPopup(true);
@@ -393,7 +394,7 @@ const page = ({ params }) => {
                                 </svg>
                               </div>
                               <div className="ml-1 text-white mt-[2%]">
-                                Gemini
+                              Gemini
                               </div>
                             </Link>
                           </li>

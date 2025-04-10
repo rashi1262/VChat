@@ -8,6 +8,8 @@ import { Edit, Pencil } from "lucide-react";
 import { Check, Clipboard } from "lucide-react";
 import { useCredits } from "@/context/creditContext";
 import InsufficientBalance from "@/components/InsufficientBalance";
+import ReactMarkdown from "react-markdown";
+
 
 const ChatPage = ({ params }) => {
   const { hasCredits, setHasCredits } = useCredits();
@@ -640,7 +642,7 @@ const ChatPage = ({ params }) => {
                           )}
                         </div>
                       ) : (
-                        <div className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
+                        <div className="ml-36 self-start text-left text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
                           {(chat.parsedResponse &&
                           chat.parsedResponse.length > 0
                             ? chat.parsedResponse
@@ -671,7 +673,10 @@ const ChatPage = ({ params }) => {
                                 )}
                               </div>
                             ) : (
-                              <span key={i}>{part.content}</span>
+                             <ReactMarkdown key={i}>{part.content}</ReactMarkdown>
+
+
+
                             )
                           )}
                         </div>
