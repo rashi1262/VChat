@@ -36,6 +36,10 @@ const ChatPage = ({ params }) => {
   const [generatedImage, setGeneratedImage] = useState([]);
   console.log(chatHistory, "chatHistorychatHistory");
   const [copiedIndex, setCopiedIndex] = useState(null);
+  const [response, setResponse] = useState(''); // Full response
+  const [displayedResponse, setDisplayedResponse] = useState(''); // Displayed response (word by word)
+  
+
 
   const handleCopy = async (text, index) => {
     try {
@@ -49,13 +53,10 @@ const ChatPage = ({ params }) => {
 
   const handleSaveEdit = async (index) => {
     if (!editMessage.trim()) return;
-
     setLoading(true);
-
     try {
       let newBotResponse, newParsedResponse;
       setLoading(true);
-
       if (chatModel === "ImageGeneration") {
         console.log("Generating updated image for prompt:", editMessage);
         const imageRes = await fetch(
@@ -65,9 +66,7 @@ const ChatPage = ({ params }) => {
             userId
           )}&prompt=${encodeURIComponent(editMessage)}`
         );
-
         if (!imageRes.ok) throw new Error("Error generating image");
-
         const imageData = await imageRes.json();
         newBotResponse = imageData.imageUrl;
         newParsedResponse = null;
@@ -80,17 +79,13 @@ const ChatPage = ({ params }) => {
             userId
           )}&message=${encodeURIComponent(editMessage)}`
         );
-
         if (!response.ok)
           throw new Error("Error fetching updated bot response");
-
         const data = await response.json();
         console.log("Updated bot response received:", data);
-
         newBotResponse = data.botResponse;
         newParsedResponse = extractCodeBlocks(newBotResponse);
       }
-
       setChatHistory((prevChats) =>
         prevChats.map((chat, i) =>
           i === index
@@ -103,7 +98,6 @@ const ChatPage = ({ params }) => {
             : chat
         )
       );
-
       const requestBody = JSON.stringify({
         id,
         userSearch: [
@@ -114,9 +108,7 @@ const ChatPage = ({ params }) => {
           },
         ],
       });
-
       console.log("PUT Request Body:", requestBody);
-
       const updateRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
         {
@@ -125,13 +117,11 @@ const ChatPage = ({ params }) => {
           body: requestBody,
         }
       );
-
       if (!updateRes.ok) {
         const errorText = await updateRes.text();
         console.error("Update API Error Response:", errorText);
         throw new Error(`Error updating chat data: ${errorText}`);
       }
-
       console.log("Chat updated successfully!");
       fetchBotResponse();
       setEditIndex(null);
@@ -150,7 +140,6 @@ const ChatPage = ({ params }) => {
   // };
 
   useEffect(() => setisLoading(true), [id]);
-
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
@@ -166,7 +155,6 @@ const ChatPage = ({ params }) => {
       }
     }
   }, []);
-
   useEffect(() => {
     if (!userId) return;
     const fetchUserChats = async () => {
@@ -188,7 +176,6 @@ const ChatPage = ({ params }) => {
     };
     fetchUserChats();
   }, [userId]);
-
   const fetchBotResponse = async () => {
     try {
       const searchRes = await fetch(
@@ -197,7 +184,6 @@ const ChatPage = ({ params }) => {
       if (!searchRes.ok) throw new Error("Error fetching bot response");
       const data = await searchRes.json();
       console.log(data, "datadata");
-
       setisLoading(false);
       setChatModel(data?.type);
       setChatHistory(
@@ -213,11 +199,9 @@ const ChatPage = ({ params }) => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     if (id) fetchBotResponse();
   }, [id]);
-
   const extractCodeBlocks = (message) => {
     if (!message) {
       console.error(
@@ -226,13 +210,11 @@ const ChatPage = ({ params }) => {
       );
       return [{ type: "text", content: "Unknown message" }];
     }
-
     const messageStr =
       typeof message === "string" ? message : JSON.stringify(message);
     const codeBlockRegex = /```([\s\S]*?)```/g;
     let parts = [],
       lastIndex = 0;
-
     messageStr.replace(codeBlockRegex, (match, code, index) => {
       if (index > lastIndex) {
         parts.push({
@@ -243,38 +225,29 @@ const ChatPage = ({ params }) => {
       parts.push({ type: "code", content: code });
       lastIndex = index + match.length;
     });
-
     if (lastIndex < messageStr.length) {
       parts.push({ type: "text", content: messageStr.slice(lastIndex) });
     }
-
     return parts.length > 0 ? parts : [{ type: "text", content: messageStr }];
   };
-
   const handleAddChat = async () => {
     if (!id || !moreChat) {
       return;
     }
-
     setMorePrompt(moreChat);
     setMoreChat("");
     setLoading(true);
-
     try {
       console.log("Fetching existing chat for ID:", id);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${id}`
       );
-
       if (!response.ok) throw new Error("Error fetching existing chat data");
-
       const chatData = await response.json();
       const existingUserSearch = Array.isArray(chatData?.userSearch)
         ? chatData.userSearch
         : [];
-
       let newChat;
-
       if (chatModel === "ImageGeneration") {
         console.log("Generating image for prompt:", moreChat);
         const imageRes = await fetch(
@@ -286,7 +259,6 @@ const ChatPage = ({ params }) => {
         );
 
         if (!imageRes.ok) throw new Error("Error generating image");
-
         const imageData = await imageRes.json();
         newChat = {
           userMessage: moreChat,
@@ -303,19 +275,15 @@ const ChatPage = ({ params }) => {
             userId
           )}&message=${encodeURIComponent(moreChat)}`
         );
-
         if (!searchRes.ok) throw new Error("Error fetching bot response");
-
         const data = await searchRes.json();
         console.log("Bot response received:", data);
-
         if (
           typeof window !== "undefined" &&
           data?.remainingCredits !== undefined
         ) {
           localStorage.setItem("remainingCredits", data.remainingCredits);
         }
-
         const responseText =
           typeof data === "string" ? data : JSON.stringify(data);
         newChat = {
@@ -324,16 +292,12 @@ const ChatPage = ({ params }) => {
           parsedResponse: extractCodeBlocks(data.botResponse),
         };
       }
-
-      // Constructing the correct PUT request body
       const requestBody = JSON.stringify({
         id, // Ensuring ID is included in the request
         userSearch: [newChat],
       });
-
       console.log("PUT Request Body:", requestBody);
       console.log(newChat, "newChat");
-
       const updateRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
         {
@@ -342,14 +306,11 @@ const ChatPage = ({ params }) => {
           body: requestBody,
         }
       );
-
       const updateResponseText = await updateRes.text();
-
       if (!updateRes.ok) {
         console.error("Update API Error Response:", updateResponseText);
         throw new Error(`Error updating chat data: ${updateResponseText}`);
       }
-
       console.log("Chat updated successfully!");
       setChatHistory((prevChats) => [...prevChats, newChat]);
     } catch (error) {
@@ -358,13 +319,10 @@ const ChatPage = ({ params }) => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     if (!id) return;
-
     fetchBotResponse();
   }, [id]);
-
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -379,11 +337,9 @@ const ChatPage = ({ params }) => {
       });
     }
   };
-
   useEffect(() => {
     scrollToBottom();
   }, [chatHistory]);
-
   return (
     <>
       {hasCredits ? (
@@ -391,21 +347,20 @@ const ChatPage = ({ params }) => {
           <Navbar />
           <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center  md:hidden">
             <div
-              className="max-w absolute top-4  overflow-y-scroll rounded-md h-[75%] p-4 mr-5 text-center  mt-20  "
+              className="max-w absolute top-4  overflow-y-scroll rounded-md h-[75%] p-4 text-center  mt-20  "
               ref={chatContainerRef}
             >
               <div className="flex flex-col sticky  h-full w-full ">
                 {isloading ? (
-                  <div className="flex flex-col gap-1 mr-36">
+                  <div className="flex flex-col gap-1 ">
                     {Array(1)
                       .fill(0)
                       .map((_, index) => (
                         <div
                           key={index}
-                          className="animate-pulse flex flex-col gap-1 mr-36"
+                          className="animate-pulse flex flex-col gap-1 "
                         >
                           <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
-
                           <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
                         </div>
                       ))}
@@ -421,12 +376,11 @@ const ChatPage = ({ params }) => {
                                 setEditIndex(index);
                                 setEditMessage(chat.userMessage);
                               }}
-                              className="text-black rounded-md text-sm mr-3"
+                              className="text-black rounded-md text-sm "
                             >
                               <Pencil size={15} />
                             </button>
                           )}
-
                           <div
                             className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${
                               editIndex === index
@@ -452,7 +406,6 @@ const ChatPage = ({ params }) => {
                                   className="w-full bg-transparent text-white p-2 rounded-md outline-none "
                                   autoFocus
                                 />
-
                                 <div className="flex justify-end gap-2 mt-2">
                                   <button
                                     onClick={() => setEditIndex(null)}
@@ -460,8 +413,7 @@ const ChatPage = ({ params }) => {
                                   >
                                     Cancel
                                   </button>
-
-                                  <button
+                              <button
                                     onClick={() => {
                                       handleSaveEdit(index);
                                       handleAddChat();
@@ -475,17 +427,16 @@ const ChatPage = ({ params }) => {
                               </div>
                             ) : (
                               <span className="break-words w-full text-white">
-                                {chat.userMessage}
+                                {chat.userMessage }
                               </span>
                             )}
                           </div>
                         </div>
                       </div>
-                      g
+                      
                     </div>
                   ))
                 )}
-
                 {morePrompt !== "" && (
                   <div className="flex flex-col gap-1 ml-36">
                     {loading && (
@@ -496,20 +447,19 @@ const ChatPage = ({ params }) => {
                   </div>
                 )}
               </div>
-
               <div className="mb-5 ml-10 w-3/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
                 <input
                   type="text"
                   value={moreChat}
                   onChange={(e) => setMoreChat(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Send a message..."
+                  placeholder="Send a messaghio3rqwl;kasz."
                   className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
                 />
 
                 <button
                   onClick={handleAddChat}
-                  className=" p-1 mr-2 rounded-full bg-white flex items-center justify-center"
+                  className=" p-1 rounded-full bg-white flex items-center justify-center"
                 >
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
@@ -534,20 +484,20 @@ const ChatPage = ({ params }) => {
               </div>
             </div>
           </div>
-          <div className="min-h-screen md:block relative bg-gray-50  flex-col items-center justify-center  w-4/5 hidden">
+          <div className="min-h-screen md:block relative bg-gray-50  flex-col items-center justify-center  w-[80%] hidden">
             <div
               className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  "
               ref={chatContainerRef}
             >
               <div className="flex flex-col sticky  h-full w-full ">
                 {isloading ? (
-                  <div className="flex flex-col gap-1 mr-36">
+                  <div className="flex flex-col gap-1 ">
                     {Array(1)
                       .fill(0)
                       .map((_, index) => (
                         <div
                           key={index}
-                          className="animate-pulse flex flex-col gap-1 mr-36"
+                          className="animate-pulse flex flex-col gap-1 "
                         >
                           <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
 
@@ -557,7 +507,7 @@ const ChatPage = ({ params }) => {
                   </div>
                 ) : (
                   chatHistory.map((chat, index) => (
-                    <div key={index} className="flex flex-col gap-1 mr-36">
+                    <div key={index} className="flex flex-col gap-1">
                       <div className="flex flex-col overflow-y-auto max-h-[500px]">
                         <div className="flex justify-end w-full pr-36">
                           {editIndex !== index && (
@@ -566,18 +516,19 @@ const ChatPage = ({ params }) => {
                                 setEditIndex(index);
                                 setEditMessage(chat.userMessage);
                               }}
-                              className="text-black rounded-md text-sm mr-3"
+                              className="text-black rounded-md text-sm "
                             >
                               <Pencil size={15} />
                             </button>
                           )}
-
                           <div
                             className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${
                               editIndex === index
                                 ? "bg-gray-500 w-[70%]"
                                 : "bg-gray-600"
-                            }`}
+                                                            }`
+                          }
+                          style={{ right: "-93px" }}
                           >
                             {editIndex === index ? (
                               <div className="flex flex-col w-full">
@@ -597,7 +548,6 @@ const ChatPage = ({ params }) => {
                                   className="w-full bg-transparent text-white p-2 rounded-md outline-none "
                                   autoFocus
                                 />
-
                                 <div className="flex justify-end gap-2 mt-2">
                                   <button
                                     onClick={() => setEditIndex(null)}
@@ -605,7 +555,6 @@ const ChatPage = ({ params }) => {
                                   >
                                     Cancel
                                   </button>
-
                                   <button
                                     onClick={() => {
                                       handleSaveEdit(index);
@@ -626,7 +575,6 @@ const ChatPage = ({ params }) => {
                           </div>
                         </div>
                       </div>
-
                       {chatModel === "ImageGeneration" && chat.botResponse ? (
                         <div className="ml-36 self-start">
                           {loading && chat.userMessage === morePrompt ? (
@@ -643,7 +591,7 @@ const ChatPage = ({ params }) => {
                         </div>
                       ) : (
                         <div className="ml-36 self-start text-left text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
-                          {(chat.parsedResponse &&
+                           {(chat.parsedResponse &&
                           chat.parsedResponse.length > 0
                             ? chat.parsedResponse
                             : [{ type: "text", content: chat.botResponse }]
@@ -653,7 +601,6 @@ const ChatPage = ({ params }) => {
                                 <pre className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto relative">
                                   <code>{part.content}</code>
                                 </pre>
-
                                 <button
                                   onClick={() => handleCopy(part.content, i)}
                                   className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white p-1 rounded"
@@ -664,7 +611,6 @@ const ChatPage = ({ params }) => {
                                     <Clipboard size={16} />
                                   )}
                                 </button>
-
                                 {/* "Copied!" Message */}
                                 {copiedIndex === i && (
                                   <span className="absolute top-2 right-10 bg-gray-700 text-white px-2 py-1 text-xs rounded">
@@ -674,10 +620,7 @@ const ChatPage = ({ params }) => {
                               </div>
                             ) : (
                              <ReactMarkdown key={i}>{part.content}</ReactMarkdown>
-
-
-
-                            )
+                           )
                           )}
                         </div>
                       )}
@@ -693,9 +636,17 @@ const ChatPage = ({ params }) => {
                           <div className="w-8 h-8 border-4 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
                         </div>
                       ) : (
-                        <div className="self-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[5%] flex items-center gap-2">
-                          <span className="animate-pulse">...</span>
-                        </div>
+                        <div>
+                        <div className="self-start bg-gray-300 "
+     style={{ right: "33px" }}>
+  <span className="animate-pulse">{morePrompt}</span>
+</div>
+
+                           <div className="self-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[5%] flex items-center gap-2">
+                          
+                           <span className="animate-pulse">...</span>
+                         </div>
+                         </div>
                       )
                     ) : null}
                   </div>
@@ -714,7 +665,7 @@ const ChatPage = ({ params }) => {
 
                 <button
                   onClick={handleAddChat}
-                  className=" p-1 mr-2 rounded-full bg-white flex items-center justify-center"
+                  className=" p-1 rounded-full bg-white flex items-center justify-center"
                 >
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>

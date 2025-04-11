@@ -241,25 +241,37 @@ const page = ({ params }) => {
                           {Array(1)
                             .fill(0)
                             .map((_, index) => (
-                              <div
-                                key={index}
-                                className="animate-pulse flex flex-col gap-1 mr-36"
-                              >
-                                <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
-
-                                <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
+                              <div className="flex flex-col gap-2 p-4"
+                              key={index}>
+                              {/* User Message - Right Side */}
+                              <div className="flex justify-end">
+                                <div className="bg-gray-500 text-white w-fit max-w-[70%] px-4 py-2 rounded-lg text-left">
+                                  {msg}
+                                </div>
                               </div>
+                            
+                              {/* Bot Typing - Left Side */}
+                              <div className="flex justify-start">
+                                <div className="bg-gray-300 w-fit px-4 py-1 rounded-lg animate-pulse text-left">
+                                  <span className="text-gray-600 font-mono after:content-[''] after:animate-typing-dots inline-block">
+                                    typing
+                                  </span>
+                                </div>
+                              </div>
+                            
+                            </div>
+                            
                             ))}
                         </div>
                       </div>
 
-                      <div className="mb-5 ml-20 w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
+                      <div className="mb-5 ml-20 w-2/4 p-1 flex bg-white justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
                         <input
                           type="text"
                           value={prompt}
                           onChange={(e) => setPrompt(e.target.value)}
                           onKeyDown={handleKeyDown}
-                          placeholder="Send a message..."
+                          placeholder="Send a ..."
                           className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
                         />
 
@@ -423,15 +435,18 @@ const page = ({ params }) => {
                       ))}
                     </div>
 
-                    <div className="mb-5 w-full md:ml-20 md:w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2 rounded-l-full rounded-r-full">
-                      <input
-                        type="text"
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        placeholder="Send a message..."
-                        className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
-                      />
+                    <div className="mb-5 w-full md:ml-20 md:w-2/4 p-1 flex bg-white  border border-gray-400 h-20
+                     justify-between items-start fixed bottom-0 left-1/2 transform -translate-x-1/2 rounded-l-3xl rounded-r-3xl
+"
+>
+                 <textarea
+  value={prompt}
+  onChange={(e) => setPrompt(e.target.value)}
+  onKeyDown={handleKeyDown}
+  placeholder="Send a message..."
+  className="w-full min-h-[3rem]  p-2 rounded-lg resize-none  focus:outline-none text-black bg-white"
+/>
+
                       <button
                         onClick={handleResponse}
                         className="p-1 mr-2 rounded-full flex items-center justify-center bg-white"

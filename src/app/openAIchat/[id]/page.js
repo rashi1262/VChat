@@ -687,7 +687,7 @@ const ChatPage = ({ params }) => {
                 value={moreChat}
                 onChange={(e) => setMoreChat(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Send a message..."
+                placeholder="Send a messe..."
                 className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
               />
 

@@ -235,9 +235,9 @@ const page = ({ params }) => {
                                     className="animate-pulse flex flex-col gap-1 mr-36"
                                   >
                                     {/* User Message Skeleton */}
-                                    <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
+                                    <div className="self-end bg-gray-200  w-1/5 rounded-lg">{msg}</div>
                                     {/* Response Skeleton */}
-                                    <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
+                                    <div className="self-start   h-6 w-1/3 rounded-lg ml-36">typing.....</div>
                                   </div>
                                 ))}
                             </div>
