@@ -58,10 +58,24 @@ const page = ({ params }) => {
   };
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const hasLoggedIn = localStorage.getItem("hasLoggedIn") === "true";
-      setShowPopup(!hasLoggedIn);
-    }
+    const handleClick = (event) => {
+      const user = localStorage.getItem("user");
+
+      if (!user) {
+        const isSearchBox =
+          event.target.closest("#searchBox") || event.target.id === "searchBox";
+
+        if (isSearchBox || event.target) {
+          setShowPopup(true);
+        }
+      }
+    };
+
+    document.addEventListener("click", handleClick);
+
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
   }, []);
 
   const handleRedirect = (path) => {
