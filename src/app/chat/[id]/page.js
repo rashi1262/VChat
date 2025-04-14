@@ -67,7 +67,9 @@ const ChatPage = ({ params }) => {
   const [moreChat, setMoreChat] = useState("");
   const [chatModel, setChatModel] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
-
+  const [isVisible, setIsVisible] = useState(false);
+ 
+ 
   const [isloading, setisLoading] = useState(false);
   const chatContainerRef = useRef(null);
   const [imgLoading, setImgLoading] = useState(false);
@@ -78,6 +80,51 @@ const ChatPage = ({ params }) => {
   const [response, setResponse] = useState("");
   const [displayedResponse, setDisplayedResponse] = useState("");
   const [expandedIndexes, setExpandedIndexes] = useState([]);
+  const [image, setImage] = useState('');
+  const [fileName, setFileName] = useState('');
+  const textareaRef = useRef(null);
+ 
+  const controlHeight = (e) => {
+    setMoreChat(e.target.value);
+    const el = textareaRef.current;
+    if (el) {
+      el.style.height = 'auto';
+ 
+      const newHeight = Math.min(el.scrollHeight, 200);
+      el.style.height = `${newHeight}px`;
+ 
+      el.style.overflowY = el.scrollHeight > 200 ? 'auto' : 'hidden';
+    }
+  };
+ 
+  const handleplusicon =()=>{
+    setIsVisible(!isVisible);
+  }
+  useEffect(() => {
+    const storedImage = localStorage.getItem('image');
+    if (storedImage) {
+      setImage(storedImage);
+    }
+  }, []);
+ 
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        localStorage.setItem('image', reader.result);
+        setImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+ 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setFileName(file.name); // Save file name or handle the file accordingly
+    }
+  };
 
   const toggleExpand = (index) => {
     setExpandedIndexes((prev) =>
@@ -282,6 +329,11 @@ const ChatPage = ({ params }) => {
     setMorePrompt(moreChat);
     setMoreChat("");
     setLoading(true);
+    const el = textareaRef.current;
+    if (el) {
+      el.style.height = "40px";        
+      el.style.overflowY = "hidden";    
+    }
     try {
       console.log("Fetching existing chat for ID:", id);
       const response = await fetch(
@@ -366,12 +418,21 @@ const ChatPage = ({ params }) => {
     if (!id) return;
     fetchBotResponse();
   }, [id]);
+
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleAddChat();
+      setMoreChat("");
+ 
+      const el = textareaRef.current;
+      if (el) {
+        el.style.height = "40px";        
+        el.style.overflowY = "hidden";  
+      }
     }
   };
+
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTo({
@@ -468,7 +529,7 @@ const ChatPage = ({ params }) => {
                                 </div>
                               </div>
                             ) : (
-                              <span className="break-words w-full text-white">
+                              <span className="break-words bg-black text-white">
                                 {chat.userMessage}
                               </span>
                             )}
@@ -541,9 +602,7 @@ const ChatPage = ({ params }) => {
                           key={index}
                           className="animate-pulse flex flex-col gap-1 "
                         >
-                          <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
-
-                          <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
+                        
                         </div>
                       ))}
                   </div>
@@ -569,9 +628,7 @@ const ChatPage = ({ params }) => {
                                 ? "bg-gray-500"
                                 : "bg-gray-600"
                             }`}
-                            
-                            // style={{ right: "-10px" }}
-                          >
+>
                             {editIndex === index ? (
                               <div className="flex flex-col w-full">
                                 <input
@@ -691,13 +748,10 @@ const ChatPage = ({ params }) => {
                         </div>
                       ) : (
                         <div>
-                          <div className="self-start bg-gray-300 "
-                            style={{ right: "33px" }}>
-                            <span className="animate-pulse">{morePrompt}</span>
-                          </div>
+                     
 
                           <div className="self-start  bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[5%] flex items-center gap-2">
-                            <span className="animate-pulse">...</span>
+                            <span className="animate-pulse">typing...</span>
                           </div>
                         </div>
                       )
@@ -706,98 +760,114 @@ const ChatPage = ({ params }) => {
                 )}
               </div>
 
-              <div className="fixed bottom-4 ml-[75px] left-1/2 transform -translate-x-1/2 w-[750px] h-[65px] bg-white border border-gray-300 shadow-md rounded-full px-6 py-3 flex items-center space-x-4">
+              <div className="fixed bottom-1 ml-[75px] left-1/2 transform -translate-x-1/2 w-[750px] h-[65px] bg-white border border-gray-300 shadow-md rounded-full px-6 py-3 flex items-center space-x-4">
                 {/* Plus icon */}
-                <button className="text-gray-500 hover:text-black">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 4v16m8-8H4"
-                    />
-                  </svg>
-                </button>
+                <button
+    onClick={handleplusicon}
+    className="text-gray-500 hover:text-black"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      className="w-6 h-6"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M12 4v16m8-8H4"
+      />
+    </svg>
+  </button>
+  {isVisible && (
+    <div
+      id="plus"
+      className="bg-gray-500 text-white p-4 rounded-md shadow-lg mt-2 absolute z-10"
+      style={{ bottom: '50px', left: '0' }}
+    >
+      {/* IMAGE: show image from localStorage */}
+      <button
+        onClick={() =>
+          setImage(localStorage.getItem('image') || null)
+        }
+        className="flex items-center mb-2"
+      >
+        <img
+          src="../assets/images.png"
+          alt="icon"
+          style={{ width: '11px', height: '11px' }}
+        />
+        <span className="ml-2">image</span>
+      </button>
+      {/* FILE: trigger hidden file input */}
+      <button
+        onClick={() => document.getElementById('fileInput')?.click()}
+        className="flex items-center"
+      >
+        <img
+          src="../assets/images.png"
+          alt="icon"
+          style={{ width: '11px', height: '11px' }}
+        />
+        <span className="ml-2">files</span>
+      </button>
+      {/* Hidden file input */}
+      <input
+        type="file"
+        id="fileInput"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+    </div>
+  )}
+    {/* If image is set, show preview */}
+    {image && (
+    <div
+      id="plus"
+      className="bg-gray-500 text-white p-4 rounded-md shadow-lg mt-2 absolute z-10"
+      style={{ bottom: '50px', left: '0' }}
+    >
+      <img
+        src={image}
+        alt="Stored"
+        style={{ width: '50px', height: '50px' }}
+      />
+      <span className="block mt-2">image</span>
+ 
+      {fileName && <p className="mt-2">Selected file: {fileName}</p>}
+    </div>
+  )}
 
-                {/* Input */}
-                <input
-                  type="text"
-                  value={moreChat}
-                  onChange={(e) => setMoreChat(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Ask Gemini"
-                  className="flex-grow bg-transparent focus:outline-none text-black placeholder-gray-400 text-base"
-                />
+<textarea
+  ref={textareaRef}
+  value={moreChat}
+  onChange={controlHeight}
+  onKeyDown={handleKeyDown}
+  placeholder="Ask Gemini..."
+  rows={1}
+  className="flex-grow resize-none focus:outline-none text-base bg-transparent max-h-[200px] overflow-y-auto"
+  style={{ minHeight: '40px' }}
+/>
 
-                {/* Icons like 'Deep Research', 'Canvas' */}
-                <div className="flex items-center space-x-4 text-gray-500 text-sm">
-                  <div className="flex items-center gap-1 cursor-pointer hover:text-black">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="w-5 h-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M11 11V6a1 1 0 0 1 1-1h4M5 11h4M5 19h4M15 19h4M15 11h4"
-                      />
-                    </svg>
-                    Deep Research
-                  </div>
-
-                  <div className="flex items-center gap-1 cursor-pointer hover:text-black">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="w-5 h-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 17v-2h6v2m0-6h-6V7h6v4z"
-                      />
-                    </svg>
-                    Canvas
-                  </div>
-                </div>
 
                 <VoiceToText onResult={handleVoiceInput} />
 
-                <button
-                  onClick={handleAddChat}
-                  className="text-gray-500 hover:text-black"
-                >
-                  {loading ? (
-                    <div className="w-6 h-6 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                  ) : (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="currentColor"
-                      viewBox="0 0 18 18"
-                      className="w-6 h-6"
-                    >
-                      <path
-                        fill="currentColor"
-                        fillRule="evenodd"
-                        d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  )}
-                </button>
+                <button onClick={handleAddChat} className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-xl transition-all">
+      {loading ? (
+        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+      ) : (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18" className="w-5 h-5">
+          <path
+            fill="currentColor"
+            fillRule="evenodd"
+            d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
+            clipRule="evenodd"
+          />
+        </svg>
+      )}
+    </button>
               </div>
               
             </div>
