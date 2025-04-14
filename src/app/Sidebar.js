@@ -20,6 +20,7 @@ export default function Sidebar() {
     await signOut({ redirect: false });
 
     localStorage.removeItem("user");
+    localStorage.removeItem("remainingCredits");
     localStorage.setItem("hasLoggedIn", false);
     router.push("/model");
   };
