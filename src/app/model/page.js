@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation";
 import { useChat } from ".././chatContext";
 import { toast, Toaster } from "sonner";
 import { useCredits } from "@/context/creditContext";
-import ReactMarkdown from 'react-markdown'
+import ReactMarkdown from "react-markdown";
+import VoiceToText from "@/components/VoiceToText";
 
 import Navbar from "../navbar";
 import { ChevronDown } from "lucide-react";
@@ -52,6 +53,10 @@ const page = ({ params }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [creditPopup, setShowCreditPopup] = useState(false);
 
+  const handleVoiceInput = (voiceText) => {
+    setPrompt((prevPrompt) => prevPrompt + " " + voiceText);
+  };
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const hasLoggedIn = localStorage.getItem("hasLoggedIn") === "true";
@@ -81,7 +86,7 @@ const page = ({ params }) => {
           setUserId(user?.id);
         }
       } catch (error) {
-       
+
       }
     }
   }, []);
@@ -100,7 +105,7 @@ const page = ({ params }) => {
         }
 
         const data = await response.json();
-       localStorage.setItem("remainingCredits", JSON.stringify(data.credits));
+        localStorage.setItem("remainingCredits", JSON.stringify(data.credits));
 
         setChatThread(
           Array.isArray(data?.chatMessages)
@@ -111,7 +116,7 @@ const page = ({ params }) => {
             : []
         );
       } catch (error) {
-      
+
         setChatThread([]);
       }
     };
@@ -241,26 +246,28 @@ const page = ({ params }) => {
                           {Array(1)
                             .fill(0)
                             .map((_, index) => (
-                              <div className="flex flex-col gap-2 p-4"
-                              key={index}>
-                              {/* User Message - Right Side */}
-                              <div className="flex justify-end">
-                                <div className="bg-gray-500 text-white w-fit max-w-[70%] px-4 py-2 rounded-lg text-left">
-                                  {msg}
+                              <div
+                                className="flex flex-col gap-2 p-4"
+                                key={index}
+                              >
+                                {/* User Message - Right Side */}
+                                <div className="flex justify-end">
+                                  <div className="bg-gray-500 text-white w-fit max-w-[70%] px-4 py-2 rounded-lg text-left">
+                                    {msg}
+                                  </div>
                                 </div>
-                              </div>
-                            
-                              {/* Bot Typing - Left Side */}
-                              <div className="flex justify-start">
-                                <div className="bg-gray-300 w-fit px-4 py-1 rounded-lg animate-pulse text-left">
-                                  <span className="text-gray-600 font-mono after:content-[''] after:animate-typing-dots inline-block">
-                                    typing
-                                  </span>
+
+                                {/* Bot Typing - Left Side */}
+                                <div className="flex justify-start">
+                                  <div className="bg-gray-300 w-fit px-4 py-1 rounded-lg animate-pulse text-left">
+                                    <span className="text-gray-600 font-mono after:content-[''] after:animate-typing-dots inline-block">
+                                      typing
+                                    </span>
+                                  </div>
                                 </div>
+
                               </div>
-                            
-                            </div>
-                            
+
                             ))}
                         </div>
                       </div>
@@ -317,7 +324,7 @@ const page = ({ params }) => {
                       Gemini <ChevronDown />
                     </button>
 
-                
+
 
                     {showButtons && (
                       <div className="flex flex-col  items-center justify-center  ">
@@ -406,7 +413,7 @@ const page = ({ params }) => {
                                 </svg>
                               </div>
                               <div className="ml-1 text-white mt-[2%]">
-                              Gemini
+                                Gemini
                               </div>
                             </Link>
                           </li>
@@ -438,15 +445,15 @@ const page = ({ params }) => {
                     <div className="mb-5 w-full md:ml-20 md:w-2/4 p-1 flex bg-white  border border-gray-400 h-20
                      justify-between items-start fixed bottom-0 left-1/2 transform -translate-x-1/2 rounded-l-3xl rounded-r-3xl
 "
->
-                 <textarea
-  value={prompt}
-  onChange={(e) => setPrompt(e.target.value)}
-  onKeyDown={handleKeyDown}
-  placeholder="Send a message..."
-  className="w-full min-h-[3rem]  p-2 rounded-lg resize-none  focus:outline-none text-black bg-white"
-/>
-
+                    >
+                      <textarea
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Send a message..."
+                        className="w-full min-h-[3rem]  p-2 rounded-lg resize-none  focus:outline-none text-black bg-white"
+                      />
+                      <VoiceToText onResult={handleVoiceInput} />
                       <button
                         onClick={handleResponse}
                         className="p-1 mr-2 rounded-full flex items-center justify-center bg-white"

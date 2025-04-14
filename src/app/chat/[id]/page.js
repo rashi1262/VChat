@@ -9,6 +9,7 @@ import { Check, Clipboard } from "lucide-react";
 import { useCredits } from "@/context/creditContext";
 import InsufficientBalance from "@/components/InsufficientBalance";
 import ReactMarkdown from "react-markdown";
+import VoiceToText from "@/components/VoiceToText";
 
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -74,10 +75,12 @@ const ChatPage = ({ params }) => {
   const [editMessage, setEditMessage] = useState("");
   const [generatedImage, setGeneratedImage] = useState([]);
   const [copiedIndex, setCopiedIndex] = useState(null);
-  const [response, setResponse] = useState(''); // Full response
-  const [displayedResponse, setDisplayedResponse] = useState(''); // Displayed response (word by word)
+  const [response, setResponse] = useState("");
+  const [displayedResponse, setDisplayedResponse] = useState("");
 
-
+  const handleVoiceInput = (voiceText) => {
+    setMoreChat((prevPrompt) => prevPrompt + " " + voiceText);
+  };
 
   const handleCopy = async (text, index) => {
     try {
@@ -126,11 +129,11 @@ const ChatPage = ({ params }) => {
         prevChats.map((chat, i) =>
           i === index
             ? {
-              ...chat,
-              userMessage: editMessage,
-              botResponse: newBotResponse,
-              parsedResponse: newParsedResponse,
-            }
+                ...chat,
+                userMessage: editMessage,
+                botResponse: newBotResponse,
+                parsedResponse: newParsedResponse,
+              }
             : chat
         )
       );
@@ -416,10 +419,10 @@ const ChatPage = ({ params }) => {
                             </button>
                           )}
                           <div
-                            className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${editIndex === index
-                              ? "bg-gray-500 w-[70%]"
-                              : "bg-gray-600"
-                              }`}
+                           className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${editIndex === index
+                                ? "bg-gray-500 w-[70%]"
+                                : "bg-gray-600"
+                            }`}
                           >
                             {editIndex === index ? (
                               <div className="flex flex-col w-full">
@@ -556,10 +559,10 @@ const ChatPage = ({ params }) => {
                           )}
                           <div
                             className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${editIndex === index
-                              ? "bg-gray-500 w-[70%]"
-                              : "bg-gray-600"
-                              }`
-                            }
+                                ? "bg-gray-500 w-[70%]"
+                                : "bg-gray-600"
+                            }`
+                          }
                             style={{ right: "-10px" }}
                           >
                             {editIndex === index ? (
@@ -674,8 +677,19 @@ const ChatPage = ({ params }) => {
               <div className="fixed bottom-4 ml-[75px] left-1/2 transform -translate-x-1/2 w-[750px] h-[65px] bg-white border border-gray-300 shadow-md rounded-full px-6 py-3 flex items-center space-x-4">
                 {/* Plus icon */}
                 <button className="text-gray-500 hover:text-black">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
                   </svg>
                 </button>
 
@@ -688,27 +702,53 @@ const ChatPage = ({ params }) => {
                   placeholder="Ask Gemini"
                   className="flex-grow bg-transparent focus:outline-none text-black placeholder-gray-400 text-base"
                 />
-                
+
 
                 {/* Icons like 'Deep Research', 'Canvas' */}
                 <div className="flex items-center space-x-4 text-gray-500 text-sm">
                   <div className="flex items-center gap-1 cursor-pointer hover:text-black">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 11V6a1 1 0 0 1 1-1h4M5 11h4M5 19h4M15 19h4M15 11h4" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 11V6a1 1 0 0 1 1-1h4M5 11h4M5 19h4M15 19h4M15 11h4"
+                      />
                     </svg>
                     Deep Research
                   </div>
 
                   <div className="flex items-center gap-1 cursor-pointer hover:text-black">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2h6v2m0-6h-6V7h6v4z" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 17v-2h6v2m0-6h-6V7h6v4z"
+                      />
                     </svg>
                     Canvas
                   </div>
                 </div>
 
-                {/* Send / loading */}
-                <button onClick={handleAddChat} className="text-gray-500 hover:text-black">
+                <VoiceToText onResult={handleVoiceInput} />
+
+                <button
+                  onClick={handleAddChat}
+                  className="text-gray-500 hover:text-black"
+                >
                   {loading ? (
                     <div className="w-6 h-6 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                   ) : (
