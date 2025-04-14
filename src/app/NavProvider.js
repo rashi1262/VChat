@@ -22,7 +22,7 @@ export const NavProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    syncNavState();
+    // syncNavState();
     window.addEventListener("storage", syncNavState);
     return () => {
       window.removeEventListener("storage", syncNavState);

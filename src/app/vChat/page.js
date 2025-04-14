@@ -9,6 +9,7 @@ import Image from "next/image";
 import Navbar from "../navbar";
 import Header from "../header";
 import { ChevronDown } from "lucide-react";
+import VoiceToText from "@/components/VoiceToText";
 import { toast, Toaster } from "sonner";
 
 import { useCredits } from "@/context/creditContext";
@@ -32,6 +33,10 @@ const page = ({ params }) => {
 
   const [messages, setMessages] = useState([]);
 
+  const handleVoiceInput = (voiceText) => {
+    setPrompt((prevPrompt) => prevPrompt + " " + voiceText);
+  };
+
   const router = useRouter();
   const [showButtons, setShowButtons] = useState(false);
   useEffect(() => {
@@ -48,7 +53,7 @@ const page = ({ params }) => {
           setUserId(user?.id);
         }
       } catch (error) {
-      
+
       }
     }
   }, []);
@@ -67,7 +72,7 @@ const page = ({ params }) => {
         }
 
         const data = await response.json();
-   
+
         localStorage.setItem("remainingCredits", JSON.stringify(data.credits));
 
         setChatThread(
@@ -79,7 +84,7 @@ const page = ({ params }) => {
             : []
         );
       } catch (error) {
-      
+        
         setChatThread([]);
       }
     };
@@ -126,13 +131,13 @@ const page = ({ params }) => {
         toast.error("Insufficient credits");
         setMsg(null);
         setLoading(false);
-        return; 
+        return;
       }
       if (!geminiRes.ok || !openAIRes.ok)
         throw new Error("Error fetching bot response");
 
-      const geminiData = await geminiRes.json(); 
-      const openAIData = await openAIRes.json(); 
+      const geminiData = await geminiRes.json();
+      const openAIData = await openAIRes.json();
 
       setResponses([
         { text: geminiData.botResponse, type: "Gemini" },
@@ -148,8 +153,6 @@ const page = ({ params }) => {
 
   const chooseResponse = async (chosenResponse, modelType) => {
     try {
-  
-
       const createChatRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/create`,
 
@@ -235,9 +238,13 @@ const page = ({ params }) => {
                                     className="animate-pulse flex flex-col gap-1 mr-36"
                                   >
                                     {/* User Message Skeleton */}
-                                    <div className="self-end bg-gray-200  w-1/5 rounded-lg">{msg}</div>
+                                    <div className="self-end bg-gray-200  w-1/5 rounded-lg">
+                                      {msg}
+                                    </div>
                                     {/* Response Skeleton */}
-                                    <div className="self-start   h-6 w-1/3 rounded-lg ml-36">typing.....</div>
+                                    <div className="self-start   h-6 w-1/3 rounded-lg ml-36">
+                                      typing.....
+                                    </div>
                                   </div>
                                 ))}
                             </div>
@@ -438,8 +445,6 @@ const page = ({ params }) => {
                     </div>
 
                     <div className="mb-5 w-full md:ml-20 md:w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2 rounded-l-full rounded-r-full">
-                     
-
                       <input
                         type="text"
                         value={prompt}
@@ -449,30 +454,34 @@ const page = ({ params }) => {
                         className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
                       />
 
-                      <button
-                        onClick={handleResponse}
-                        className="p-1 mr-2 rounded-full  flex items-center justify-center bg-white"
-                      >
-                        {loading ? (
-                          <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                        ) : (
-                          <div className="w-7 h-6 p-1">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 18 18"
-                              className="text-gray-400 CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
-                            >
-                              <path
-                                fill="currentColor"
-                                fillRule="evenodd"
-                                d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
-                                clipRule="evenodd"
-                              ></path>
-                            </svg>
-                          </div>
-                        )}
-                      </button>
+                      <div className="flex items-center space-x-2 mr-2">
+                        <VoiceToText onResult={handleVoiceInput} />
+
+                        <button
+                          onClick={handleResponse}
+                          className="p-1 rounded-full flex items-center justify-center bg-white"
+                        >
+                          {loading ? (
+                            <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                          ) : (
+                            <div className="w-7 h-6 p-1">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 18 18"
+                                className="text-gray-400 CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+                              >
+                                <path
+                                  fill="currentColor"
+                                  fillRule="evenodd"
+                                  d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
+                                  clipRule="evenodd"
+                                ></path>
+                              </svg>
+                            </div>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -9,6 +9,7 @@ import { Check, Clipboard } from "lucide-react";
 import { useCredits } from "@/context/creditContext";
 import InsufficientBalance from "@/components/InsufficientBalance";
 import ReactMarkdown from "react-markdown";
+import VoiceToText from "@/components/VoiceToText";
 
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -74,14 +75,17 @@ const ChatPage = ({ params }) => {
   const [editMessage, setEditMessage] = useState("");
   const [generatedImage, setGeneratedImage] = useState([]);
   const [copiedIndex, setCopiedIndex] = useState(null);
-  const [response, setResponse] = useState(''); // Full response
-  const [displayedResponse, setDisplayedResponse] = useState(''); // Displayed response (word by word)
+  const [response, setResponse] = useState("");
+  const [displayedResponse, setDisplayedResponse] = useState("");
   const [expandedIndexes, setExpandedIndexes] = useState([]);
 
   const toggleExpand = (index) => {
     setExpandedIndexes((prev) =>
       prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
     );
+  }   
+  const handleVoiceInput = (voiceText) => {
+    setMoreChat((prevPrompt) => prevPrompt + " " + voiceText);
   };
 
   const handleCopy = async (text, index) => {
@@ -770,8 +774,12 @@ const ChatPage = ({ params }) => {
                   </div>
                 </div>
 
-                {/* Send / loading */}
-                <button onClick={handleAddChat} className="text-gray-500 hover:text-black">
+                <VoiceToText onResult={handleVoiceInput} />
+
+                <button
+                  onClick={handleAddChat}
+                  className="text-gray-500 hover:text-black"
+                >
                   {loading ? (
                     <div className="w-6 h-6 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                   ) : (
