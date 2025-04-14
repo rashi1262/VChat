@@ -11,7 +11,7 @@ import ReactMarkdown from "react-markdown";
 import VoiceToText from "@/components/VoiceToText";
 
 import Navbar from "../navbar";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import InsufficientBalance from "@/components/InsufficientBalance";
 
 export const cards = [
