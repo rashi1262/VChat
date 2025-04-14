@@ -10,6 +10,45 @@ import { useCredits } from "@/context/creditContext";
 import InsufficientBalance from "@/components/InsufficientBalance";
 import ReactMarkdown from "react-markdown";
 
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
+
+import hljs from 'highlight.js';
+
+const CodeBlock = ({ code, language = "text", onCopy, copied }) => {
+  // Auto-detect the language if not provided
+  const detectedLanguage = language === "text" ? hljs.highlightAuto(code).language : language;
+
+  return (
+    <div className="relative mt-4 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+      <div className="flex justify-between items-center bg-[#f0f2f5] px-4 py-2 text-sm font-medium text-gray-600">
+        <span>{detectedLanguage?.toUpperCase()}</span>
+        <button
+          onClick={onCopy}
+          className="text-xs bg-white px-2 py-1 rounded-md border hover:bg-gray-100"
+        >
+          {copied ? "Copied!" : "Copy"}
+        </button>
+      </div>
+
+      <SyntaxHighlighter
+        language={detectedLanguage}
+        style={oneLight}
+        showLineNumbers
+        wrapLines={true}
+        customStyle={{
+          margin: 0,
+          padding: "1rem",
+          backgroundColor: "#f6f8fa",
+          fontSize: "14px",
+        }}
+      >
+        {code}
+      </SyntaxHighlighter>
+    </div>
+  );
+};
+
 
 const ChatPage = ({ params }) => {
   const { hasCredits, setHasCredits } = useCredits();
@@ -34,11 +73,10 @@ const ChatPage = ({ params }) => {
   const [editIndex, setEditIndex] = useState(null);
   const [editMessage, setEditMessage] = useState("");
   const [generatedImage, setGeneratedImage] = useState([]);
-  console.log(chatHistory, "chatHistorychatHistory");
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [response, setResponse] = useState(''); // Full response
   const [displayedResponse, setDisplayedResponse] = useState(''); // Displayed response (word by word)
-  
+
 
 
   const handleCopy = async (text, index) => {
@@ -60,8 +98,7 @@ const ChatPage = ({ params }) => {
       if (chatModel === "ImageGeneration") {
         console.log("Generating updated image for prompt:", editMessage);
         const imageRes = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_BASE_URL
+          `${process.env.NEXT_PUBLIC_BASE_URL
           }/chatbot/generate-image?userId=${encodeURIComponent(
             userId
           )}&prompt=${encodeURIComponent(editMessage)}`
@@ -73,8 +110,7 @@ const ChatPage = ({ params }) => {
       } else {
         console.log("Fetching updated bot response for:", editMessage);
         const response = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_BASE_URL
+          `${process.env.NEXT_PUBLIC_BASE_URL
           }/chatbot/search?userId=${encodeURIComponent(
             userId
           )}&message=${encodeURIComponent(editMessage)}`
@@ -90,11 +126,11 @@ const ChatPage = ({ params }) => {
         prevChats.map((chat, i) =>
           i === index
             ? {
-                ...chat,
-                userMessage: editMessage,
-                botResponse: newBotResponse,
-                parsedResponse: newParsedResponse,
-              }
+              ...chat,
+              userMessage: editMessage,
+              botResponse: newBotResponse,
+              parsedResponse: newParsedResponse,
+            }
             : chat
         )
       );
@@ -251,8 +287,7 @@ const ChatPage = ({ params }) => {
       if (chatModel === "ImageGeneration") {
         console.log("Generating image for prompt:", moreChat);
         const imageRes = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_BASE_URL
+          `${process.env.NEXT_PUBLIC_BASE_URL
           }/chatbot/generate-image?userId=${encodeURIComponent(
             userId
           )}&prompt=${encodeURIComponent(moreChat)}`
@@ -269,8 +304,7 @@ const ChatPage = ({ params }) => {
         setImgLoading(false);
       } else {
         const searchRes = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_BASE_URL
+          `${process.env.NEXT_PUBLIC_BASE_URL
           }/chatbot/search?userId=${encodeURIComponent(
             userId
           )}&message=${encodeURIComponent(moreChat)}`
@@ -382,11 +416,10 @@ const ChatPage = ({ params }) => {
                             </button>
                           )}
                           <div
-                            className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${
-                              editIndex === index
-                                ? "bg-gray-500 w-[70%]"
-                                : "bg-gray-600"
-                            }`}
+                            className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${editIndex === index
+                              ? "bg-gray-500 w-[70%]"
+                              : "bg-gray-600"
+                              }`}
                           >
                             {editIndex === index ? (
                               <div className="flex flex-col w-full">
@@ -413,7 +446,7 @@ const ChatPage = ({ params }) => {
                                   >
                                     Cancel
                                   </button>
-                              <button
+                                  <button
                                     onClick={() => {
                                       handleSaveEdit(index);
                                       handleAddChat();
@@ -427,13 +460,13 @@ const ChatPage = ({ params }) => {
                               </div>
                             ) : (
                               <span className="break-words w-full text-white">
-                                {chat.userMessage }
+                                {chat.userMessage}
                               </span>
                             )}
                           </div>
                         </div>
                       </div>
-                      
+
                     </div>
                   ))
                 )}
@@ -507,9 +540,9 @@ const ChatPage = ({ params }) => {
                   </div>
                 ) : (
                   chatHistory.map((chat, index) => (
-                    <div key={index} className="flex flex-col gap-1">
+                    <div key={index} className="flex flex-col ">
                       <div className="flex flex-col overflow-y-auto max-h-[500px]">
-                        <div className="flex justify-end w-full pr-36">
+                        <div className="flex ml-[850px]">
                           {editIndex !== index && (
                             <button
                               onClick={() => {
@@ -522,13 +555,12 @@ const ChatPage = ({ params }) => {
                             </button>
                           )}
                           <div
-                            className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${
-                              editIndex === index
-                                ? "bg-gray-500 w-[70%]"
-                                : "bg-gray-600"
-                                                            }`
-                          }
-                          style={{ right: "-93px" }}
+                            className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${editIndex === index
+                              ? "bg-gray-500 w-[70%]"
+                              : "bg-gray-600"
+                              }`
+                            }
+                            style={{ right: "-10px" }}
                           >
                             {editIndex === index ? (
                               <div className="flex flex-col w-full">
@@ -568,7 +600,7 @@ const ChatPage = ({ params }) => {
                                 </div>
                               </div>
                             ) : (
-                              <span className="break-words w-full  text-white">
+                              <span className="break-words  text-white">
                                 {chat.userMessage}
                               </span>
                             )}
@@ -591,38 +623,24 @@ const ChatPage = ({ params }) => {
                         </div>
                       ) : (
                         <div className="ml-36 self-start text-left text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
-                           {(chat.parsedResponse &&
-                          chat.parsedResponse.length > 0
+                          {(chat.parsedResponse && chat.parsedResponse.length > 0
                             ? chat.parsedResponse
                             : [{ type: "text", content: chat.botResponse }]
                           ).map((part, i) =>
                             part.type === "code" ? (
-                              <div key={i} className="relative">
-                                <pre className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto relative">
-                                  <code>{part.content}</code>
-                                </pre>
-                                <button
-                                  onClick={() => handleCopy(part.content, i)}
-                                  className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white p-1 rounded"
-                                >
-                                  {copiedIndex === i ? (
-                                    <Check size={16} />
-                                  ) : (
-                                    <Clipboard size={16} />
-                                  )}
-                                </button>
-                                {/* "Copied!" Message */}
-                                {copiedIndex === i && (
-                                  <span className="absolute top-2 right-10 bg-gray-700 text-white px-2 py-1 text-xs rounded">
-                                    Copied!
-                                  </span>
-                                )}
-                              </div>
+                              <CodeBlock
+                                key={i}
+                                code={part.content}
+                                language={part.language || "text"} // You can default to "text" or auto-detect
+                                copied={copiedIndex === i}
+                                onCopy={() => handleCopy(part.content, i)}
+                              />
                             ) : (
-                             <ReactMarkdown key={i}>{part.content}</ReactMarkdown>
-                           )
+                              <ReactMarkdown key={i}>{part.content}</ReactMarkdown>
+                            )
                           )}
                         </div>
+
                       )}
                     </div>
                   ))
@@ -637,57 +655,79 @@ const ChatPage = ({ params }) => {
                         </div>
                       ) : (
                         <div>
-                        <div className="self-start bg-gray-300 "
-     style={{ right: "33px" }}>
-  <span className="animate-pulse">{morePrompt}</span>
-</div>
+                          <div className="self-start bg-gray-300 "
+                            style={{ right: "33px" }}>
+                            <span className="animate-pulse">{morePrompt}</span>
+                          </div>
 
-                           <div className="self-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[5%] flex items-center gap-2">
-                          
-                           <span className="animate-pulse">...</span>
-                         </div>
-                         </div>
+                          <div className="self-start  bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[5%] flex items-center gap-2">
+
+                            <span className="animate-pulse">...</span>
+                          </div>
+                        </div>
                       )
                     ) : null}
                   </div>
                 )}
               </div>
 
-              <div className="mb-5 ml-20 w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
+              <div className="fixed bottom-4 ml-[75px] left-1/2 transform -translate-x-1/2 w-[750px] h-[65px] bg-white border border-gray-300 shadow-md rounded-full px-6 py-3 flex items-center space-x-4">
+                {/* Plus icon */}
+                <button className="text-gray-500 hover:text-black">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+
+                {/* Input */}
                 <input
                   type="text"
                   value={moreChat}
                   onChange={(e) => setMoreChat(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Send a message..."
-                  className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
+                  placeholder="Ask Gemini"
+                  className="flex-grow bg-transparent focus:outline-none text-black placeholder-gray-400 text-base"
                 />
 
-                <button
-                  onClick={handleAddChat}
-                  className=" p-1 rounded-full bg-white flex items-center justify-center"
-                >
+                {/* Icons like 'Deep Research', 'Canvas' */}
+                <div className="flex items-center space-x-4 text-gray-500 text-sm">
+                  <div className="flex items-center gap-1 cursor-pointer hover:text-black">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 11V6a1 1 0 0 1 1-1h4M5 11h4M5 19h4M15 19h4M15 11h4" />
+                    </svg>
+                    Deep Research
+                  </div>
+
+                  <div className="flex items-center gap-1 cursor-pointer hover:text-black">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2h6v2m0-6h-6V7h6v4z" />
+                    </svg>
+                    Canvas
+                  </div>
+                </div>
+
+                {/* Send / loading */}
+                <button onClick={handleAddChat} className="text-gray-500 hover:text-black">
                   {loading ? (
-                    <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-6 h-6 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                   ) : (
-                    <div className="w-7 h-6 p-1">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 18 18"
-                        className="text-gray-400 CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
-                      >
-                        <path
-                          fill="currentColor"
-                          fillRule="evenodd"
-                          d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
-                          clipRule="evenodd"
-                        ></path>
-                      </svg>
-                    </div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 18 18"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        fill="currentColor"
+                        fillRule="evenodd"
+                        d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
+                        clipRule="evenodd"
+                      />
+                    </svg>
                   )}
                 </button>
               </div>
+
             </div>
           </div>
         </div>
