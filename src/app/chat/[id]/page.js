@@ -688,6 +688,7 @@ const ChatPage = ({ params }) => {
                   placeholder="Ask Gemini"
                   className="flex-grow bg-transparent focus:outline-none text-black placeholder-gray-400 text-base"
                 />
+                
 
                 {/* Icons like 'Deep Research', 'Canvas' */}
                 <div className="flex items-center space-x-4 text-gray-500 text-sm">
