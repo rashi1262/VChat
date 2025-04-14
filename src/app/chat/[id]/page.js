@@ -4,7 +4,7 @@ import Link from "next/link";
 import Navbar from "../../navbar";
 import { useChat } from "../../chatContext";
 import { useRouter } from "next/navigation";
-import { Edit, Pencil } from "lucide-react";
+import { ChevronDown, ChevronUp, Edit, Pencil } from "lucide-react";
 import { Check, Clipboard } from "lucide-react";
 import { useCredits } from "@/context/creditContext";
 import InsufficientBalance from "@/components/InsufficientBalance";
@@ -76,8 +76,13 @@ const ChatPage = ({ params }) => {
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [response, setResponse] = useState(''); // Full response
   const [displayedResponse, setDisplayedResponse] = useState(''); // Displayed response (word by word)
+  const [expandedIndexes, setExpandedIndexes] = useState([]);
 
-
+  const toggleExpand = (index) => {
+    setExpandedIndexes((prev) =>
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+    );
+  };
 
   const handleCopy = async (text, index) => {
     try {
@@ -126,11 +131,11 @@ const ChatPage = ({ params }) => {
         prevChats.map((chat, i) =>
           i === index
             ? {
-              ...chat,
-              userMessage: editMessage,
-              botResponse: newBotResponse,
-              parsedResponse: newParsedResponse,
-            }
+                ...chat,
+                userMessage: editMessage,
+                botResponse: newBotResponse,
+                parsedResponse: newParsedResponse,
+              }
             : chat
         )
       );
@@ -416,10 +421,10 @@ const ChatPage = ({ params }) => {
                             </button>
                           )}
                           <div
-                            className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${editIndex === index
-                              ? "bg-gray-500 w-[70%]"
-                              : "bg-gray-600"
-                              }`}
+                            className={`relative mt-2 px-3 py-2  max-w-[70%] flex flex-col rounded-[24px_4px_24px_24px]  gap-2 transition-all duration-200 ${editIndex === index
+                                ? "bg-gray-500 w-[70%]"
+                                : "bg-gray-600"
+                            }`}
                           >
                             {editIndex === index ? (
                               <div className="flex flex-col w-full">
@@ -466,7 +471,7 @@ const ChatPage = ({ params }) => {
                           </div>
                         </div>
                       </div>
-
+                      
                     </div>
                   ))
                 )}
@@ -519,7 +524,7 @@ const ChatPage = ({ params }) => {
           </div>
           <div className="min-h-screen md:block relative bg-gray-50  flex-col items-center justify-center  w-[80%] hidden">
             <div
-              className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  "
+              className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-start  mt-20  "
               ref={chatContainerRef}
             >
               <div className="flex flex-col sticky  h-full w-full ">
@@ -542,7 +547,7 @@ const ChatPage = ({ params }) => {
                   chatHistory.map((chat, index) => (
                     <div key={index} className="flex flex-col ">
                       <div className="flex flex-col overflow-y-auto max-h-[500px]">
-                        <div className="flex ml-[850px]">
+                        <div className="flex justify-end">
                           {editIndex !== index && (
                             <button
                               onClick={() => {
@@ -555,12 +560,13 @@ const ChatPage = ({ params }) => {
                             </button>
                           )}
                           <div
-                            className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${editIndex === index
-                              ? "bg-gray-500 w-[70%]"
-                              : "bg-gray-600"
-                              }`
-                            }
-                            style={{ right: "-10px" }}
+                            className={`relative  px-3 py-2 text-lg flex flex-col rounded-[24px_4px_24px_24px] w-fit break-words gap-2 transition-all duration-200 ${
+                              editIndex === index
+                                ? "bg-gray-500"
+                                : "bg-gray-600"
+                            }`}
+                            
+                            // style={{ right: "-10px" }}
                           >
                             {editIndex === index ? (
                               <div className="flex flex-col w-full">
@@ -600,9 +606,34 @@ const ChatPage = ({ params }) => {
                                 </div>
                               </div>
                             ) : (
-                              <span className="break-words  text-white">
-                                {chat.userMessage}
-                              </span>
+                              <div className="flex justify-end">
+                                <div className="max-w-96  w-fit text-white break-words relative">
+                                  <span
+                                    className={`${
+                                      !expandedIndexes.includes(index)
+                                        ? "line-clamp-3"
+                                        : ""
+                                    } `}
+                                  >
+                                    <div className="mr-3">
+                                    {chat.userMessage}
+                                    </div>          
+                                  </span>
+
+                                  {chat.userMessage.length > 100 && (
+                                    <button
+                                      onClick={() => toggleExpand(index)}
+                                      className="text-blue-300 text-sm absolute right-0  top-0"
+                                    >
+                                      {expandedIndexes.includes(index) ? (
+                                        <ChevronUp />
+                                      ) : (
+                                        <ChevronDown />
+                                      )}
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
                             )}
                           </div>
                         </div>
@@ -622,8 +653,9 @@ const ChatPage = ({ params }) => {
                           )}
                         </div>
                       ) : (
-                        <div className="ml-36 self-start text-left text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
-                          {(chat.parsedResponse && chat.parsedResponse.length > 0
+                        <div className="ml-36  self-start text-left text-lg text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
+                          {(chat.parsedResponse &&
+                          chat.parsedResponse.length > 0
                             ? chat.parsedResponse
                             : [{ type: "text", content: chat.botResponse }]
                           ).map((part, i) =>
@@ -661,7 +693,6 @@ const ChatPage = ({ params }) => {
                           </div>
 
                           <div className="self-start  bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[5%] flex items-center gap-2">
-
                             <span className="animate-pulse">...</span>
                           </div>
                         </div>
@@ -674,8 +705,19 @@ const ChatPage = ({ params }) => {
               <div className="fixed bottom-4 ml-[75px] left-1/2 transform -translate-x-1/2 w-[750px] h-[65px] bg-white border border-gray-300 shadow-md rounded-full px-6 py-3 flex items-center space-x-4">
                 {/* Plus icon */}
                 <button className="text-gray-500 hover:text-black">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
                   </svg>
                 </button>
 
@@ -688,20 +730,41 @@ const ChatPage = ({ params }) => {
                   placeholder="Ask Gemini"
                   className="flex-grow bg-transparent focus:outline-none text-black placeholder-gray-400 text-base"
                 />
-                
 
                 {/* Icons like 'Deep Research', 'Canvas' */}
                 <div className="flex items-center space-x-4 text-gray-500 text-sm">
                   <div className="flex items-center gap-1 cursor-pointer hover:text-black">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 11V6a1 1 0 0 1 1-1h4M5 11h4M5 19h4M15 19h4M15 11h4" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 11V6a1 1 0 0 1 1-1h4M5 11h4M5 19h4M15 19h4M15 11h4"
+                      />
                     </svg>
                     Deep Research
                   </div>
 
                   <div className="flex items-center gap-1 cursor-pointer hover:text-black">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2h6v2m0-6h-6V7h6v4z" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 17v-2h6v2m0-6h-6V7h6v4z"
+                      />
                     </svg>
                     Canvas
                   </div>
@@ -728,7 +791,7 @@ const ChatPage = ({ params }) => {
                   )}
                 </button>
               </div>
-
+              
             </div>
           </div>
         </div>

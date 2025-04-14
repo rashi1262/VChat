@@ -51,6 +51,7 @@ const page = ({ params }) => {
   const [showButtons, setShowButtons] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [creditPopup, setShowCreditPopup] = useState(false);
+  const [expandedIndexes, setExpandedIndexes] = useState([]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -58,6 +59,12 @@ const page = ({ params }) => {
       setShowPopup(!hasLoggedIn);
     }
   }, []);
+
+  const toggleExpand = (index) => {
+    setExpandedIndexes((prev) =>
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+    );
+  };
 
   const handleRedirect = (path) => {
     localStorage.setItem("showPopup", "false");
@@ -245,15 +252,32 @@ const page = ({ params }) => {
                               key={index}>
                               {/* User Message - Right Side */}
                               <div className="flex justify-end">
-                                <div className="bg-gray-500 text-white w-fit max-w-[70%] px-4 py-2 rounded-lg text-left">
-                                  {msg}
-                                </div>
-                              </div>
+                            <div
+                              className={`text-white w-fit bg-gray-500 rounded-[24px_4px_24px_24px] max-w-[444px] px-4 py-2 text-center text-lg relative ${
+                                !expandedIndexes.includes(index) ? "line-clamp-3" : ""
+                              } mr-3`}
+                            >
+                              {msg}
+
+                              {msg.length > 100 && ( 
+                                <button
+                                  onClick={() => toggleExpand(index)}
+                                  className="text-blue-300 text-sm absolute right-0 top-0"
+                                >
+                                  {expandedIndexes.includes(index) ? (
+                                    <ChevronUp />
+                                  ) : (
+                                    <ChevronDown />
+                                  )}
+                                </button>
+                              )}
+                            </div>
+</div>
                             
                               {/* Bot Typing - Left Side */}
                               <div className="flex justify-start">
                                 <div className="bg-gray-300 w-fit px-4 py-1 rounded-lg animate-pulse text-left">
-                                  <span className="text-gray-600 font-mono after:content-[''] after:animate-typing-dots inline-block">
+                                  <span className="text-gray-600 font-mono after:content-[''] text-lg after:animate-typing-dots inline-block">
                                     typing
                                   </span>
                                 </div>
