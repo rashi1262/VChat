@@ -61,19 +61,18 @@ const page = ({ params }) => {
   useEffect(() => {
     const handleClick = (event) => {
       const user = localStorage.getItem("user");
-
+  
       if (!user) {
-        const isSearchBox =
-          event.target.closest("#searchBox") || event.target.id === "searchBox";
-
-        if (isSearchBox || event.target) {
+        const isTextarea =
+          event.target.closest("textarea");
+        if (isTextarea) {
           setShowPopup(true);
         }
       }
     };
-
+  
     document.addEventListener("click", handleClick);
-
+  
     return () => {
       document.removeEventListener("click", handleClick);
     };

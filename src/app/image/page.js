@@ -21,22 +21,22 @@ const page = () => {
   const [loading, setLoading] = useState(false);
   const { chatThread, setChatThread } = useChat();
   const router = useRouter();
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const storedUser = localStorage.getItem("user");
-        if (!storedUser) {
-          router.push("/home");
-          return;
-        } else {
-          const user = JSON.parse(storedUser);
-          setEmail(user?.email || "No Email");
-          setName(user?.name || "No Name");
-          setUserId(user?.id);
-        }
-      } catch (error) {}
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (typeof window !== "undefined") {
+  //     try {
+  //       const storedUser = localStorage.getItem("user");
+  //       if (!storedUser) {
+  //         router.push("/home");
+  //         return;
+  //       } else {
+  //         const user = JSON.parse(storedUser);
+  //         setEmail(user?.email || "No Email");
+  //         setName(user?.name || "No Name");
+  //         setUserId(user?.id);
+  //       }
+  //     } catch (error) {}
+  //   }
+  // }, []);
 
   useEffect(() => {
     if (!userId) return;
