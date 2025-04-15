@@ -4,7 +4,7 @@ import Link from "next/link";
 import Navbar from "../../navbar";
 import { useChat } from "../../chatContext";
 import { useRouter } from "next/navigation";
-import { Edit, Pencil } from "lucide-react";
+import { Edit, Pencil, Volume2 } from "lucide-react";
 import { Check, Clipboard } from "lucide-react";
 import { useCredits } from "@/context/creditContext";
 import InsufficientBalance from "@/components/InsufficientBalance";
@@ -15,6 +15,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 import hljs from 'highlight.js';
+import SpeechToSpeech from "@/components/SpeechToSpeech";
 
 const CodeBlock = ({ code, language = "text", onCopy, copied }) => {
   // Auto-detect the language if not provided
@@ -54,6 +55,7 @@ const CodeBlock = ({ code, language = "text", onCopy, copied }) => {
 const ChatPage = ({ params }) => {
   const { hasCredits, setHasCredits } = useCredits();
   const { id } = use(params);
+  const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
@@ -744,6 +746,7 @@ const ChatPage = ({ params }) => {
                 </div>
 
                 <VoiceToText onResult={handleVoiceInput} />
+                <Volume2 onClick={() => setIsOpen(true)} className="text-blue-500 ml-2 cursor-pointer" />
 
                 <button
                   onClick={handleAddChat}
@@ -775,6 +778,8 @@ const ChatPage = ({ params }) => {
       ) : (
         <InsufficientBalance />
       )}
+
+      {isOpen && <SpeechToSpeech setIsOpen={setIsOpen} userId={userId} id={id}/>}
     </>
   );
 };
