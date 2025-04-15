@@ -11,9 +11,8 @@ import Header from "../header";
 import { ChevronDown } from "lucide-react";
 import VoiceToText from "@/components/VoiceToText";
 import { toast, Toaster } from "sonner";
-
 import { useCredits } from "@/context/creditContext";
-import { cards } from "../model/page";
+import { cards,Card } from "@/components/utils";
 import InsufficientBalance from "@/components/InsufficientBalance";
 
 const page = ({ params }) => {
@@ -497,20 +496,4 @@ const page = ({ params }) => {
 };
 
 export default page;
-const Card = ({ prompt, image, bgColor, setPrompt }) => {
-  return (
-    <div
-      className={`relative border rounded-md p-4 hover:bg-white cursor-pointer ${bgColor}`}
-      onClick={() => setPrompt(prompt)}
-    >
-      <div className="w-10 h-10 mb-2">
-        <img
-          src={image}
-          alt="Card image"
-          className="w-full h-full object-contain"
-        />
-      </div>
-      <p className="text-gray-500 text-sm">{prompt}</p>
-    </div>
-  );
-};
+
