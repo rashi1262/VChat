@@ -52,15 +52,31 @@ const SpeechToSpeech = ({ setIsOpen, userId, id }) => {
       try {
         // Step 1: Get bot response
         const searchRes = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_BASE_URL
-          }/chatbot/search?userId=${encodeURIComponent(
-            userId
-          )}&message=${encodeURIComponent(message)}`
+          'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=AIzaSyAgrOTx5__YJrVFPRWRui9iEzxtfxYysa4',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [
+                    {
+                      text: message, // user input
+                    },
+                  ],
+                },
+              ],
+            }),
+          }
         );
+        
+   
+        
         if (!searchRes.ok) throw new Error("Error fetching bot response");
         const data = await searchRes.json();
-        const botResponse = data?.botResponse || "No response received.";
+        const botResponse =   data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response found';
 
         // Step 2: Add user + bot response to chat history
         const newChat = {
@@ -68,6 +84,23 @@ const SpeechToSpeech = ({ setIsOpen, userId, id }) => {
           botResponse,
           parsedResponse: null,
         };
+        const utterance = new SpeechSynthesisUtterance(botResponse);
+        
+        utterance.voice = voiceRef.current || null;
+
+        utterance.onend = () => {
+            setIsSpeaking(false);
+            setIsLoading(false);
+            if (isMicOn) {
+              try {
+                recognition.stop(); // just in case it's still running
+                recognition.start(); // 🔁 Start listening again!
+              } catch (err) {
+              }
+            }
+          };
+        speechSynthesis.speak(utterance);
+        setTranscript(`Bot: ${botResponse}`);
 
         const updateRes = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
@@ -87,33 +120,9 @@ const SpeechToSpeech = ({ setIsOpen, userId, id }) => {
         }
 
         // Step 3: Fetch the updated chat history
-        const getRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${id}`
-        );
-        if (!getRes.ok) throw new Error("Error fetching updated chat history");
-        const updatedChat = await getRes.json();
-
-        const lastBotResponse =
-          updatedChat?.userSearch?.slice(-1)[0]?.botResponse || botResponse;
 
         // Step 4: Speak out and show response
-        const utterance = new SpeechSynthesisUtterance(lastBotResponse);
-        
-        utterance.voice = voiceRef.current || null;
-
-        utterance.onend = () => {
-            setIsSpeaking(false);
-            setIsLoading(false);
-            if (isMicOn) {
-              try {
-                recognition.stop(); // just in case it's still running
-                recognition.start(); // 🔁 Start listening again!
-              } catch (err) {
-              }
-            }
-          };
-        speechSynthesis.speak(utterance);
-        setTranscript(`Bot: ${lastBotResponse}`);
+     
       } catch (err) {
         setTranscript("Error getting bot response.");
       } finally {
