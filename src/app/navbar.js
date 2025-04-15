@@ -229,7 +229,7 @@ const page = () => {
                   <div className="ml-1 mt-[2%]">Chats</div>
                 </Link>
                 <div className="md:h-56 h-32">
-                  <div className="md:h-[200px] md:max-h-[200px] overflow-y-auto scrollbar-thin text-gray-600">
+                  <div className=" overflow-y-auto custom-scrollbar  md:h-[200px] md:max-h-[200px]  text-gray-600">
                     {Array.isArray(chatThread) &&
                       chatThread.map((chat) => (
                         <div
