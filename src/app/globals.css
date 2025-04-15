@@ -19,3 +19,27 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+@layer utilities {
+  .fade-line {
+    opacity: 0;
+    animation: fadeInLine 0.3s ease forwards;
+  }
+
+  @keyframes fadeInLine {
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+/* globals.css */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(16, 15, 15, 0.3);
+  border-radius: 9999px;
+}
+

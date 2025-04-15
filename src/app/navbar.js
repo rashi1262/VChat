@@ -229,7 +229,7 @@ const page = () => {
                   <div className="ml-1 mt-[2%]">Chats</div>
                 </Link>
                 <div className="md:h-56 h-32">
-                  <div className="md:h-[200px] md:max-h-[200px] overflow-y-auto scrollbar-thin text-gray-600">
+                  <div className=" overflow-y-auto custom-scrollbar  md:h-[200px] md:max-h-[200px]  text-gray-600">
                     {Array.isArray(chatThread) &&
                       chatThread.map((chat) => (
                         <div
@@ -351,7 +351,7 @@ export default page;
 
 const features = [
   { href: "/vChat", img: "/assests/vlogo.avif", title: "VChat" },
-  { href: "/model", img: "/assests/svgviewer-output.svg", title: "Gemini" },
+  { href: "/model", img: "/assests/gemini.png", title: "Gemini" },
   { href: "/openAI", img: "/assests/svgviewer-output.svg", title: "OpenAI" },
   { href: "/image", img: "/assests/svgviewer-output (2).svg", title: "Image Generation" },
   { href: "/upload", img: "/assests/svgviewer-output (3).svg", title: "Upload & Ask PDF" }

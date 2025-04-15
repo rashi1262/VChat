@@ -1,0 +1,25 @@
+{
+    "charset": "UTF-8",
+    "viewport": "width=device-width, initial-scale=1.0",
+    "title": "VChat: Connect, Chat & Collaborate Instantly",
+    "description": "VChat lets you connect and collaborate with friends, teams, and communities instantly. Enjoy fast, secure, and real-time messaging across all your devices.",
+    "author": "VChat",
+    "keywords": "VChat, online chat app, team collaboration, instant messaging, secure chat, real-time messaging, group chat app",
+    "canonical": "https://vchatai.netlify.app/",
+    "robots": "index, follow",
+    "og": {
+      "title": "VChat - Connect, Chat & Collaborate in Real-Time",
+      "description": "Join VChat to experience fast, secure, and seamless messaging. Chat with friends, create group chats, and collaborate like never before.",
+      "url": "https://vchatai.netlify.app/",
+      "type": "website",
+      "image": "https://vchatai.netlify.app/images/og-image.svg"
+    },
+    "twitter": {
+      "card": "summary_large_image",
+      "title": "VChat - Connect, Chat & Collaborate Instantly",
+      "description": "Real-time messaging app for connecting with friends and teams. Enjoy secure and fast communication across devices with VChat.",
+      "image": "https://vchatai.netlify.app/images/og-image.svg"
+    },
+    "favicon": "https://vchatai.netlify.app/favicon.ico"
+  }
+  
