@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useCredits } from "@/context/creditContext";
 import { toast, Toaster } from "sonner";
 import InsufficientBalance from "@/components/InsufficientBalance";
+import { AuthPopup } from "../model/page";
 
 const page = () => {
   const { hasCredits } = useCredits();
@@ -23,6 +24,7 @@ const page = () => {
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
   const { chatThread, setChatThread } = useChat();
+  const [showPopup, setShowPopup] = useState(false);
   const router = useRouter();
   // useEffect(() => {
   //   if (typeof window !== "undefined") {
@@ -42,6 +44,26 @@ const page = () => {
   //     }
   //   }
   // }, []);
+
+    useEffect(() => {
+          const handleClick = (event) => {
+            const user = localStorage.getItem("user");
+      
+            if (!user) {
+              const isTextarea = event.target.closest("textarea");
+              if (isTextarea) {
+                setShowPopup(true);
+              }
+            }
+          };
+      
+          document.addEventListener("click", handleClick);
+      
+          return () => {
+            document.removeEventListener("click", handleClick);
+          };
+        }, []);
+  
 
   const fileInputRef = useRef(null);
 
@@ -438,6 +460,9 @@ const page = () => {
               </div>
             </div>
           )}
+          {showPopup && (
+                    <AuthPopup/>
+                    )}
         </div>
       ) : (
         <InsufficientBalance />

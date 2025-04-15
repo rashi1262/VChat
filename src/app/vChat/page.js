@@ -12,8 +12,9 @@ import { ChevronDown } from "lucide-react";
 import VoiceToText from "@/components/VoiceToText";
 import { toast, Toaster } from "sonner";
 import { useCredits } from "@/context/creditContext";
-import { cards,Card } from "@/components/utils";
+import { cards, Card } from "@/components/utils";
 import InsufficientBalance from "@/components/InsufficientBalance";
+import { AuthPopup } from "../model/page";
 
 const page = ({ params }) => {
   const { hasCredits } = useCredits();
@@ -29,6 +30,7 @@ const page = ({ params }) => {
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState(null);
   const [msg, setMsg] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
 
   const [messages, setMessages] = useState([]);
 
@@ -56,6 +58,25 @@ const page = ({ params }) => {
   //     }
   //   }
   // }, []);
+  useEffect(() => {
+    const handleClick = (event) => {
+      const user = localStorage.getItem("user");
+
+      if (!user) {
+        const isTextarea = event.target.closest("textarea");
+        if (isTextarea) {
+          setShowPopup(true);
+        }
+      }
+    };
+
+    document.addEventListener("click", handleClick);
+
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, []);
+
 
   useEffect(() => {
     if (!userId) return;
@@ -487,6 +508,7 @@ const page = ({ params }) => {
               </>
             )}
           </div>
+          {showPopup && <AuthPopup/>}
         </div>
       ) : (
         <InsufficientBalance />
@@ -496,4 +518,3 @@ const page = ({ params }) => {
 };
 
 export default page;
-

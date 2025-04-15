@@ -445,7 +445,22 @@ const page = ({ params }) => {
             )}
           </div>
           {showPopup && (
-            <div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
+          <AuthPopup />
+          )}
+        </div>
+      ) : (
+        <InsufficientBalance />
+      )}
+    </>
+  );
+};
+
+export default page;
+
+export const AuthPopup = () => {
+  return (
+    <>
+      <div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
               <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center text-white">
                 <h2 className="text-2xl  font-bold">Welcome back</h2>
                 <p className=" p-2  text-lg ">
@@ -468,15 +483,8 @@ const page = ({ params }) => {
                 </div>
               </div>
             </div>
-          )}
-        </div>
-      ) : (
-        <InsufficientBalance />
-      )}
     </>
-  );
-};
-
-export default page;
+  )
+}
 
 
