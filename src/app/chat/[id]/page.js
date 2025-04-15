@@ -52,6 +52,7 @@ const CodeBlock = ({ code, language = "text", onCopy, copied }) => {
 
 
 const ChatPage = ({ params }) => {
+  const fileInputRef = useRef(null);
   const { hasCredits, setHasCredits } = useCredits();
   const { id } = use(params);
   const [isOpen, setIsOpen] = useState(false);
@@ -69,8 +70,10 @@ const ChatPage = ({ params }) => {
   const [chatModel, setChatModel] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
- 
- 
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+
   const [isloading, setisLoading] = useState(false);
   const chatContainerRef = useRef(null);
   const [imgLoading, setImgLoading] = useState(false);
@@ -129,6 +132,25 @@ const ChatPage = ({ params }) => {
     setImage(null);
     setFileName("");
   };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+    setSelectedFile(file); // Save file for later API use
+    const reader = new FileReader();
+    reader.onloadend = () => {
+    setImagePreview(reader.result); // Preview
+    };
+    reader.readAsDataURL(file);
+    }
+    e.target.value = null;
+    setShowUploadDialog(false);
+    };
+    
+    const removeImage = () => {
+    setImagePreview(null);
+    setSelectedFile(null);
+    };
   
   const toggleExpand = (index) => {
     setExpandedIndexes((prev) =>
@@ -327,9 +349,10 @@ const ChatPage = ({ params }) => {
     return parts.length > 0 ? parts : [{ type: "text", content: messageStr }];
   };
   const handleAddChat = async () => {
-    if (!id || !moreChat) {
+    if (!id || (!moreChat.trim() && !selectedFile)) {
       return;
-    }
+      }
+
     setMorePrompt(moreChat);
     setMoreChat("");
     setLoading(true);
@@ -369,15 +392,21 @@ const ChatPage = ({ params }) => {
         setGeneratedImage(imageData.imageUrl);
         setImgLoading(false);
       } else {
-        const searchRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL
-          }/chatbot/search?userId=${encodeURIComponent(
-            userId
-          )}&message=${encodeURIComponent(moreChat)}`
-        );
+        const formData = new FormData();
+        formData.append('userId', userId);
+        formData.append('message', moreChat);
+        if (selectedFile) {
+        formData.append('file', selectedFile); // 👈 Pass the file here
+        }
+        const searchRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/searchs`, {
+        method: 'POST',
+        body: formData,
+        });
         if (!searchRes.ok) throw new Error("Error fetching bot response");
         const data = await searchRes.json();
-        console.log("Bot response received:", data);
+        setSelectedFile(null);
+        setImagePreview(null);
+        setMoreChat('');
         if (
           typeof window !== "undefined" &&
           data?.remainingCredits !== undefined
@@ -425,18 +454,16 @@ const ChatPage = ({ params }) => {
   }, [id]);
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleAddChat();
-      setMoreChat("");
-      setIsVisible(false);
- 
-      const el = textareaRef.current;
-      if (el) {
-        el.style.height = "40px";        
-        el.style.overflowY = "hidden";  
-      }
-    }
+  if (e.key === "Enter" && !e.shiftKey) {
+  e.preventDefault();
+  handleAddChat();
+  setMoreChat("");
+  const el = textareaRef.current;
+  if (el) {
+  el.style.height = "40px";
+  el.style.overflowY = "hidden";
+  }
+  }
   };
 
   const scrollToBottom = () => {
@@ -766,24 +793,51 @@ const ChatPage = ({ params }) => {
                 )}
               </div>
 
+              {showUploadDialog && (
+                    <div className="absolute bottom-20 left-70  w-64 bg-white shadow-lg border border-gray-300 rounded-xl p-2 ">
+                      <button
+                        onClick={() => {
+                          console.log("Google Drive clicked");
+                          setShowUploadDialog(false);
+                        }}
+                        className="w-full text-left px-3 py-2 rounded hover:bg-gray-100 text-sm flex items-center gap-2"
+                      >
+                        <span>📁</span> Connect to Google Drive
+                      </button>
+                      <button
+                        onClick={() => {
+                          console.log("OneDrive clicked");
+                          setShowUploadDialog(false);
+                        }}
+                        className="w-full text-left px-3 py-2 rounded hover:bg-gray-100 text-sm flex items-center gap-2"
+                      >
+                        <span>☁️</span> Connect to Microsoft OneDrive
+                      </button>
+                      <button
+  onClick={() => {
+    fileInputRef.current.value = null; // Reset input so onChange fires even for same file
+    fileInputRef.current.click();
+  }}
+  className="w-full text-left px-3 py-2 rounded hover:bg-gray-100 text-sm flex items-center gap-2"
+>
+  <span>🖼️</span> Upload from computer
+</button>
+                      <input
+                        type="file"
+                        accept="image/*,application/pdf"
+                        ref={fileInputRef}
+                        onChange={handleFileUpload}
+                        className="hidden"
+                      />
+                    </div>
+                  )}
+            
+ 
+
               <div className="fixed bottom-0 ml-[75px] left-1/2 transform -translate-x-1/2 w-[750px] max-h-[300px] bg-white border border-gray-300 shadow-md rounded-2xl px-4 py-2 flex flex-col">
 
   <div className="flex-grow overflow-y-auto">
 
-    {(image || fileName) && (
-      <div className="mb-2m p-2 rounded-md flex items-center space-x-2">
-        {image && (
-          <img src={image} alt="Preview" className="w-10 h-10 object-cover rounded" />
-        )}
-            <button
-      onClick={handleCancelSelection}
-      className="mt-2 bg-gray-100 "
-    >
-     x
-    </button>
-      </div>
-
-    )}
 
     <textarea
       ref={textareaRef}
@@ -801,11 +855,27 @@ const ChatPage = ({ params }) => {
   <div className="flex justify-between items-center mt-2" style={{ height: '35px' }}>
     
     {/* Plus Icon Button */}
-    <button onClick={handleplusicon} className="text-gray-500 hover:text-black p-2 flex items-center justify-center h-7 w-7">
+    <button onClick={() => setShowUploadDialog((prev) => !prev)} className="text-gray-500 hover:text-black p-2 flex items-center justify-center h-7 w-7">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
       </svg>
     </button>
+
+    <div className="w-full p-2">
+{/* {/ Image Preview /} */}
+{imagePreview && (
+<div className="relative mb-2 w-full max-w-xs">
+<img src={imagePreview} alt="Preview" className="rounded-lg w-full h-auto object-cover" />
+<button
+onClick={removeImage}
+className="absolute top-1 right-1 bg-white text-black rounded-full w-6 h-6 flex items-center justify-center shadow hover:bg-gray-100"
+>
+&times;
+</button>
+</div>
+)}
+
+</div>
 
     {/* Voice Mic */}
     <VoiceToText onResult={handleVoiceInput} />

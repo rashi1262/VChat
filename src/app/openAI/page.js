@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import React from "react";
 import Link from "next/link";
@@ -9,26 +8,8 @@ import { useChat } from "../chatContext";
 import { toast, Toaster } from "sonner";
 import { useCredits } from "@/context/creditContext";
 import InsufficientBalance from "@/components/InsufficientBalance";
+import { cards,Card } from "@/components/utils";
 
-export const cards = [
-  {
-    prompt: "Solve a debate: which came first, the chiken or the egg?",
-    image: "/assests/icon1.svg",
-  },
-  {
-    prompt:
-      "I want to get promated at work.Lat's make a detailed plan together.",
-    image: "/assests/icon2.svg",
-  },
-  {
-    prompt: "Describe how blockchain technology works.",
-    image: "/assests/icon3.svg",
-  },
-  {
-    prompt: "Can you help me brainstorm ideas for a brand campaign",
-    image: "/assests/icon4.svg",
-  },
-];
 const page = () => {
   const { hasCredits, setHasCredits } = useCredits();
 
@@ -322,20 +303,4 @@ const page = () => {
 };
 
 export default page;
-const Card = ({ prompt, image, bgColor, setPrompt }) => {
-  return (
-    <div
-      className={`relative border rounded-md p-4 hover:bg-white cursor-pointer ${bgColor}`}
-      onClick={() => setPrompt(prompt)}
-    >
-      <div className="w-10 h-10 mb-2">
-        <img
-          src={image}
-          alt="Card image"
-          className="w-full h-full object-contain"
-        />
-      </div>
-      <p className="text-gray-500 text-sm">{prompt}</p>
-    </div>
-  );
-};
+
