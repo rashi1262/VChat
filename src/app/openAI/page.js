@@ -9,6 +9,7 @@ import { toast, Toaster } from "sonner";
 import { useCredits } from "@/context/creditContext";
 import InsufficientBalance from "@/components/InsufficientBalance";
 import { cards,Card } from "@/components/utils";
+import { AuthPopup } from "../model/page";
 
 const page = () => {
   const { hasCredits, setHasCredits } = useCredits();
@@ -22,23 +23,43 @@ const page = () => {
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
   const { chatThread, setChatThread } = useChat();
+  const [showPopup, setShowPopup] = useState(false);
   const router = useRouter();
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (typeof window !== "undefined") {
-      try {
-        const storedUser = localStorage.getItem("user");
-        if (!storedUser) {
-          router.push("/login");
-          return;
-        } else {
-          const user = JSON.parse(storedUser);
+  // useEffect(() => {
+  //   if (typeof window === "undefined") return;
+  //   if (typeof window !== "undefined") {
+  //     try {
+  //       const storedUser = localStorage.getItem("user");
+  //       if (!storedUser) {
+  //         router.push("/login");
+  //         return;
+  //       } else {
+  //         const user = JSON.parse(storedUser);
 
-          setUserId(user?.id);
+  //         setUserId(user?.id);
+  //       }
+  //     } catch (error) {}
+  //   }
+  // }, []);
+
+  useEffect(() => {
+      const handleClick = (event) => {
+        const user = localStorage.getItem("user");
+  
+        if (!user) {
+          const isTextarea = event.target.closest("textarea");
+          if (isTextarea) {
+            setShowPopup(true);
+          }
         }
-      } catch (error) {}
-    }
-  }, []);
+      };
+  
+      document.addEventListener("click", handleClick);
+  
+      return () => {
+        document.removeEventListener("click", handleClick);
+      };
+    }, []);
 
   useEffect(() => {
     if (!userId) return;
@@ -294,7 +315,11 @@ const page = () => {
               </div>
             </div>
           )}
+           {showPopup && (
+                    <AuthPopup/>
+                    )}
         </div>
+        
       ) : (
       <InsufficientBalance />
       )}

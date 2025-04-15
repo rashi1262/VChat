@@ -39,19 +39,18 @@ const page = ({ params }) => {
   useEffect(() => {
     const handleClick = (event) => {
       const user = localStorage.getItem("user");
-
+  
       if (!user) {
-        const isSearchBox =
-          event.target.closest("#searchBox") || event.target.id === "searchBox";
-
-        if (isSearchBox || event.target) {
+        const isTextarea =
+          event.target.closest("textarea");
+        if (isTextarea) {
           setShowPopup(true);
         }
       }
     };
-
+  
     document.addEventListener("click", handleClick);
-
+  
     return () => {
       document.removeEventListener("click", handleClick);
     };
@@ -577,7 +576,24 @@ const page = ({ params }) => {
             )}
           </div>
           {showPopup && (
-            <div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
+          <AuthPopup />
+          )}
+        </div>
+      ) : (
+        <InsufficientBalance />
+      )}
+                  {isOpen && <SpeechToSpeech setIsOpen={setIsOpen} userId={userId} />}
+
+    </>
+  );
+};
+
+export default page;
+
+export const AuthPopup = () => {
+  return (
+    <>
+      <div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
               <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center text-white">
                 <h2 className="text-2xl  font-bold">Welcome back</h2>
                 <p className=" p-2  text-lg ">
@@ -600,17 +616,8 @@ const page = ({ params }) => {
                 </div>
               </div>
             </div>
-          )}
-        </div>
-      ) : (
-        <InsufficientBalance />
-      )}
-            {isOpen && <SpeechToSpeech setIsOpen={setIsOpen} userId={userId} />}
-      
     </>
-  );
-};
-
-export default page;
+  )
+}
 
 

@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Mic, X } from "lucide-react";
+import { Mic, MicOff, StopCircle, X } from "lucide-react";
 import React, { useEffect, useState, useRef } from "react";
+import GradientCircleCanvas from "./GradientCircleCanvas";
 
 const SpeechToSpeech = ({ setIsOpen, userId, id: initialId }) => {
   const [transcript, setTranscript] = useState("Listening...");
@@ -247,31 +248,31 @@ const SpeechToSpeech = ({ setIsOpen, userId, id: initialId }) => {
 
   return (
     <AnimatePresence>
+    <motion.div
+      className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <motion.div
-        className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        className="bg-white w-full h-full p-6 relative flex flex-col items-center justify-center"
+        initial={{ y: 100 }}
+        animate={{ y: 0 }}
+        exit={{ y: 100 }}
+        transition={{ duration: 0.4, ease: "easeInOut" }}
       >
-        <motion.div
-          className="bg-white w-full h-full p-6 relative flex flex-col items-center justify-center"
-          initial={{ y: 100 }}
-          animate={{ y: 0 }}
-          exit={{ y: 100 }}
-          transition={{ duration: 0.4, ease: "easeInOut" }}
+        <button
+          className="absolute top-4 right-4 text-black"
+          onClick={handleClose}
         >
-          <button
-            className="absolute top-4 right-4 text-black"
-            onClick={handleClose}
-          >
-            <X size={30} />
-          </button>
+          <X size={30} />
+        </button>
 
-          <motion.div
-            className="p-8 rounded-full bg-blue-100"
-            animate={
-              isMicOn
-                ? {
+        {/* <motion.div
+          className="p-8 rounded-full bg-blue-100"
+          animate={
+            isMicOn
+              ? {
                   scale: [1, 1.1, 1],
                   boxShadow: [
                     "0 0 0 0px #3b82f6",
@@ -279,39 +280,90 @@ const SpeechToSpeech = ({ setIsOpen, userId, id: initialId }) => {
                     "0 0 0 0px #3b82f6",
                   ],
                 }
-                : {}
-            }
-            transition={{ repeat: Infinity, duration: 1.8 }}
-          >
-            <Mic
-              size={64}
-              className={`text-blue-500 ${isMicOn ? "" : "opacity-30"}`}
-            />
-          </motion.div>
+              : {}
+          }
+          transition={{ repeat: Infinity, duration: 1.8 }}
+        >
+          <Mic
+            size={64}
+            className={`text-blue-500 ${isMicOn ? "" : "opacity-30"}`}
+          />
+        </motion.div> */}
 
-          <p className="text-xl text-gray-800 mt-6 text-center w-full h-24 overflow-y-auto">
-            {isLoading ? "Loading response..." : transcript}
-          </p>
+        <div className="relative w-64 h-64 flex items-center justify-center">
+            <div className="absolute inset-0 z-0 rounded-full overflow-hidden">
+              <GradientCircleCanvas />
+            </div>
 
-          <div className="flex justify-center gap-4 fixed bottom-6 w-full">
+            {/* <motion.div
+              className="z-10"
+              animate={
+                isMicOn
+                  ? {
+                      scale: [1, 1.1, 1],
+                      boxShadow: [
+                        "0 0 0 0px #3b82f6",
+                        "0 0 0 20px rgba(59,130,246,0)",
+                        "0 0 0 0px #3b82f6",
+                      ],
+                    }
+                  : {}
+              }
+              transition={{ repeat: Infinity, duration: 1.8 }}
+            >
+              <Mic
+                size={64}
+                className={`text-blue-500 ${isMicOn ? "" : "opacity-30"}`}
+              />
+            </motion.div> */}
+          </div>
+
+        <p className="text-xl text-gray-800 mt-6 text-center w-full h-24 overflow-y-auto">
+          {isLoading ? "Loading response..." : transcript}
+        </p>
+
+        {/* <div className="flex justify-center gap-4 fixed bottom-6 w-full">
+        <button
+          onClick={handleToggleMic}
+          className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition-all"
+        >
+          {isMicOn ? "Turn Mic Off" : "Turn Mic On"}
+        </button>
+        <button
+          onClick={handleStopSpeech}
+          disabled={!isSpeaking}
+          className={`mt-4 px-6 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition-all ${
+            !isSpeaking ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
+          {isSpeaking ? "Stop Speech" : "No Speech to Stop"}
+        </button>
+        </div> */}
+
+
+<div className="flex justify-center gap-4 fixed bottom-6 w-full">
             <button
               onClick={handleToggleMic}
-              className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition-all"
+              className="mt-4 p-4 bg-blue-500 text-white rounded-full shadow hover:bg-blue-600 transition-all"
+              aria-label={isMicOn ? "Turn Mic Off" : "Turn Mic On"}
             >
-              {isMicOn ? "Turn Mic Off" : "Turn Mic On"}
+              {isMicOn ? <MicOff size={24} /> : <Mic size={24} />}
             </button>
             <button
               onClick={handleStopSpeech}
               disabled={!isSpeaking}
-              className={`mt-4 px-6 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition-all ${!isSpeaking ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+              className={`mt-4 p-4 bg-red-500 text-white rounded-full shadow hover:bg-red-600 transition-all ${
+                !isSpeaking ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              aria-label="Stop Speech"
             >
-              {isSpeaking ? "Stop Speech" : "No Speech to Stop"}
+              <StopCircle size={24} />
             </button>
           </div>
-        </motion.div>
+     
       </motion.div>
-    </AnimatePresence>
+    </motion.div>
+  </AnimatePresence>
   );
 };
 
