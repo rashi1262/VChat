@@ -4,7 +4,26 @@ import Link from "next/link";
 import Navbar from "../../navbar";
 import { useChat } from "../../chatContext";
 import { useRouter } from "next/navigation";
-import { Edit, Pencil,ChevronDown, ChevronUp, Check, Clipboard, Volume2 } from "lucide-react";
+import {
+  Edit,
+  Pencil,
+  ChevronDown,
+  ChevronUp,
+  Check,
+  Clipboard,
+  Volume2,
+  Sparkle,
+} from "lucide-react";
+
+import {
+  Plus,
+  Mic,
+  // Image as ImageIcon,
+  File,
+  // Volume2,
+  Send,
+} from "lucide-react";
+
 import { useCredits } from "@/context/creditContext";
 import InsufficientBalance from "@/components/InsufficientBalance";
 import ReactMarkdown from "react-markdown";
@@ -13,12 +32,13 @@ import VoiceToText from "@/components/VoiceToText";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
-import hljs from 'highlight.js';
+import hljs from "highlight.js";
 import SpeechToSpeech from "@/components/SpeechToSpeech";
 
 const CodeBlock = ({ code, language = "text", onCopy, copied }) => {
   // Auto-detect the language if not provided
-  const detectedLanguage = language === "text" ? hljs.highlightAuto(code).language : language;
+  const detectedLanguage =
+    language === "text" ? hljs.highlightAuto(code).language : language;
 
   return (
     <div className="relative mt-4 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
@@ -49,7 +69,6 @@ const CodeBlock = ({ code, language = "text", onCopy, copied }) => {
     </div>
   );
 };
-
 
 const ChatPage = ({ params }) => {
   const fileInputRef = useRef(null);
@@ -84,47 +103,66 @@ const ChatPage = ({ params }) => {
   const [response, setResponse] = useState("");
   const [displayedResponse, setDisplayedResponse] = useState("");
   const [expandedIndexes, setExpandedIndexes] = useState([]);
-  const [image, setImage] = useState('');
-  const [fileName, setFileName] = useState('');
+  const [image, setImage] = useState("");
+  const [fileName, setFileName] = useState("");
   const textareaRef = useRef(null);
+
+  const uploadRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (uploadRef.current && !uploadRef.current.contains(event.target)) {
+        setShowUploadDialog(false);
+      }
+    };
+
+    if (showUploadDialog) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showUploadDialog]);
+
   const controlHeight = (e) => {
     const textarea = e.target;
-  
+
     // Reset height to calculate scrollHeight accurately
-    textarea.style.height = 'auto';
-  
+    textarea.style.height = "auto";
+
     // Limit height to max 200px
     const newHeight = Math.min(textarea.scrollHeight, 200);
     textarea.style.height = `${newHeight}px`;
-  
+
     setMoreChat(textarea.value);
   };
-  
-  const handleplusicon =()=>{
+
+  const handleplusicon = () => {
     setIsVisible(!isVisible);
-  }
+  };
   useEffect(() => {
-    const storedImage = localStorage.getItem('image');
+    const storedImage = localStorage.getItem("image");
     if (storedImage) {
       setImage(storedImage);
     }
   }, []);
-  
+
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     setIsVisible(false);
     if (file) {
       setFileName(file.name);
-  
-      if (file.type.startsWith('image/')) {
+
+      if (file.type.startsWith("image/")) {
         const reader = new FileReader();
         reader.onloadend = () => {
-          localStorage.setItem('image', reader.result);
+          localStorage.setItem("image", reader.result);
           setImage(reader.result);
         };
         reader.readAsDataURL(file);
       } else {
-        setImage(null); 
+        setImage(null);
       }
     }
   };
@@ -136,27 +174,27 @@ const ChatPage = ({ params }) => {
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-    setSelectedFile(file); // Save file for later API use
-    const reader = new FileReader();
-    reader.onloadend = () => {
-    setImagePreview(reader.result); // Preview
-    };
-    reader.readAsDataURL(file);
+      setSelectedFile(file); // Save file for later API use
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result); // Preview
+      };
+      reader.readAsDataURL(file);
     }
     e.target.value = null;
     setShowUploadDialog(false);
-    };
-    
-    const removeImage = () => {
+  };
+
+  const removeImage = () => {
     setImagePreview(null);
     setSelectedFile(null);
-    };
-  
+  };
+
   const toggleExpand = (index) => {
     setExpandedIndexes((prev) =>
       prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
     );
-  }   
+  };
   const handleVoiceInput = (voiceText) => {
     setMoreChat((prevPrompt) => prevPrompt + " " + voiceText);
   };
@@ -180,7 +218,8 @@ const ChatPage = ({ params }) => {
       if (chatModel === "ImageGeneration") {
         console.log("Generating updated image for prompt:", editMessage);
         const imageRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL
+          `${
+            process.env.NEXT_PUBLIC_BASE_URL
           }/chatbot/generate-image?userId=${encodeURIComponent(
             userId
           )}&prompt=${encodeURIComponent(editMessage)}`
@@ -192,7 +231,8 @@ const ChatPage = ({ params }) => {
       } else {
         console.log("Fetching updated bot response for:", editMessage);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL
+          `${
+            process.env.NEXT_PUBLIC_BASE_URL
           }/chatbot/search?userId=${encodeURIComponent(
             userId
           )}&message=${encodeURIComponent(editMessage)}`
@@ -351,7 +391,7 @@ const ChatPage = ({ params }) => {
   const handleAddChat = async () => {
     if (!id || (!moreChat.trim() && !selectedFile)) {
       return;
-      }
+    }
 
     setMorePrompt(moreChat);
     setMoreChat("");
@@ -359,8 +399,8 @@ const ChatPage = ({ params }) => {
     setIsVisible(false);
     const el = textareaRef.current;
     if (el) {
-      el.style.height = "40px";        
-      el.style.overflowY = "hidden";    
+      el.style.height = "40px";
+      el.style.overflowY = "hidden";
     }
     try {
       console.log("Fetching existing chat for ID:", id);
@@ -376,7 +416,8 @@ const ChatPage = ({ params }) => {
       if (chatModel === "ImageGeneration") {
         console.log("Generating image for prompt:", moreChat);
         const imageRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL
+          `${
+            process.env.NEXT_PUBLIC_BASE_URL
           }/chatbot/generate-image?userId=${encodeURIComponent(
             userId
           )}&prompt=${encodeURIComponent(moreChat)}`
@@ -393,20 +434,23 @@ const ChatPage = ({ params }) => {
         setImgLoading(false);
       } else {
         const formData = new FormData();
-        formData.append('userId', userId);
-        formData.append('message', moreChat);
+        formData.append("userId", userId);
+        formData.append("message", moreChat);
         if (selectedFile) {
-        formData.append('file', selectedFile); // 👈 Pass the file here
+          formData.append("file", selectedFile); // 👈 Pass the file here
         }
-        const searchRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/searchs`, {
-        method: 'POST',
-        body: formData,
-        });
+        const searchRes = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/searchs`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
         if (!searchRes.ok) throw new Error("Error fetching bot response");
         const data = await searchRes.json();
         setSelectedFile(null);
         setImagePreview(null);
-        setMoreChat('');
+        setMoreChat("");
         if (
           typeof window !== "undefined" &&
           data?.remainingCredits !== undefined
@@ -454,16 +498,16 @@ const ChatPage = ({ params }) => {
   }, [id]);
 
   const handleKeyDown = (e) => {
-  if (e.key === "Enter" && !e.shiftKey) {
-  e.preventDefault();
-  handleAddChat();
-  setMoreChat("");
-  const el = textareaRef.current;
-  if (el) {
-  el.style.height = "40px";
-  el.style.overflowY = "hidden";
-  }
-  }
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleAddChat();
+      setMoreChat("");
+      const el = textareaRef.current;
+      if (el) {
+        el.style.height = "40px";
+        el.style.overflowY = "hidden";
+      }
+    }
   };
 
   const scrollToBottom = () => {
@@ -480,7 +524,7 @@ const ChatPage = ({ params }) => {
   return (
     <>
       {hasCredits ? (
-        <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
+        <div className="flex w-full  bg-gray-50 text-sm overflow-y-scroll">
           <Navbar />
           <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center  md:hidden">
             <div
@@ -505,7 +549,10 @@ const ChatPage = ({ params }) => {
                 ) : (
                   chatHistory.map((chat, index) => (
                     <div key={index} className="flex flex-col gap-1 ">
-                      <div className="flex flex-col overflow-y-auto max-h-[500px]">
+                      <div
+                        className="flex flex-col overflow-y-auto  h-[500px] "
+                        style={{ maxHeight: "calc(h-500px - 100px)" }}
+                      >
                         <div className="flex justify-end w-full ">
                           {editIndex !== index && (
                             <button
@@ -519,9 +566,10 @@ const ChatPage = ({ params }) => {
                             </button>
                           )}
                           <div
-                            className={`relative mt-2 px-3 py-2  max-w-[70%] flex flex-col rounded-[24px_4px_24px_24px]  gap-2 transition-all duration-200 ${editIndex === index
-                                ? "bg-gray-500 w-[70%]"
-                                : "bg-gray-600"
+                            className={`relative mt-2 px-3 py-2  max-w-[70%] flex flex-col rounded-[24px_4px_24px_24px]  gap-2 transition-all duration-200 ${
+                              editIndex === index
+                                ? "bg-[#e9eef6] w-[70%]"
+                                : "bg-[#dbdbdb]"
                             }`}
                           >
                             {editIndex === index ? (
@@ -542,10 +590,10 @@ const ChatPage = ({ params }) => {
                                   className="w-full bg-transparent text-white p-2 rounded-md outline-none "
                                   autoFocus
                                 />
-                                <div className="flex justify-end gap-2 mt-2">
+                                <div className="flex justify-end gap-3 mt-3">
                                   <button
                                     onClick={() => setEditIndex(null)}
-                                    className="px-3 py-1 bg-gray-400 text-white rounded-md"
+                                    className="px-4 py-2 bg-red-500 text-white rounded-full shadow-sm hover:bg-red-600 transition-all duration-200"
                                   >
                                     Cancel
                                   </button>
@@ -555,7 +603,7 @@ const ChatPage = ({ params }) => {
                                       handleAddChat();
                                       setEditIndex(null);
                                     }}
-                                    className="px-3 py-1 bg-green-500 text-white rounded-md"
+                                    className="px-4 py-2 bg-green-500 text-white rounded-full shadow-sm hover:bg-green-600 transition-all duration-200"
                                   >
                                     Send
                                   </button>
@@ -569,12 +617,11 @@ const ChatPage = ({ params }) => {
                           </div>
                         </div>
                       </div>
-                      
                     </div>
                   ))
                 )}
                 {morePrompt !== "" && (
-                  <div className="flex flex-col gap-1 ml-36">
+                  <div className="flex flex-col gap-1 ">
                     {loading && (
                       <div className="mself-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[5%] flex items-center gap-2">
                         <span className="animate-pulse">...</span>
@@ -620,9 +667,9 @@ const ChatPage = ({ params }) => {
               </div>
             </div>
           </div>
-          <div className="min-h-screen md:block relative bg-gray-50  flex-col items-center justify-center  w-[80%] hidden">
+          <div className="min-h-screen md:flex relative bg-gray-50  items-center w-full  justify-center">
             <div
-              className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-start  mt-20  "
+              className=" absolute top-4  overflow-y-auto w-full rounded-md h-[70%] p-4 text-start  mt-20  max-w-4xl mx-auto "
               ref={chatContainerRef}
             >
               <div className="flex flex-col sticky  h-full w-full ">
@@ -634,9 +681,7 @@ const ChatPage = ({ params }) => {
                         <div
                           key={index}
                           className="animate-pulse flex flex-col gap-1 "
-                        >
-                        
-                        </div>
+                        ></div>
                       ))}
                   </div>
                 ) : (
@@ -658,10 +703,10 @@ const ChatPage = ({ params }) => {
                           <div
                             className={`relative  px-3 py-2 text-lg flex flex-col rounded-[24px_4px_24px_24px] w-fit break-words gap-2 transition-all duration-200 ${
                               editIndex === index
-                                ? "bg-gray-500"
-                                : "bg-gray-600"
+                                ? "bg-[#dbdbdb]"
+                                : "bg-[#e9eef6]"
                             }`}
->
+                          >
                             {editIndex === index ? (
                               <div className="flex flex-col w-full">
                                 <input
@@ -680,10 +725,10 @@ const ChatPage = ({ params }) => {
                                   className="w-full bg-transparent text-[#3d3d3d] p-2 rounded-md outline-none "
                                   autoFocus
                                 />
-                                <div className="flex justify-end gap-2 mt-2">
+                                <div className="flex justify-end gap-3 mt-3">
                                   <button
                                     onClick={() => setEditIndex(null)}
-                                    className="px-3 py-1 bg-black text-white rounded-md"
+                                    className="px-4 py-2 bg-[#dc3545] text-white rounded-full shadow-sm hover:bg-gray-700 transition-all duration-200 text-sm w-[80px]"
                                   >
                                     Cancel
                                   </button>
@@ -693,7 +738,7 @@ const ChatPage = ({ params }) => {
                                       handleAddChat();
                                       setEditIndex(null);
                                     }}
-                                    className="px-3 py-1 bg-green-500 text-white rounded-md"
+                                    className="px-4 py-2 bg-green-600 text-white rounded-full shadow-sm hover:bg-green-700 transition-all duration-200 text-sm w-[80px]"
                                   >
                                     Send
                                   </button>
@@ -701,7 +746,7 @@ const ChatPage = ({ params }) => {
                               </div>
                             ) : (
                               <div className="flex justify-end">
-                                <div className="max-w-96  w-fit text-white break-words relative">
+                                <div className="max-w-96  w-fit text-black break-words relative">
                                   <span
                                     className={`${
                                       !expandedIndexes.includes(index)
@@ -709,15 +754,15 @@ const ChatPage = ({ params }) => {
                                         : ""
                                     } `}
                                   >
-                                    <div className="mr-3">
-                                    {chat.userMessage}
-                                    </div>          
+                                    <div className="mr-[25px]">
+                                      {chat.userMessage}
+                                    </div>
                                   </span>
 
                                   {chat.userMessage.length > 100 && (
                                     <button
                                       onClick={() => toggleExpand(index)}
-                                      className="text-blue-300 text-sm absolute right-0  top-0"
+                                      className="text-white bg-black rounded-full text-sm absolute right-0  top-0"
                                     >
                                       {expandedIndexes.includes(index) ? (
                                         <ChevronUp />
@@ -747,7 +792,7 @@ const ChatPage = ({ params }) => {
                           )}
                         </div>
                       ) : (
-                        <div className="ml-36  self-start text-left text-lg text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
+                        <div className="  self-start text-left text-lg text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
                           {(chat.parsedResponse &&
                           chat.parsedResponse.length > 0
                             ? chat.parsedResponse
@@ -762,29 +807,69 @@ const ChatPage = ({ params }) => {
                                 onCopy={() => handleCopy(part.content, i)}
                               />
                             ) : (
-                              <ReactMarkdown key={i}>{part.content}</ReactMarkdown>
+                              <ReactMarkdown key={i}>
+                                {part.content}
+                              </ReactMarkdown>
                             )
                           )}
                         </div>
-
                       )}
                     </div>
                   ))
                 )}
 
                 {morePrompt !== "" && (
-                  <div className="flex flex-col gap-1 ml-36">
+                  <div className="flex flex-col gap-1 ">
                     {loading ? (
                       chatModel === "ImageGeneration" ? (
                         <div className="w-48 h-48 bg-gray-300 flex items-center justify-center rounded-xl my-5">
                           <div className="w-8 h-8 border-4 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
                         </div>
                       ) : (
-                        <div>
-                     
+                        <div className="flex justify-start mb-4">
+                          <div className=" w-fit max-w-sm px-5 py-3   flex items-center space-x-3 animate-pulse">
+                            {/* Spinning Gradient Sparkle Icon (Filled) */}
+                            <svg
+  width="28"
+  height="28"
+  viewBox="0 0 24 24"
+  className="animate-spin-slow"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <defs>
+    <linearGradient
+      id="sparkleGradient"
+      x1="0"
+      y1="0"
+      x2="24"
+      y2="24"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop offset="0%" stopColor="#3b82f6" /> {/* Tailwind Blue-500 */}
+      <stop offset="100%" stopColor="#f9a8d4" /> {/* Tailwind Pink-300 */}
+    </linearGradient>
+  </defs>
+  <path
+    fill="url(#sparkleGradient)"
+    stroke="#1f2937"  // Tailwind slate-800
+    strokeWidth="1"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"
+  />
+</svg>
 
-                          <div className="self-start  bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[5%] flex items-center gap-2">
-                            <span className="animate-pulse">typing...</span>
+
+
+                            {/* Text and Animated Dots */}
+                            <span className="text-gray-700 text-base font-medium flex items-center">
+                              Just a second
+                              {/* <span className="ml-2 flex space-x-1">
+                                <span className="w-1.5 h-1.5 bg-gray-600 rounded-full animate-bounce [animation-delay:0s]" />
+                                <span className="w-1.5 h-1.5 bg-gray-600 rounded-full animate-bounce [animation-delay:0.15s]" />
+                                <span className="w-1.5 h-1.5 bg-gray-600 rounded-full animate-bounce [animation-delay:0.3s]" />
+                              </span> */}
+                            </span>
                           </div>
                         </div>
                       )
@@ -792,178 +877,152 @@ const ChatPage = ({ params }) => {
                   </div>
                 )}
               </div>
-
+            </div>
+            <div className=" absolute bottom-0 left-0 right-0 mx-auto max-w-[750px] px-4 py-2 z-20 ">
               {showUploadDialog && (
-                    <div className="absolute bottom-20 left-70  w-64 bg-white shadow-lg border border-gray-300 rounded-xl p-2 ">
-                      <button
-                        onClick={() => {
-                          console.log("Google Drive clicked");
-                          setShowUploadDialog(false);
-                        }}
-                        className="w-full text-left px-3 py-2 rounded hover:bg-gray-100 text-sm flex items-center gap-2"
-                      >
-                        <span>📁</span> Connect to Google Drive
-                      </button>
-                      <button
-                        onClick={() => {
-                          console.log("OneDrive clicked");
-                          setShowUploadDialog(false);
-                        }}
-                        className="w-full text-left px-3 py-2 rounded hover:bg-gray-100 text-sm flex items-center gap-2"
-                      >
-                        <span>☁️</span> Connect to Microsoft OneDrive
-                      </button>
-                      <button
-  onClick={() => {
-    fileInputRef.current.value = null; // Reset input so onChange fires even for same file
-    fileInputRef.current.click();
-  }}
-  className="w-full text-left px-3 py-2 rounded hover:bg-gray-100 text-sm flex items-center gap-2"
->
-  <span>🖼️</span> Upload from computer
-</button>
-                      <input
-                        type="file"
-                        accept="image/*,application/pdf"
-                        ref={fileInputRef}
-                        onChange={handleFileUpload}
-                        className="hidden"
-                      />
-                    </div>
-                  )}
-            
- 
+                <div
+                  ref={uploadRef}
+                  className="absolute bottom-0 left-0  w-64 bg-white shadow-lg border border-gray-300 rounded-xl p-2 "
+                >
+                  <button
+                    onClick={() => {
+                      console.log("Google Drive clicked");
+                      setShowUploadDialog(false);
+                    }}
+                    className="w-full text-left px-3 py-2 rounded hover:bg-gray-100 text-sm flex items-center gap-2"
+                  >
+                    <span>📁</span> Connect to Google Drive
+                  </button>
+                  <button
+                    onClick={() => {
+                      console.log("OneDrive clicked");
+                      setShowUploadDialog(false);
+                    }}
+                    className="w-full text-left px-3 py-2 rounded hover:bg-gray-100 text-sm flex items-center gap-2"
+                  >
+                    <span>☁️</span> Connect to Microsoft OneDrive
+                  </button>
+                  <button
+                    onClick={() => {
+                      fileInputRef.current.value = null; // Reset input so onChange fires even for same file
+                      fileInputRef.current.click();
+                    }}
+                    className="w-full text-left px-3 py-2 rounded hover:bg-gray-100 text-sm flex items-center gap-2"
+                  >
+                    <span>🖼️</span> Upload from computer
+                  </button>
+                  <input
+                    type="file"
+                    accept="image/*,application/pdf"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                </div>
+              )}
+              <div className=" w-full bg-gray-100 border border-gray-300 rounded-2xl px-4 py-2 flex justify-between shadow-sm flex-col">
+                {/* Text Area */}
+                <div className="flex-grow overflow-y-auto">
+                  <textarea
+                    ref={textareaRef}
+                    value={moreChat}
+                    onChange={controlHeight}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Ask Gemini..."
+                    rows={1}
+                    className="w-full resize-none focus:outline-none text-base text-black bg-transparent max-h-[200px] overflow-y-auto rounded-lg px-4 py-2 placeholder:text-gray-400"
+                    style={{ minHeight: "40px", height: "auto" }}
+                  />
+                </div>
 
-              <div className="fixed bottom-0 ml-[75px] left-1/2 transform -translate-x-1/2 w-[750px] max-h-[300px] bg-white border border-gray-300 shadow-md rounded-2xl px-4 py-2 flex flex-col">
+                {/* Bottom Action Bar */}
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => setShowUploadDialog((prev) => !prev)}
+                      className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
+                    >
+                      <Plus className="w-5 h-5" strokeWidth={1.5} />
+                    </button>
+                    <VoiceToText onResult={handleVoiceInput} />
+                    <button
+                      onClick={() => setIsOpen(true)}
+                      className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
+                    >
+                      <Volume2 className="w-5 h-5" strokeWidth={1.5} />
+                    </button>
+                  </div>
 
-  <div className="flex-grow overflow-y-auto">
+                  {/* Middle: Image Preview */}
+                  <div className="w-full px-2">
+                    {imagePreview && (
+                      <div className="relative mb-2 w-full max-w-xs">
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="rounded-lg  h-[100px] w-[100px] object-contain"
+                        />
+                        <button
+                          onClick={removeImage}
+                          className="absolute top-1 right-1 bg-white text-black rounded-full w-6 h-6 flex items-center justify-center shadow hover:bg-gray-100"
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    )}
+                  </div>
 
+                  {/* Right: Send Button */}
+                  <button
+                    onClick={handleAddChat}
+                    className="bg-neutral-800 hover:bg-neutral-900 text-white p-2 rounded-full transition-all flex items-center justify-center h-10 w-10"
+                  >
+                    {loading ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Send className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
 
-    <textarea
-      ref={textareaRef}
-      value={moreChat}
-      onChange={controlHeight}
-      onKeyDown={handleKeyDown}
-      placeholder="Ask Gemini..."
-      rows={1}
-      className="w-full resize-none focus:outline-none text-base text-[#444] bg-white max-h-[150px] overflow-y-auto"
-      style={{ minHeight: '40px', height: 'auto' }}
-    />
-  </div>
+                {/* Upload Dialog */}
+                {isVisible && (
+                  <div className="bg-white text-gray-700 p-3 rounded-md shadow-lg absolute z-10 bottom-[65px] left-[90px] space-y-2 w-40 border border-gray-200">
+                    <button
+                      onClick={() =>
+                        document.getElementById("imageInput")?.click()
+                      }
+                      className="flex items-center space-x-2 hover:text-black"
+                    >
+                      <ImageIcon className="w-5 h-5" />
+                      <span>Image</span>
+                    </button>
+                    <button
+                      onClick={() =>
+                        document.getElementById("fileInput")?.click()
+                      }
+                      className="flex items-center space-x-2 hover:text-black"
+                    >
+                      <File className="w-5 h-5" />
+                      <span>Files</span>
+                    </button>
 
-  {/* Bottom Row: Plus Icon, Mic, and Send Button */}
-  <div className="flex justify-between items-center mt-2" style={{ height: '35px' }}>
-    
-    {/* Plus Icon Button */}
-    <button onClick={() => setShowUploadDialog((prev) => !prev)} className="text-gray-500 hover:text-black p-2 flex items-center justify-center h-7 w-7">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-      </svg>
-    </button>
-
-    <div className="w-full p-2">
-{/* {/ Image Preview /} */}
-{imagePreview && (
-<div className="relative mb-2 w-full max-w-xs">
-<img src={imagePreview} alt="Preview" className="rounded-lg w-full h-auto object-cover" />
-<button
-onClick={removeImage}
-className="absolute top-1 right-1 bg-white text-black rounded-full w-6 h-6 flex items-center justify-center shadow hover:bg-gray-100"
->
-&times;
-</button>
-</div>
-)}
-
-</div>
-
-    {/* Voice Mic */}
-    <VoiceToText onResult={handleVoiceInput} />
-    <Volume2 onClick={() => setIsOpen(true)} className="text-blue-500 ml-2 cursor-pointer" />
-    {/* Send Button */}
-    <button
-      onClick={handleAddChat}
-      className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-xl transition-all"
-    >
-      {loading ? (
-        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-      ) : (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18" className="w-5 h-5">
-          <path
-            fillRule="evenodd"
-            d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
-            clipRule="evenodd"
-          />
-        </svg>
-      )}
-    </button>
-  </div>
-
-  
-  {isVisible && (
-    <div className="bg-white text-gray p-4 rounded-md shadow-lg absolute z-10" style={{ bottom: '65px', left: '90px' }}>
-      <button
-  onClick={() => document.getElementById('imageInput')?.click()}
-  className="flex items-center mb-2"
->
-  {/* Image Icon - Photo or Camera */}
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    className="w-4 h-4 text-gray"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M3 7h2l2-3h10l2 3h2a1 1 0 011 1v11a1 1 0 01-1 1H3a1 1 0 01-1-1V8a1 1 0 011-1zm9 10a4 4 0 100-8 4 4 0 000 8z"
-    />
-  </svg>
-  <span className="ml-2">Image</span>
-</button>
-
-<button
-  onClick={() => document.getElementById('fileInput')?.click()}
-  className="flex items-center"
->
- 
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    className="w-4 h-4 text-gray"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M7 7h10M7 11h10M7 15h6M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"
-    />
-  </svg>
-  <span className="ml-2">Files</span>
-</button>
-
-
-      <input
-        type="file"
-        id="imageInput"
-        accept="image/*"
-        onChange={handleFileChange}
-        className="hidden"
-      />
-      <input
-        type="file"
-        id="fileInput"
-        onChange={handleFileChange}
-        className="hidden"
-      />
-    </div>
-  )}
-</div>
-        
+                    <input
+                      type="file"
+                      id="imageInput"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                    <input
+                      type="file"
+                      id="fileInput"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -971,7 +1030,9 @@ className="absolute top-1 right-1 bg-white text-black rounded-full w-6 h-6 flex 
         <InsufficientBalance />
       )}
 
-      {isOpen && <SpeechToSpeech setIsOpen={setIsOpen} userId={userId} id={id}/>}
+      {isOpen && (
+        <SpeechToSpeech setIsOpen={setIsOpen} userId={userId} id={id} />
+      )}
     </>
   );
 };

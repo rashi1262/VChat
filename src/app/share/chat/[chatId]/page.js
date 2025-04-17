@@ -182,14 +182,14 @@ const handleKeyDown = (e) => {
     >
       
       {chatHistory.map((chat, index) => (
-  <div key={index} className="flex flex-col gap-1 mr-36">
+  <div key={index} className="flex flex-col gap-1 ">
    
     <div className="mr-36 mt-2 self-end bg-blue-500 text-white px-3 py-2 rounded-xl max-w-[70%]">
       {chat.userMessage}
     </div>
 
     {/* Bot Response */}
-    <div className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
+    <div className="self-start text-left text-lg text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
       {chat.parsedResponse.map((part, i) =>
         part.type === "code" ? (
           <pre key={i} className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto">
@@ -205,7 +205,7 @@ const handleKeyDown = (e) => {
 
 
       {morePrompt !== "" && (
-        <div className="flex flex-col gap-1 ml-36">
+        <div className="flex flex-col gap-1 ">
           {loading && (
             <div className="mself-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[5%] flex items-center gap-2">
               <span className="animate-pulse">...</span>

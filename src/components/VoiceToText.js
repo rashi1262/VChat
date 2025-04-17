@@ -35,7 +35,7 @@ const VoiceToText = ({ onResult }) => {
     <button
       onClick={toggleListening}
       type="button"
-      className={`w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-md ${
+      className={`w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm  ${
         isListening ? "bg-red-500" : "bg-white"
       }`}
     >

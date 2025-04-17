@@ -173,11 +173,11 @@ const page = () => {
          <div className="flex flex-col sticky  h-full w-full ">
       
 
-<div className="flex flex-col gap-1 mr-36">
+<div className="flex flex-col gap-1 ">
  {Array(1)
    .fill(0)
    .map((_, index) => (
-     <div key={index} className="animate-pulse flex flex-col gap-1 mr-36">
+     <div key={index} className="animate-pulse flex flex-col gap-1 ">
       
        <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
 

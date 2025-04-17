@@ -24,8 +24,6 @@ const GradientCircleCanvas = () => {
 
       const gradientX2 = centerX + Math.cos(frame * 0.01) * 100; // Slow left-right motion
       const gradientY2 = centerY + Math.sin(frame * 0.01) * 100; // Slow top-bottom motion
-
-      // First Gradient Layer (Radial)
       const gradient1 = ctx.createRadialGradient(
         gradientX1,
         gradientY1,

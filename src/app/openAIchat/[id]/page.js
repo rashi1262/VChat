@@ -402,13 +402,13 @@ const ChatPage = ({ params }) => {
           >
             <div className="flex flex-col sticky  h-full w-full ">
               {isloading ? (
-                <div className="flex flex-col gap-1 mr-36">
+                <div className="flex flex-col gap-1 ">
                   {Array(1)
                     .fill(0)
                     .map((_, index) => (
                       <div
                         key={index}
-                        className="animate-pulse flex flex-col gap-1 mr-36"
+                        className="animate-pulse flex flex-col gap-1 "
                       >
                         <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
 
@@ -434,7 +434,7 @@ const ChatPage = ({ params }) => {
                         )}
 
                         <div
-                          className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${
+                          className={`relative  px-3 py-2 text-lg flex flex-col rounded-[24px_4px_24px_24px] w-fit break-words gap-2 transition-all duration-200 ${
                             editIndex === index
                               ? "bg-gray-500 w-[70%]"
                               : "bg-gray-600"
@@ -460,7 +460,7 @@ const ChatPage = ({ params }) => {
                               <div className="flex justify-end gap-2 mt-2">
                                 <button
                                   onClick={() => setEditIndex(null)}
-                                  className="px-3 py-1 bg-gray-400 text-white rounded-md"
+                                  className="px-4 py-2 bg-[#dc3545] text-white rounded-full shadow-sm hover:bg-gray-700 transition-all duration-200 text-sm w-[80px]"
                                 >
                                   Cancel
                                 </button>
@@ -471,7 +471,7 @@ const ChatPage = ({ params }) => {
                                     handleAddChat();
                                     setEditIndex(null);
                                   }}
-                                  className="px-3 py-1 bg-green-500 text-white rounded-md"
+                                  className="px-4 py-2 bg-green-600 text-white rounded-full shadow-sm hover:bg-green-700 transition-all duration-200 text-sm w-[80px]"
                                 >
                                   Send
                                 </button>
@@ -491,7 +491,7 @@ const ChatPage = ({ params }) => {
               )}
 
               {morePrompt !== "" && (
-                <div className="flex flex-col gap-1 ml-36">
+                <div className="flex flex-col gap-1 ">
                   {loading && (
                     <div className="mself-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[5%] flex items-center gap-2">
                       <span className="animate-pulse">...</span>
@@ -545,13 +545,13 @@ const ChatPage = ({ params }) => {
           >
             <div className="flex flex-col sticky  h-full w-full ">
               {isloading ? (
-                <div className="flex flex-col gap-1 mr-36">
+                <div className="flex flex-col gap-1 ">
                   {Array(1)
                     .fill(0)
                     .map((_, index) => (
                       <div
                         key={index}
-                        className="animate-pulse flex flex-col gap-1 mr-36"
+                        className="animate-pulse flex flex-col gap-1 "
                       >
                         <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
 
@@ -561,7 +561,7 @@ const ChatPage = ({ params }) => {
                 </div>
               ) : (
                 chatHistory.map((chat, index) => (
-                  <div key={index} className="flex flex-col gap-1 mr-36">
+                  <div key={index} className="flex flex-col gap-1 ">
                     <div className="flex flex-col overflow-y-auto max-h-[500px]">
                       <div className="flex justify-end w-full pr-36">
                         {editIndex !== index && (
@@ -577,7 +577,7 @@ const ChatPage = ({ params }) => {
                         )}
 
                         <div
-                          className={`relative mt-2 px-3 py-2 rounded-xl max-w-[70%] flex flex-col gap-2 transition-all duration-200 ${
+                          className={`relative  px-3 py-2 text-lg flex flex-col rounded-[24px_4px_24px_24px] w-fit break-words gap-2 transition-all duration-200 ${
                             editIndex === index
                               ? "bg-gray-500 w-[70%]"
                               : "bg-gray-200"
@@ -603,7 +603,7 @@ const ChatPage = ({ params }) => {
                               <div className="flex justify-end gap-2 mt-2">
                                 <button
                                   onClick={() => setEditIndex(null)}
-                                  className="px-3 py-1 bg-gray-400 text-white rounded-md"
+                                  className="px-4 py-2 bg-[#dc3545] text-white rounded-full shadow-sm hover:bg-gray-700 transition-all duration-200 text-sm w-[80px]"
                                 >
                                   Cancel
                                 </button>
@@ -614,7 +614,7 @@ const ChatPage = ({ params }) => {
                                     handleAddChat();
                                     setEditIndex(null);
                                   }}
-                                  className="px-3 py-1 bg-green-500 text-white rounded-md"
+                                  className="px-4 py-2 bg-green-600 text-white rounded-full shadow-sm hover:bg-green-700 transition-all duration-200 text-sm w-[80px]"
                                 >
                                   Send
                                 </button>
@@ -630,7 +630,7 @@ const ChatPage = ({ params }) => {
                     </div>
 
  
-      <div className="ml-36 self-start text-left bg-gray-300 text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
+      <div className="self-start text-left text-lg text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
         {(
           chat.parsedResponse && chat.parsedResponse.length > 0
             ? chat.parsedResponse
@@ -664,7 +664,7 @@ const ChatPage = ({ params }) => {
               )}
 
 {morePrompt !== "" && (
-  <div className="flex flex-col gap-1 ml-36">
+  <div className="flex flex-col gap-1 ">
     {loading ? (
       chatModel === "ImageGeneration" ? (
         <div className="w-48 h-48 bg-gray-300 flex items-center justify-center rounded-xl my-5">

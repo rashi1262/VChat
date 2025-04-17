@@ -8,6 +8,8 @@ import { useChat } from ".././chatContext";
 import { toast, Toaster } from "sonner";
 import { useCredits } from "@/context/creditContext";
 import InsufficientBalance from "@/components/InsufficientBalance";
+import { AuthPopup } from "../model/page";
+import { Send, Plus, Volume2, Mic } from "lucide-react";
 
 const page = () => {
   const { hasCredits } = useCredits();
@@ -20,6 +22,7 @@ const page = () => {
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
   const { chatThread, setChatThread } = useChat();
+  const [showPopup, setShowPopup] = useState(false);
   const router = useRouter();
   // useEffect(() => {
   //   if (typeof window !== "undefined") {
@@ -37,6 +40,35 @@ const page = () => {
   //     } catch (error) {}
   //   }
   // }, []);
+
+
+  const controlHeight = (e) => {
+    const textarea = e.target;
+    textarea.style.height = "auto";
+    const newHeight = Math.min(textarea.scrollHeight, 200);
+    textarea.style.height = `${newHeight}px`;
+    setPrompt(textarea.value);
+  };
+  
+
+  useEffect(() => {
+    const handleClick = (event) => {
+      const user = localStorage.getItem("user");
+
+      if (!user) {
+        const isTextarea = event.target.closest("textarea");
+        if (isTextarea) {
+          setShowPopup(true);
+        }
+      }
+    };
+
+    document.addEventListener("click", handleClick);
+
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, []);
 
   useEffect(() => {
     if (!userId) return;
@@ -62,7 +94,6 @@ const page = () => {
             : []
         );
       } catch (error) {
-    
         setChatThread([]);
       }
     };
@@ -172,13 +203,13 @@ const page = () => {
                 <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center  w-4/5">
                   <div className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  ">
                     <div className="flex flex-col sticky  h-full w-full ">
-                      <div className="flex flex-col gap-1 mr-36">
+                      <div className="flex flex-col gap-1 ">
                         {Array(1)
                           .fill(0)
                           .map((_, index) => (
                             <div
                               key={index}
-                              className="animate-pulse flex flex-col gap-1 mr-36"
+                              className="animate-pulse flex flex-col gap-1 "
                             >
                               <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
 
@@ -230,7 +261,7 @@ const page = () => {
               <div className="fixed top-3 right-5 flex items-center "></div>
             </>
           ) : (
-            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  md:ml-auto md:w-full md:max-w-[calc(100%-256px)]">
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  md:ml-auto md:w-full relative ">
               <div className="flex justify-center items-center h-screen">
                 <div className="md:max-w-4xl w-full rounded-md p-6 text-center">
                   <div className="w-16 h-16 rounded-full md:ml-[240px] mx-auto mb-10 ">
@@ -260,45 +291,68 @@ const page = () => {
                     </svg>
                   </div>
                   <h1 className="text-2xl text-gray-900">Image Generation</h1>
-                  <h1 className="text-[18px] mt-5 text-gray-400">
+                  <p className="text-[18px] mt-5 text-gray-400">
                     Bring your ideas to life—create stunning images from just a
                     few words!
-                  </h1>
-                </div>
-                <div className="mb-5 md:ml-20 md:w-2/4 p-1 flex w-full bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full px-4">
-                  <input
-                    type="text"
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Send a message..."
-                    className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
-                  />
+                 </p>
 
-                  <button
-                    onClick={handleResponse}
-                    className="p-1 mr-2 rounded-full bg-white"
-                  >
-                    <div className="w-7 h-6 p-1 ">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 18 18"
-                        className=" text-gray-400 CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
-                      >
-                        <path
-                          fill="currentColor"
-                          fillRule="evenodd"
-                          d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
-                          clipRule="evenodd"
-                        ></path>
-                      </svg>
-                    </div>
-                  </button>
+                  <p></p>
+
+               
                 </div>
+                <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-[750px] px-4 py-2 z-2">
+ <div className="w-full bg-gray-100 border border-gray-300 rounded-2xl px-4 py-2 flex justify-between shadow-sm flex-col">
+ <textarea
+    value={prompt}
+    onChange={controlHeight}
+    onKeyDown={handleKeyDown}
+    placeholder="Send a message..."
+    rows={1}
+    className="w-full resize-none focus:outline-none text-base text-[#444] bg-transparent max-h-[200px] overflow-y-auto rounded-lg px-2 py-2 placeholder:text-gray-400"
+    style={{ minHeight: "40px", height: "auto" }}
+  />
+
+  {/* Icons Section */}
+  <div className="flex justify-between items-center mt-2">
+    {/* Left Side Icons */}
+    <div className="flex gap-x-2">
+      {/* Upload/Plus */}
+      <button
+        onClick={() => setShowUploadDialog((prev) => !prev)}
+        className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
+      >
+        <Plus className="w-5 h-5 text-gray-500" strokeWidth={1.5} />
+      </button>
+
+      {/* Speaker */}
+      <button
+        onClick={() => setIsOpen(true)}
+        className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
+      >
+        <Volume2 className="w-5 h-5 text-gray-500" strokeWidth={1.5} />
+      </button>
+
+      {/* Mic */}
+      <div className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white">
+        <Mic className="w-5 h-5 text-gray-500" strokeWidth={1.5} />
+      </div>
+    </div>
+
+    {/* Send Button */}
+    <button
+      onClick={handleResponse}
+      className="w-10 h-10 p-2 rounded-full flex items-center justify-center shadow-sm bg-neutral-800 text-white hover:bg-neutral-900 transition-all"
+    >
+      <Send className="w-5 h-5" />
+    </button>
+  </div>
+  </div>
+
+</div>
               </div>
             </div>
           )}
+          {showPopup && <AuthPopup />}
         </div>
       ) : (
         <InsufficientBalance />

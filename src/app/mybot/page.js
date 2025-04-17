@@ -27,30 +27,12 @@ const page = () => {
       <div className="flex w-full justify-between bg-gray-50 text-sm">
       <Navbar/>
     
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  md:ml-auto md:w-full md:max-w-[calc(100%-256px)]">
+        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  md:ml-auto md:w-full ">
           <div className="max-w-6xl w-full rounded-md py-6 mt-12">
             <strong className=" text-gray-600  ml-20  text-lg">
               My Bots
             </strong>
-            {/* <button className="flex absolute top-20 right-56 text-gray-400 px-4 py-2 rounded-md border  rounded-l-full rounded-r-full hover:border-black">
-              <div className="w-4 h-4 mr-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 16 16"
-                  className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="1.336"
-                    d="m14 12-.667.73a1.8 1.8 0 0 1-1.333.604c-.5 0-.98-.218-1.333-.604a1.8 1.8 0 0 0-1.334-.603c-.5 0-.979.217-1.333.603m-6 .604h1.116c.326 0 .49 0 .643-.037q.205-.05.385-.16c.135-.082.25-.198.48-.428L13 4.334a1.414 1.414 0 1 0-2-2l-8.375 8.375c-.23.23-.346.346-.429.48q-.11.181-.16.386C2 11.728 2 11.89 2 12.217z"
-                  ></path>
-                </svg>
-              </div>
-              Customize
-            </button> */}
+      
 
             <h1 className="text-gray-400 mt-1 mb-5 ml-20 text-sm">
               Manage your favorite bots.
@@ -86,13 +68,13 @@ const page = () => {
                 </div>
                  <div className="grid grid-cols-1 rounded-4xl items-center  ">
                   <div className="flex border rounded-md p-4 hover:bg-white justify-center gap-6 overflow-x-auto">
-                    <div className="mr-3 ml-5">
+                    <div className=" w-[15%] flex justify-center items-center">
                       <Link
                         href="/model"
                         className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm  "
                       >
                         <div  className=" mx-auto ">
-                          <div className="flex  border rounded-md p-1 hover:bg-white ">
+                          <div className="">
                             <div className="w-10 h-10 m-4 ">
                               <svg
                                 viewBox="0 0 42 42"
@@ -141,13 +123,13 @@ const page = () => {
                         Gemini
                       </Link>
                     </div>
-                    <div className="mr-3 ml-5">
+                    <div className="w-[15%] flex justify-center items-center">
                       <Link
                         href="/openAIGPT-4o"
                         className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm  "
                       >
                         <div className=" mx-auto ">
-                          <div className="flex  border rounded-md p-1 hover:bg-white ">
+                          <div className="">
                             <div className="w-10 h-10 m-4">
                               <svg
                                 viewBox="0 0 42 42"
@@ -196,13 +178,13 @@ const page = () => {
                         OpenAI GPT-4o
                       </Link>
                     </div>
-                    <div className="mr-3 ml-5">
+                    <div className="w-[15%] flex justify-center items-center">
                       <Link
                         href="/deepSeek"
                         className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm  "
                       >
                         <div className="mx-auto ">
-                          <div className="flex  border rounded-md p-1 hover:bg-white ">
+                          <div className="">
                             <div className="w-10 h-10 m-4">
                               <svg
                                 fill="none"
@@ -250,13 +232,13 @@ const page = () => {
                         DeepSeek
                       </Link>
                     </div>
-                    <div className="mr-3 ml-5">
+                    <div className="w-[15%] flex justify-center items-center">
                       <Link
                         href="/image"
                         className="items-center mr-4 text-gray-600 hover:bg-gray-100 rounded text-sm "
                       >
                         <div className="grid grid-cols-1  items-center   mb-2">
-                          <div className="flex  border rounded-md p-1 hover:bg-white ">
+                          <div className="">
                             <div className="w-10 h-10 m-4 ">
                               <svg
                                 fill="none"
@@ -288,48 +270,7 @@ const page = () => {
                         Image Generation
                       </Link>
                     </div>
-                   {/* <div>
-                      <Link
-                        href="/upload"
-                        className="items-center  text-gray-600 hover:bg-gray-100 rounded text-sm "
-                      >
-                        <div className="grid grid-cols-1  items-center   mb-2">
-                          <div className="flex  border rounded-md p-1 hover:bg-white ">
-                            <div className="w-10 h-10 m-3">
-                              <svg
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 42 42"
-                                className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
-                              >
-                                <path
-                                  d="M.5 21C.5 9.678 9.678.5 21 .5S41.5 9.678 41.5 21 32.322 41.5 21 41.5.5 32.322.5 21Z"
-                                  fill="#fff"
-                                ></path>
-                                <rect
-                                  x="0.656"
-                                  y="0.656"
-                                  width="40.688"
-                                  height="40.688"
-                                  rx="20.344"
-                                  stroke="#EEE"
-                                  strokeWidth="1.313"
-                                ></rect>
-                                <path
-                                  d="M27.918 17.253 22.7 12.036v5.217h5.217Z"
-                                  fill="#D47070"
-                                ></path>
-                                <path
-                                  d="M22.7 18.744c-.822 0-1.49-.669-1.49-1.491v-5.217h-5.217a1.49 1.49 0 0 0-1.491 1.49v14.907a1.49 1.49 0 0 0 1.49 1.49l10.435.002c.823 0 1.491-.668 1.491-1.49v-9.691h-5.217Z"
-                                  fill="#D47070"
-                                ></path>
-                              </svg>
-                            </div>
-                          </div>
-                        </div>
-                        Upload & Ask PDF
-                      </Link>
-                    </div> */}
+            
                   </div>
                 </div>
 

@@ -8,6 +8,10 @@ import { useRouter } from "next/navigation";
 import { useCredits } from "@/context/creditContext";
 import { toast, Toaster } from "sonner";
 import InsufficientBalance from "@/components/InsufficientBalance";
+import { AuthPopup } from "../model/page";
+
+import { Send, Plus, Mic, Volume2 } from "lucide-react";
+import VoiceToText from "@/components/VoiceToText";
 
 const page = () => {
   const { hasCredits } = useCredits();
@@ -23,7 +27,22 @@ const page = () => {
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
   const { chatThread, setChatThread } = useChat();
+  const [showPopup, setShowPopup] = useState(false);
   const router = useRouter();
+
+
+  const controlHeight = (e) => {
+    const textarea = e.target;
+  
+    // Reset height to allow shrinking
+    textarea.style.height = "auto";
+  
+    // Limit height to max 200px
+    const newHeight = Math.min(textarea.scrollHeight, 200);
+    textarea.style.height = `${newHeight}px`;
+  
+    setPrompt(textarea.value);
+  };
   // useEffect(() => {
   //   if (typeof window !== "undefined") {
   //     try {
@@ -42,6 +61,28 @@ const page = () => {
   //     }
   //   }
   // }, []);
+
+  // const startVoiceInput = () => {
+  //   // Trigger your VoiceToText or any mic feature here
+  // };
+  useEffect(() => {
+    const handleClick = (event) => {
+      const user = localStorage.getItem("user");
+
+      if (!user) {
+        const isTextarea = event.target.closest("textarea");
+        if (isTextarea) {
+          setShowPopup(true);
+        }
+      }
+    };
+
+    document.addEventListener("click", handleClick);
+
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, []);
 
   const fileInputRef = useRef(null);
 
@@ -277,13 +318,13 @@ const page = () => {
                 <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center  w-4/5">
                   <div className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  ">
                     <div className="flex flex-col sticky  h-full w-full ">
-                      <div className="flex flex-col gap-1 mr-36">
+                      <div className="flex flex-col gap-1 ">
                         {Array(1)
                           .fill(0)
                           .map((_, index) => (
                             <div
                               key={index}
-                              className="animate-pulse flex flex-col gap-1 mr-36"
+                              className="animate-pulse flex flex-col gap-1 "
                             >
                               {/* User Message Skeleton */}
                               <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
@@ -337,7 +378,7 @@ const page = () => {
               <div className="fixed top-3 right-5 flex items-center "></div>
             </>
           ) : (
-            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  md:ml-auto md:w-full md:max-w-[calc(100%-256px)]">
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  md:ml-auto md:w-full relative ">
               <div className="max-w-3xl rounded-md  text-center  px-3">
                 <div className="w-16 h-16 rounded-full md:ml-72 md:mb-10 mx-auto mb-4">
                   <svg
@@ -369,75 +410,77 @@ const page = () => {
                     ></path>
                   </svg>
                 </div>
-                <h1 className="md:text-3xl text-lg  text-gray-900">Upload & Ask PDF</h1>
-                <p className="md:text-xl text-base mt-5 text-gray-400">
+                <h1 className="text-2xl text-gray-900">Upload & Ask PDF</h1>
+                <p className="text-[18px] mt-5 text-gray-400">
                   Get instant answers and insights from your documents—just
                   upload and ask!
                 </p>
-                <div className="mb-5 w-full md:ml-20 md:w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2 rounded-l-full rounded-r-full">
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current.click()}
-                    className="ml-2 p-2 rounded-full bg-white"
-                  >
-                    <div className="w-7 h-6 p-1">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 18 18"
-                        className="text-gray-400"
-                      >
-                        <path
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="1.5"
-                          d="M9 3.75v10.5M3.75 9h10.5"
-                        ></path>
-                      </svg>
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        accept=".pdf"
-                        onChange={handleFileChange}
-                        className="hidden"
-                      />
-                    </div>
-                  </button>
+                <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-[750px] px-4 py-2 z-20">
 
-                  <input
-                    type="text"
-                    value={file ? `${prompt} (File: ${file.name})` : prompt} // Display file name if available
-                    onChange={(e) => setPrompt(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Send a message..."
-                    className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
-                  />
+                  <div className="w-full bg-gray-100 border border-gray-300 rounded-2xl px-4 py-2 flex justify-between shadow-sm flex-col">
+                     {/* Textarea Input */}
+  <textarea
+    value={file ? `${prompt} (File: ${file.name})` : prompt}
+    onChange={controlHeight} // auto-resize handler
+    onKeyDown={handleKeyDown}
+    placeholder="Send a message..."
+    rows={1}
+    className="w-full resize-none focus:outline-none text-base text-[#444] bg-transparent max-h-[200px] overflow-y-auto rounded-lg px-2 py-2"
+    style={{ minHeight: "40px", height: "auto" }}
+  />
 
-                  <button
-                    onClick={handleKeyDown}
-                    className="p-1 mr-2 rounded-full bg-white"
-                  >
-                    <div className="w-7 h-6 p-1">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 18 18"
-                        className="text-gray-400"
-                      >
-                        <path
-                          fill="currentColor"
-                          fillRule="evenodd"
-                          d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
-                          clipRule="evenodd"
-                        ></path>
-                      </svg>
-                    </div>
-                  </button>
-                </div>
+  {/* Icon Buttons Row */}
+  <div className="flex justify-between items-center mt-2">
+    {/* Left Side Icons */}
+    <div className="flex gap-x-2">
+      {/* Upload */}
+      <button
+        onClick={() => fileInputRef.current.click()}
+        className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
+      >
+        <Plus className="w-5 h-5" strokeWidth={1.5} />
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept=".pdf"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+      </button>
+
+      {/* Speaker */}
+      <button
+        onClick={() => setIsOpen(true)}
+        className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
+      >
+        <Volume2 className="w-5 h-5" strokeWidth={1.5} />
+      </button>
+
+      {/* Mic (Voice Input) */}
+      <div className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white">
+        <VoiceToText />
+      </div>
+    </div>
+
+    {/* Send Button */}
+    <button
+      onClick={handleResponse}
+      className="w-10 h-10 p-2 rounded-full flex items-center justify-center shadow-sm bg-neutral-800 text-white hover:bg-neutral-900 transition-all"
+    >
+      {loading ? (
+        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+      ) : (
+        <Send className="w-5 h-5" />
+      )}
+    </button>
+  </div>
+                  </div>
+ 
+</div>
               </div>
             </div>
           )}
+          {showPopup && <AuthPopup />}
         </div>
       ) : (
         <InsufficientBalance />
