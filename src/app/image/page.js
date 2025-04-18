@@ -264,7 +264,7 @@ const page = () => {
             <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  md:ml-auto md:w-full relative ">
               <div className="flex justify-center items-center h-screen">
                 <div className="md:max-w-4xl w-full rounded-md p-6 text-center">
-                  <div className="w-16 h-16 rounded-full md:ml-[240px] mx-auto mb-10 ">
+                  <div className="w-16 h-16 rounded-full  mx-auto mb-6 ">
                     <svg
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"

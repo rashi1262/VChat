@@ -196,7 +196,7 @@ const page = ({ params }) => {
         const firstMessage = chatHistory.userSearch[0];
       }
 
-      // router.push(`/chat/${chatData.id}`);
+      router.push(`/chat/${chatData.id}`);
       setLoading(false);
     } catch (error) {
       setLoading(false);
