@@ -154,8 +154,11 @@ const Page = () => {
     <>
       <div className="flex w-full justify-between bg-gray-50 text-sm">
         <Navbar />
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center mt-4 ml-auto w-[80%]">
+        <div className=" bg-gray-50 flex flex-col items-center  w-full ">
+      
           <div className="grid grid-cols-1 gap-6 items-center mr-20 ml-20">
+           
+            <div className=" p-6 h-screen overflow-y-auto custom-scrollbar">
             <div className="flex border mt-14 rounded-md p-1 bg-gray-200 rounded-l-full rounded-r-full mr-20 ml-20">
               {[
                 "Popular",
@@ -177,7 +180,6 @@ const Page = () => {
                 </button>
               ))}
             </div>
-            <div className="min-h-screen p-6">
               <div className="justify-center text-center">
                 <h1 className="text-3xl text-gray-700 mb-3 mt-8 font-bold">
                   {category}

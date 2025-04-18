@@ -21,6 +21,7 @@ import {
 import InsufficientBalance from "@/components/InsufficientBalance";
 import { cards, Card } from "@/components/utils";
 import SpeechToSpeech from "@/components/SpeechToSpeech";
+import SecondNavbar from "../SecondNavbar";
 const page = ({ params }) => {
   const { hasCredits } = useCredits();
   const [showPopup, setShowPopup] = useState(false);
@@ -195,7 +196,7 @@ const page = ({ params }) => {
         const firstMessage = chatHistory.userSearch[0];
       }
 
-      router.push(`/chat/${chatData.id}`);
+      // router.push(`/chat/${chatData.id}`);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -265,6 +266,8 @@ const page = ({ params }) => {
           <Toaster position="top-center" richColors />
           <div className="flex w-full justify-between bg-gray-50 text-sm">
             <Navbar />
+            <SecondNavbar/>
+            
             {msg ? (
               <>
                 <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
@@ -284,17 +287,17 @@ const page = ({ params }) => {
                                 {/* User Message - Right Side */}
                                 <div className="flex justify-end">
                                   <div
-                                    className={`text-black w-fit bg-[#e9eef6] rounded-[24px_4px_24px_24px] max-w-[444px] px-4 py-2 text-center text-lg relative ${
+                                    className={`text-black w-fit bg-[#e9eef6] rounded-[24px_4px_24px_24px] max-w-[444px] px-4 py-2 text-center text-lg relative pr-[38px] ${
                                       !expandedIndexes.includes(index)
                                         ? "line-clamp-3"
                                         : ""
-                                    } mr-3`}
+                                    } `}
                                   >
                                     {msg}
                                     {msg.length > 100 && (
                                       <button
                                         onClick={() => toggleExpand(index)}
-                                        className="text-blue-300 text-sm absolute right-0 top-0"
+                                        className="text-white rounded-full bg-black text-sm absolute right-[10px] top-[10px]"
                                       >
                                         {expandedIndexes.includes(index) ? (
                                           <ChevronUp />
@@ -395,9 +398,7 @@ const page = ({ params }) => {
                                 </svg>
                               </button>
 
-                              <button className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white">
-                                <Mic strokeWidth={1} />
-                              </button>
+                             
                               <button className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white">
                                 <Volume2 strokeWidth={1} />
                               </button>
@@ -615,12 +616,8 @@ const page = ({ params }) => {
                                 <Plus className="w-5 h-5" strokeWidth={1.5} />
                               </button>
 
-                              <button
-                                onClick={handleVoiceInput}
-                                className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
-                              >
-                                <Mic className="w-5 h-5" strokeWidth={1.5} />
-                              </button>
+  <VoiceToText onResult={handleVoiceInput} />
+
 
                               <button
                                 onClick={() => setIsOpen(true)}

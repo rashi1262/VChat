@@ -37,6 +37,8 @@ import "./globals.css";
 import { NextAuthProvider } from "./Providers";
 import { ChatProvider } from "./chatContext"; 
 import Header from "./header";
+import { SecondNavProvider } from "../context/SecondNavContext"; // adjust path accordingly
+
 // import Navbar from "./navbar";
 import { CreditProvider } from "../context/creditContext";
 import { NavProvider } from "./NavProvider";
@@ -68,7 +70,12 @@ export default function RootLayout({ children }) {
             <NextAuthProvider>
               <ChatProvider>
                <CreditProvider>
-                {children}</CreditProvider>
+               <SecondNavProvider>
+
+                {children}
+                </SecondNavProvider>
+                </CreditProvider>
+                
                 </ChatProvider>
             </NextAuthProvider>
             </NavProvider>

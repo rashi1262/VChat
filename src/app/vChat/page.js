@@ -352,12 +352,12 @@ const page = ({ params }) => {
               <>
                 <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center hidden">
                   <div className="max-w-4xl w-full  rounded-md p-6 text-center">
-                    <button
+                    {/* <button
                       className="h-6 flex w-full justify-center items-center text-center text-black rounded"
                       onClick={() => setShowButtons(!showButtons)}
                     >
                       Gemini <ChevronDown />
-                    </button>
+                    </button> */}
 
                     {showButtons && (
                       <div className="flex flex-col  items-center justify-center  ">
