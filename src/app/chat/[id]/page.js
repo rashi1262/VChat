@@ -35,6 +35,7 @@ import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import hljs from "highlight.js";
 import SpeechToSpeech from "@/components/SpeechToSpeech";
 import SecondNavbar from "@/app/SecondNavbar";
+import MobileSidebar from "@/app/MobileSidebar";
 
 const CodeBlock = ({ code, language = "text", onCopy, copied }) => {
   // Auto-detect the language if not provided
@@ -526,9 +527,10 @@ const ChatPage = ({ params }) => {
     <>
       {hasCredits ? (
         <div className="flex w-full  bg-gray-50 text-sm overflow-y-scroll">
-          <Navbar />
-            <SecondNavbar/>
-          <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center  md:hidden">
+          <Navbar/>
+            <SecondNavbar />
+            <MobileSidebar />
+          {/* <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center  md:hidden">
             <div
               className="max-w absolute top-4  overflow-y-scroll rounded-md h-[75%] p-4 text-center  mt-20  "
               ref={chatContainerRef}
@@ -668,7 +670,7 @@ const ChatPage = ({ params }) => {
                 </button>
               </div>
             </div>
-          </div>
+          </div> */}
           <div className="min-h-screen md:flex relative bg-gray-50  items-center w-full  justify-center">
             <div
               className=" absolute top-4  overflow-y-auto w-full rounded-md h-[70%] p-4 text-start  mt-20  max-w-4xl mx-auto "

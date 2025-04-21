@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { useChat } from "./chatContext";
 import { useRouter } from "next/navigation";
-import { Plus, Sparkle, SquareMenu } from "lucide-react";
+import { Plus, Sparkle, SquareMenu, X } from "lucide-react";
 import { EllipsisVertical } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import Image from "next/image";
@@ -116,12 +116,12 @@ const page = () => {
   };
 
   return (
-    <div>
+    <div className="md:block hidden">
       <div className="relative z-40">
         <Toaster position="top-center" richColors />
 
         <div
-          className={`h-screen custom-scrollbar bg-[#f4f4f5] text-black overflow-y-auto left-0 top-0 flex flex-col items-center  transition-all duration-300 ${
+          className={`h-screen custom-scrollbar bg-[#f4f4f5] text-black overflow-y-auto left-0 top-0 flex flex-col items-center overflow-x-hidden transition-all duration-300 ${
             !isNavVisible ? " w-24 p-2" : " w-64 p-4" // or w-[50%] if you want a larger expanded sidebar
           }`}
         >
@@ -130,19 +130,15 @@ const page = () => {
               <li className=" flex rounded  flex-col gap-y-7  ">
                 <button
                   onClick={() => setIsNavVisible(!isNavVisible)}
-                  className="relative group p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all duration-200 w-10 h-10"
+                  className="relative group p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all duration-200 w-8 h-8 flex justify-center items-centers"
                 >
-                  <div className="w-6 h-6 flex items-center justify-center">
-                    <SquareMenu strokeWidth={1} />
+                  <div className="w-5 h-5 flex items-center justify-center">
+                    {isNavVisible ? (
+                      <X strokeWidth={1} className="w-6 h-6" />
+                    ) : (
+                      <SquareMenu strokeWidth={1} className="w-6 h-6" />
+                    )}
                   </div>
-
-                  {/* Extended Menu (Shown on Hover) */}
-                  {/* <div className="absolute  bottom-[-20px] ml-2 w-20  bg-black border rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                 
-                    <span className="text-white text-[10px] md:text-[12px]">
-                      Expand menu
-                    </span>
-                  </div> */}
                 </button>
 
                 <Link
@@ -151,19 +147,13 @@ const page = () => {
                 >
                   <Plus size={12} className="mr-2" />
                   {isNavVisible && <div className="text-sm">New Chat</div>}
-
-                  {/* Tooltip (shown on hover) */}
-                  {/* <div className="absolute bottom-[-20px] ml-2 w-20 bg-black border  text-center rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <span className="text-white text-[10px] md:text-[12px]">
-                      New Chat
-                    </span>
-                  </div> */}
                 </Link>
               </li>
+
               <li>
                 <Link
                   href="/mybot"
-                  className="flex items-center px-2 py-1 mb-4 mt-4 text-gray-600 hover:bg-[#dedede] active:bg-[#dedede] rounded-[30px] text-sm transition "
+                  className="flex items-center px-2 py-1 mb-4 mt-4 text-gray-600 hover:bg-trans active:bg-[#dedede] rounded-[30px] text-sm transition "
                 >
                   <div className="w-8 h-8 p-1 bg-white rounded-full flex items-center justify-center">
                     <Sparkle className="w-4 h-4" strokeWidth={1} />
@@ -173,7 +163,20 @@ const page = () => {
                   {/* <div className="ml-1">My Bot</div> */}
                 </Link>
               </li>
-              {features.map((feature) => (
+
+              <li>
+                <Link
+                  href="/model"
+                  className="flex items-center px-2 py-1 mb-4 mt-4 text-gray-600 hover:bg-trans active:bg-[#dedede] rounded-[30px] text-sm transition "
+                >
+                  <div className="w-8 h-8 p-1 bg-white rounded-full flex items-center justify-center">
+                    <Sparkle className="w-4 h-4" strokeWidth={1} />
+                  </div>
+                  {isNavVisible && <div className="ml-2 text-sm ">Chat</div>}
+                </Link>
+              </li>
+
+              {/* {features.map((feature) => (
                 <div className=" group relative" key={feature.title}>
                   <Link
                     href={feature.href}
@@ -192,17 +195,9 @@ const page = () => {
                     )}
                   </Link>
 
-                  {/* Tooltip when nav is collapsed */}
-                  {/* {!isNavVisible && (
-  <div className="absolute -top-3 left-full ml-2 z-20 w-max max-w-[10rem] px-3 py-2 text-xs bg-black text-white border border-gray-700 rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-    {feature.title}
-
-    <div className="absolute -bottom-1 left-2 w-3 h-3 bg-black rotate-45 border-l border-t border-gray-700 z-[-1]"></div>
-  </div>
-)} */}
+   
                 </div>
-              ))}
-            
+              ))} */}
             </ul>
             <ul className="">
               {isNavVisible && (

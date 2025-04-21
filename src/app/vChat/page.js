@@ -15,6 +15,7 @@ import { useCredits } from "@/context/creditContext";
 import { cards, Card } from "@/components/utils";
 import InsufficientBalance from "@/components/InsufficientBalance";
 import { AuthPopup } from "../model/page";
+import SecondNavbar from "../SecondNavbar";
 
 const page = ({ params }) => {
   const { hasCredits } = useCredits();
@@ -249,6 +250,7 @@ const page = ({ params }) => {
 
           <div className="flex w-full justify-between bg-gray-50 text-sm">
             <Navbar />
+            <SecondNavbar />
 
             {msg ? (
               <>

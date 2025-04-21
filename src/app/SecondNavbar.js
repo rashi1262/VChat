@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { useChat } from "./chatContext";
 import { useRouter } from "next/navigation";
-import { Plus, Sparkle, SquareMenu } from "lucide-react";
+import { Plus, Sparkle, SquareMenu, X } from "lucide-react";
 import { EllipsisVertical } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import Image from "next/image";
@@ -119,12 +119,12 @@ const SecondNavbar = () => {
   };
 
   return (
-    <div>
+    <div className="md:block hidden">
       <div className="relative z-40">
         <Toaster position="top-center" richColors />
 
         <div
-          className={`h-screen  bg-white text-black overflow-y-auto left-0 top-0 flex flex-col items-center  transition-all duration-300 ${
+          className={`h-screen overflow-x-hidden bg-white text-black overflow-y-auto left-0 top-0 flex flex-col items-center  transition-all duration-300 ${
             !isSecondNavVisible ? " w-24 p-2" : " w-64 p-4" // or w-[50%] if you want a larger expanded sidebar
           }`}
         >
@@ -133,10 +133,14 @@ const SecondNavbar = () => {
               <li className=" flex rounded  flex-col gap-y-7  ">
                 <button
                   onClick={toggleSecondNav}
-                  className="relative group p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all duration-200 w-10 h-10"
+                  className="relative group p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all duration-200 w-8 h-8 flex justify-center items-center"
                 >
-                  <div className="w-6 h-6 flex items-center justify-center">
-                    <SquareMenu strokeWidth={1} />
+                  <div className="w-5 h-5 flex items-center justify-center">
+                    {!isSecondNavVisible ? (
+                      <SquareMenu strokeWidth={1} className="w-6 h-6" />
+                    ) : (
+                      <X strokeWidth={1} className="w-6 h-6" />
+                    )}
                   </div>
 
                   {/* Extended Menu (Shown on Hover) */}
@@ -150,12 +154,12 @@ const SecondNavbar = () => {
               </li>
 
               {features.map((feature) => (
-                <div className=" group relative" key={feature.title}>
+                <div className=" group relative mt-6" key={feature.title}>
                   <Link
                     href={feature.href}
                     className="flex items-center px-2 py-1 mb-4 text-gray-600 hover:bg-[#dedede] active:bg-[#dedede] rounded-[30px] text-sm transition"
                   >
-                    <div className="w-8 h-8 p-1 bg-white rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 p-1 bg-white rounded-full flex items-center justify-center shadow-md">
                       <Image
                         src={feature.img}
                         width={26}
@@ -185,25 +189,15 @@ const SecondNavbar = () => {
                     href=""
                     className="flex  mb-2 items-center p-2 hover:bg-gray-100 rounded-full bg-[#f4f4f5] py-2 mt-[30px] text-sm"
                   >
-                    <div className="w-6 h-4 p-1 flex items-center ">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 18 18"
-                        className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--tiny___trsDz"
-                      >
-                        <path
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="1.5"
-                          d="m1.5 5.25 6.124 4.287c.496.347.744.52 1.013.587.238.06.488.06.726 0 .27-.067.517-.24 1.013-.587L16.5 5.25M5.1 15h7.8c1.26 0 1.89 0 2.371-.245a2.25 2.25 0 0 0 .984-.984c.245-.48.245-1.11.245-2.371V6.6c0-1.26 0-1.89-.245-2.371a2.25 2.25 0 0 0-.983-.984C14.79 3 14.16 3 12.9 3H5.1c-1.26 0-1.89 0-2.371.245a2.25 2.25 0 0 0-.984.984C1.5 4.709 1.5 5.339 1.5 6.6v4.8c0 1.26 0 1.89.245 2.371.216.424.56.768.984.984C3.209 15 3.839 15 5.1 15"
-                        ></path>
-                      </svg>
+                    <div className="w-6 h-4 p-1 flex flex-col items-center ">
+                 
+                      
                     </div>
 
                     {/* My Bot */}
                     <div className="ml-2 text-sm "> Recent Chats</div>
+                    <hr className="my-4 h-px border-t-0 bg-transparent bg-gradient-to-r from-transparent via-neutral-500 to-transparent opacity-25 dark:opacity-100" />
+                   
                     {/* <div className="ml-1 mt-[2%]">Chats</div> */}
                   </Link>
                   <div className="">
@@ -290,7 +284,7 @@ export default SecondNavbar;
 
 const features = [
   { href: "/vChat", img: "/assests/vlogo.avif", title: "VChat" },
-  { href: "/model", img: "/assests/gemini.png", title: "Gemini" },
+  { href: "/model", img: "/assests/gemini-color.png", title: "Gemini" },
   { href: "/openAI", img: "/assests/svgviewer-output.svg", title: "OpenAI" },
   {
     href: "/image",

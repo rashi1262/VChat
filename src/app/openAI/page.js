@@ -12,6 +12,7 @@ import { cards, Card } from "@/components/utils";
 import { AuthPopup } from "../model/page";
 // import { Send } from "lucide-react";
 import { Send, Plus, Mic, Volume2 } from "lucide-react";
+import SecondNavbar from "../SecondNavbar";
 
 const page = () => {
   const { hasCredits, setHasCredits } = useCredits();
@@ -221,6 +222,7 @@ const page = () => {
           <Toaster position="top-center" richColors />
 
           <Navbar />
+          <SecondNavbar />
 
           {msg ? (
             <>
