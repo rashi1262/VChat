@@ -1,113 +1,116 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import React from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useChat } from "../chatContext";
-import Image from "next/image";
-import Navbar from "../navbar";
-import Header from "../header";
 import { ChevronDown, Send, Plus, Mic, Volume2 } from "lucide-react";
 import VoiceToText from "@/components/VoiceToText";
 import { toast, Toaster } from "sonner";
 import { useCredits } from "@/context/creditContext";
 import { cards, Card } from "@/components/utils";
 import InsufficientBalance from "@/components/InsufficientBalance";
-import { AuthPopup } from "../model/page";
+import Navbar from "../navbar";
 import SecondNavbar from "../SecondNavbar";
+import { AuthPopup } from "../model/page";
+import ReactMarkdown from "react-markdown";
 
-const page = ({ params }) => {
+const Page = ({ params }) => {
   const { hasCredits } = useCredits();
   const { chatThread, setChatThread } = useChat();
+  const router = useRouter();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [prompt, setPrompt] = useState("");
-  const [response, setResponse] = useState("");
   const [responses, setResponses] = useState([]);
   const [selected, setSelected] = useState("");
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState(null);
   const [msg, setMsg] = useState("");
   const [showPopup, setShowPopup] = useState(false);
-
-  const [messages, setMessages] = useState([]);
-
+  const [showButtons, setShowButtons] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const fileInputRef = useRef(null);
+  // Handle voice input
   const handleVoiceInput = (voiceText) => {
     setPrompt((prevPrompt) => prevPrompt + " " + voiceText);
   };
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file); // Save file for later API use
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result); // Preview
+      };
+      reader.readAsDataURL(file);
+    }
+    e.target.value = null;
+    setShowUploadDialog(false);
+  };
+
+  const removeImage = () => {
+    setImagePreview(null);
+    setSelectedFile(null);
+  };
+
+  // Check user authentication
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (!storedUser) {
+          router.push("/login");
+          return;
+        } else {
+          const user = JSON.parse(storedUser);
+          setEmail(user?.email || "No Email");
+          setName(user?.name || "No Name");
+          setUserId(user?.id);
+        }
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    }
+  }, [router]);
+
+  // Handle textarea height
   const controlHeight = (e) => {
     const textarea = e.target;
-
-    // Reset height to allow shrinking
     textarea.style.height = "auto";
-
-    // Limit height to max 200px
     const newHeight = Math.min(textarea.scrollHeight, 200);
     textarea.style.height = `${newHeight}px`;
-
     setPrompt(textarea.value);
   };
 
-  const router = useRouter();
-  const [showButtons, setShowButtons] = useState(false);
-  // useEffect(() => {
-  //   if (typeof window !== "undefined") {
-  //     try {
-  //       const storedUser = localStorage.getItem("user");
-  //       if (!storedUser) {
-  //         router.push("/login");
-  //         return;
-  //       } else {
-  //         const user = JSON.parse(storedUser);
-  //         setEmail(user?.email || "No Email");
-  //         setName(user?.name || "No Name");
-  //         setUserId(user?.id);
-  //       }
-  //     } catch (error) {
-
-  //     }
-  //   }
-  // }, []);
+  // Show popup for unauthenticated users
   useEffect(() => {
     const handleClick = (event) => {
       const user = localStorage.getItem("user");
-
-      if (!user) {
-        const isTextarea = event.target.closest("textarea");
-        if (isTextarea) {
-          setShowPopup(true);
-        }
+      if (!user && event.target.closest("textarea")) {
+        setShowPopup(true);
       }
     };
-
     document.addEventListener("click", handleClick);
-
-    return () => {
-      document.removeEventListener("click", handleClick);
-    };
+    return () => document.removeEventListener("click", handleClick);
   }, []);
 
+  // Fetch user chats
   useEffect(() => {
     if (!userId) return;
-
     const fetchUserChats = async () => {
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-by-userid/${userId}`
         );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch chats");
-        }
-
+        if (!response.ok) throw new Error("Failed to fetch chats");
         const data = await response.json();
-
         localStorage.setItem("remainingCredits", JSON.stringify(data.credits));
-
         setChatThread(
           Array.isArray(data?.chatMessages)
             ? data.chatMessages.map((chat) => ({
@@ -117,47 +120,52 @@ const page = ({ params }) => {
             : []
         );
       } catch (error) {
+        console.error("Error fetching chats:", error);
         setChatThread([]);
       }
     };
-
     fetchUserChats();
-  }, [userId]);
+  }, [userId, setChatThread]);
 
+  // Handle Enter key for submitting prompt
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleResponse();
     }
   };
+
+  // Navigate to chat by ID
   const getChatById = (c) => {
     router.push(`/chat/${c}`);
   };
-  const handleResponse = async () => {
-    if (prompt === "") return;
-    setLoading(true);
 
+  // Handle API response
+  const handleResponse = async () => {
+    if (!prompt.trim()) return;
+    setLoading(true);
     try {
       const current = prompt;
       setSelected(prompt);
       setMsg(current);
       setPrompt("");
-
       const cleanUserId = userId.trim();
-      const geminiRes = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_BASE_URL
-        }/chatbot/search?userId=${encodeURIComponent(
-          cleanUserId
-        )}&message=${encodeURIComponent(current)}`
-      );
-      const openAIRes = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_BASE_URL
-        }/chatbot/openai?userId=${encodeURIComponent(
-          cleanUserId
-        )}&message=${encodeURIComponent(current)}`
-      );
+      const [geminiRes, openAIRes] = await Promise.all([
+        fetch(
+          `${
+            process.env.NEXT_PUBLIC_BASE_URL
+          }/chatbot/search?userId=${encodeURIComponent(
+            cleanUserId
+          )}&message=${encodeURIComponent(current)}`
+        ),
+        fetch(
+          `${
+            process.env.NEXT_PUBLIC_BASE_URL
+          }/chatbot/openai?userId=${encodeURIComponent(
+            cleanUserId
+          )}&message=${encodeURIComponent(current)}`
+        ),
+      ]);
 
       if (geminiRes.status === 402 || openAIRes.status === 400) {
         toast.error("Insufficient credits");
@@ -168,26 +176,28 @@ const page = ({ params }) => {
       if (!geminiRes.ok || !openAIRes.ok)
         throw new Error("Error fetching bot response");
 
-      const geminiData = await geminiRes.json();
-      const openAIData = await openAIRes.json();
+      const [geminiData, openAIData] = await Promise.all([
+        geminiRes.json(),
+        openAIRes.json(),
+      ]);
 
       setResponses([
         { text: geminiData.botResponse, type: "Gemini" },
         { text: openAIData.botResponse, type: "OpenAI" },
       ]);
-
-      setLoading(false);
     } catch (error) {
+      console.error("Error handling response:", error);
+      toast.error(error.message);
+    } finally {
       setLoading(false);
-      setError(error.message);
     }
   };
 
+  // Save selected response
   const chooseResponse = async (chosenResponse, modelType) => {
     try {
       const createChatRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/create`,
-
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -200,22 +210,17 @@ const page = ({ params }) => {
           }),
         }
       );
-
       if (!createChatRes.ok) throw new Error("Failed to create chat");
-
       const chatData = await createChatRes.json();
 
       const chatHistoryRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${chatData.id}`
       );
-
       if (!chatHistoryRes.ok) throw new Error("Failed to fetch chat history");
-
       const chatHistory = await chatHistoryRes.json();
 
       if (chatHistory.userSearch?.length > 0 && chatHistory.userId === userId) {
         const firstMessage = chatHistory.userSearch[0];
-
         setChatThread((prev) => {
           const chatExists = prev.some((chat) => chat.chatId === chatData.id);
           if (!chatExists) {
@@ -231,306 +236,201 @@ const page = ({ params }) => {
           return prev;
         });
       }
-
       router.push(`/Vchatmodel/${chatData.id}`);
     } catch (error) {
-      setError(error.message);
+      console.error("Error choosing response:", error);
+      toast.error(error.message);
     }
-  };
-
-  const handleResponseSelection = (selectedResponse) => {
-    chooseResponse(selectedResponse.text, selectedResponse.type);
   };
 
   return (
     <>
       {hasCredits ? (
-        <div className="bg-gray-50">
+        <div className="flex min-h-screen bg-gray-50">
           <Toaster position="top-center" richColors />
+          {/* Sidebar */}
+          <Navbar />
+          <SecondNavbar />
 
-          <div className="flex w-full justify-between bg-gray-50 text-sm">
-            <Navbar />
-            <SecondNavbar />
+          <div className="flex-1 flex flex-col items-center p-4 relative">
+            {/* Main Content Container with fixed height and scroll */}
 
             {msg ? (
-              <>
-                <div className="flex w-full  bg-gray-50 text-sm overflow-y-scroll">
-                  {/* <Navbar /> */}
-
-                  <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center full">
-                    {loading && (
-                      <div className="max-w absolute top-4 overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center mt-20">
-                        <div className="flex flex-col sticky h-full w-full">
-                          {responses.length === 0 && (
-                            <div className="flex flex-col gap-1 ">
-                              {Array(1)
-                                .fill(0)
-                                .map((_, index) => (
-                                  <div
-                                    key={index}
-                                    className="animate-pulse flex flex-col gap-1 "
-                                  >
-                                    {/* User Message Skeleton */}
-                                    <div className="self-end bg-gray-200  w-1/5 rounded-lg">
-                                      {msg}
-                                    </div>
-                                    {/* Response Skeleton */}
-                                    <div className="self-start   h-6 w-1/3 rounded-lg ml-36">
-                                      typing.....
-                                    </div>
-                                  </div>
-                                ))}
-                            </div>
-                          )}
-                        </div>
+              <div
+                className="w-full max-w-4xl"
+                style={{
+                  height: "calc(100vh - 200px)", // Adjust based on your needs
+                  overflowY: "auto",
+                  paddingBottom: "120px", // Space for input area
+                }}
+              >
+                <div className="w-full flex flex-col justify-start items-center">
+                  {loading && (
+                    <div className="flex flex-col gap-4 mt-16 px-4 w-full ">
+                      {/* User message bubble */}
+                      <div className="self-end bg-gray-200 text-gray-800 p-3 rounded-lg max-w-md">
+                        {msg}
                       </div>
-                    )}
 
-                    {responses.length > 0 && (
-                      <div className="w-full flex flex-col items-center mt-5">
-                        <p className="text-gray-500 text-sm mb-2">
-                          Which response would u like :
-                        </p>
-                        <p className="text-xs">
-                          your response will help vchat get better
-                        </p>
-                        <div className="flex justify-center items-center gap-8 w-full">
-                          {responses.map((response, index) => (
-                            <div
-                              key={index}
-                              className="w-full h-[60vh] overflow-y-scroll max-w-md p-4 border rounded-md shadow-md text-center cursor-pointer  hover:border-purple-500 hover:border-2"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                chooseResponse(response.text, response.type);
-                              }}
-                            >
-                              <p className="text-gray-800">{response.text}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="">
-                      <input
-                        type="text"
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        placeholder="Send a message..."
-                        className="w-3/4 p-1 rounded focus:outline-none text-black "
-                      />
-
-                      <button
-                        onClick={handleResponse}
-                        className="p-1 mr-2 rounded-full bg-white flex items-center justify-center"
-                      >
-                        {loading ? (
-                          <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                        ) : (
-                          <div className="w-7 h-6 p-1">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 18 18"
-                              className="text-gray-400"
-                            >
-                              <path
-                                fill="currentColor"
-                                fillRule="evenodd"
-                                d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
-                                clipRule="evenodd"
-                              ></path>
-                            </svg>
-                          </div>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center hidden">
-                  <div className="max-w-4xl w-full  rounded-md p-6 text-center">
-                    {/* <button
-                      className="h-6 flex w-full justify-center items-center text-center text-black rounded"
-                      onClick={() => setShowButtons(!showButtons)}
-                    >
-                      Gemini <ChevronDown />
-                    </button> */}
-
-                    {showButtons && (
-                      <div className="flex flex-col  items-center justify-center  ">
-                        <ul className="bg-gray-200  rounded-lg w-4/5">
-                          <li className="text-center">
-                            <Link
-                              href="/mybot"
-                              className="flex border-black p-2 ml-16 hover:bg-gray-300 rounded text-sm mt-[10%] mr-5"
-                            >
-                              <div className="w-5  h-[2%] p-1 ">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 18 18"
-                                  className=" bg-white rounded-full  CustomIcon-module__icon___zGR29 CustomIcon-module__icon--tiny___trsDz"
-                                >
-                                  <g clipPath="url(#your-bots_svg__a)">
-                                    <path
-                                      stroke="currentColor"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth="1.5"
-                                      d="m9 1.5-.976 3.904c-.19.762-.286 1.143-.484 1.453a2.25 2.25 0 0 1-.683.683c-.31.198-.69.293-1.453.484L1.5 9l3.904.976c.762.19 1.143.286 1.453.484.275.176.507.408.683.683.198.31.293.69.484 1.452L9 16.5l.976-3.905c.19-.761.286-1.142.484-1.452.176-.275.408-.507.683-.683.31-.198.69-.293 1.452-.484L16.5 9l-3.905-.976c-.761-.19-1.142-.286-1.452-.484a2.25 2.25 0 0 1-.683-.683c-.198-.31-.293-.69-.484-1.453z"
-                                      fill="black"
-                                    ></path>
-                                  </g>
-                                  <defs>
-                                    <clipPath id="your-bots_svg__a">
-                                      <path
-                                        fill="currentColor"
-                                        d="M0 0h18v18H0z"
-                                      ></path>
-                                    </clipPath>
-                                  </defs>
-                                </svg>
-                              </div>
-                              <div className="ml-1 text-white">My Bot</div>
-                            </Link>
-                          </li>
-                          <li>
-                            <Link
-                              href="/model"
-                              className="flex border-black items-center ml-16 p-[1%] text-gray-400 hover:bg-gray-100 rounded text-sm mr-5"
-                            >
-                              <div className="w-8  h-[2%] p-1 ">
-                                <svg
-                                  viewBox="0 0 42 42"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
-                                >
-                                  <g clipPath="url(#clip0_11185_26182)">
-                                    <path
-                                      d="M0.5 21C0.5 9.678 9.678 0.5 21 0.5C32.322 0.5 41.5 9.678 41.5 21C41.5 32.322 32.322 41.5 21 41.5C9.678 41.5 0.5 32.322 0.5 21Z"
-                                      fill="white"
-                                    ></path>
-                                    <g clipPath="url(#clip1_11185_26182)">
-                                      <path
-                                        d="M31.2789 18.8229C31.8234 17.1886 31.6359 15.3984 30.7652 13.9119C29.4557 11.6319 26.8232 10.4589 24.2522 11.0109C23.1084 9.72236 21.4652 8.98961 19.7424 9.00011C17.1144 8.99411 14.7827 10.6861 13.9742 13.1866C12.2859 13.5324 10.8287 14.5891 9.97594 16.0869C8.65669 18.3609 8.95744 21.2274 10.7199 23.1774C10.1754 24.8116 10.3629 26.6019 11.2337 28.0884C12.5432 30.3684 15.1757 31.5414 17.7467 30.9894C18.8897 32.2779 20.5337 33.0106 22.2564 32.9994C24.8859 33.0061 27.2184 31.3126 28.0269 28.8099C29.7152 28.4641 31.1724 27.4074 32.0252 25.9096C33.3429 23.6356 33.0414 20.7714 31.2797 18.8214L31.2789 18.8229ZM22.2579 31.4311C21.2057 31.4326 20.1864 31.0644 19.3787 30.3901C19.4154 30.3706 19.4792 30.3354 19.5204 30.3099L24.2994 27.5499C24.5439 27.4111 24.6939 27.1509 24.6924 26.8696V20.1324L26.7122 21.2986C26.7339 21.3091 26.7482 21.3301 26.7512 21.3541V26.9334C26.7482 29.4144 24.7389 31.4259 22.2579 31.4311ZM12.5949 27.3039C12.0677 26.3934 11.8779 25.3261 12.0587 24.2904C12.0939 24.3114 12.1562 24.3496 12.2004 24.3751L16.9794 27.1351C17.2217 27.2769 17.5217 27.2769 17.7647 27.1351L23.5989 23.7661V26.0986C23.6004 26.1226 23.5892 26.1459 23.5704 26.1609L18.7397 28.9501C16.5879 30.1891 13.8399 29.4526 12.5957 27.3039H12.5949ZM11.3372 16.8721C11.8622 15.9601 12.6909 15.2626 13.6779 14.9004C13.6779 14.9416 13.6757 15.0144 13.6757 15.0654V20.5861C13.6742 20.8666 13.8242 21.1269 14.0679 21.2656L19.9022 24.6339L17.8824 25.8001C17.8622 25.8136 17.8367 25.8159 17.8142 25.8061L12.9827 23.0146C10.8354 21.7711 10.0989 19.0239 11.3364 16.8729L11.3372 16.8721ZM27.9317 20.7339L22.0974 17.3649L24.1172 16.1994C24.1374 16.1859 24.1629 16.1836 24.1854 16.1934L29.0169 18.9826C31.1679 20.2254 31.9052 22.9771 30.6624 25.1281C30.1367 26.0386 29.3087 26.7361 28.3224 27.0991V21.4134C28.3247 21.1329 28.1754 20.8734 27.9324 20.7339H27.9317ZM29.9417 17.7084C29.9064 17.6866 29.8442 17.6491 29.7999 17.6236L25.0209 14.8636C24.7787 14.7219 24.4787 14.7219 24.2357 14.8636L18.4014 18.2326V15.9001C18.3999 15.8761 18.4112 15.8529 18.4299 15.8379L23.2607 13.0509C25.4124 11.8096 28.1634 12.5484 29.4039 14.7009C29.9282 15.6099 30.1179 16.6741 29.9402 17.7084H29.9417ZM17.3034 21.8656L15.2829 20.6994C15.2612 20.6889 15.2469 20.6679 15.2439 20.6439V15.0646C15.2454 12.5806 17.2607 10.5676 19.7447 10.5691C20.7954 10.5691 21.8124 10.9381 22.6202 11.6101C22.5834 11.6296 22.5204 11.6649 22.4784 11.6904L17.6994 14.4504C17.4549 14.5891 17.3049 14.8486 17.3064 15.1299L17.3034 21.8641V21.8656ZM18.4007 19.5001L20.9994 17.9994L23.5982 19.4994V22.5001L20.9994 24.0001L18.4007 22.5001V19.5001Z"
-                                        fill="black"
-                                      ></path>
-                                    </g>
-                                    <path
-                                      d="M41.3443 21.0002C41.3443 9.76457 32.2359 0.65625 21.0002 0.65625C9.76457 0.65625 0.65625 9.76457 0.65625 21.0002C0.65625 32.2359 9.76457 41.3443 21.0002 41.3443C32.2359 41.3443 41.3443 32.2359 41.3443 21.0002Z"
-                                      stroke="#EEEEEE"
-                                      strokeWidth="1.313"
-                                    ></path>
-                                  </g>
-                                  <defs>
-                                    <clipPath id="clip0_11185_26182">
-                                      <rect
-                                        width="42"
-                                        height="42"
-                                        fill="white"
-                                      ></rect>
-                                    </clipPath>
-                                    <clipPath id="clip1_11185_26182">
-                                      <rect
-                                        width="24"
-                                        height="24"
-                                        fill="white"
-                                        transform="translate(9 9)"
-                                      ></rect>
-                                    </clipPath>
-                                  </defs>
-                                </svg>
-                              </div>
-                              <div className="ml-1 text-white mt-[2%]">
-                                Gemini
-                              </div>
-                            </Link>
-                          </li>
-                        </ul>
-                      </div>
-                    )}
-                    <h1 className="md:text-3xl mb-5 text-lg text-gray-600 md:mb-16 text-center">
-                      How can I help you today?
-                    </h1>
-                  </div>
-                </div>
-                <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  md:ml-auto md:w-full relative ">
-                  <div className="max-w-4xl w-full rounded-md p-6 text-center  ">
-                    <h1 className="md:text-3xl mb-5 text-lg text-gray-600 md:mb-16 text-center ">
-                      How can I help you today?
-                    </h1>
-                    <div className="grid md:grid-cols-4 grid-cols-2 gap-6">
-                      {cards.map((card, index) => (
-                        <Card
-                          key={index}
-                          prompt={card.prompt}
-                          image={card.image}
-                          bgColor={card.bgColor}
-                          setPrompt={setPrompt}
-                        />
-                      ))}
-                    </div>
-
-                    <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-[750px] px-4 py-2 z-20">
-                      <div className="w-full bg-gray-100 border border-gray-300 rounded-2xl px-4 py-2 flex justify-between shadow-sm flex-col">
-                        {/* Input Field */}
-                        <textarea
-                          value={prompt}
-                          onChange={controlHeight}
-                          onKeyDown={handleKeyDown}
-                          placeholder="Send a message..."
-                          rows={1}
-                          className="w-full resize-none focus:outline-none text-base text-[#444] bg-transparent max-h-[200px] overflow-y-auto rounded-lg px-2 py-2"
-                          style={{ minHeight: "40px", height: "auto" }}
-                        />
-
-                        {/* Icons Section */}
-                        <div className="flex justify-between">
-                          {/* Upload/Plus Icon */}
-                          <div className="flex gap-x-1">
-                            <button
-                              onClick={() =>
-                                setShowUploadDialog((prev) => !prev)
-                              }
-                              className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
-                            >
-                              <Plus className="w-5 h-5" strokeWidth={1.5} />
-                            </button>
-
-                            <button
-                              onClick={() => setIsOpen(true)}
-                              className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
-                            >
-                              <Volume2 className="w-5 h-5" strokeWidth={1.5} />
-                            </button>
-                            <div className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white">
-                              <VoiceToText onResult={handleVoiceInput} />
-                            </div>
-                          </div>
-
-                          <button
-                            onClick={handleResponse}
-                            className="w-10 h-10 p-2 rounded-full flex items-center justify-center shadow-sm bg-neutral-800 text-white hover:bg-neutral-900 transition-all"
+                      {/* Typing spinner animation */}
+                      <div className="flex justify-start">
+                        <div className="flex items-center space-x-3 px-5 py-3 rounded-xl  animate-pulse w-fit max-w-sm">
+                          <svg
+                            width="28"
+                            height="28"
+                            viewBox="0 0 24 24"
+                            className="animate-spin-slow"
+                            xmlns="http://www.w3.org/2000/svg"
                           >
-                            {loading ? (
-                              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                              <Send className="w-5 h-5" />
-                            )}
-                          </button>
+                            <defs>
+                              <linearGradient
+                                id="sparkleGradient"
+                                x1="0"
+                                y1="0"
+                                x2="24"
+                                y2="24"
+                                gradientUnits="userSpaceOnUse"
+                              >
+                                <stop offset="0%" stopColor="#3b82f6" />
+                                <stop offset="100%" stopColor="#f9a8d4" />
+                              </linearGradient>
+                            </defs>
+                            <path
+                              fill="url(#sparkleGradient)"
+                              stroke="#1f2937"
+                              strokeWidth="1"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"
+                            />
+                          </svg>
+                          <span className="text-gray-700 text-base font-medium">
+                            Just a second
+                          </span>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  )}
+
+                  {/* Only show responses when not loading and responses exist */}
+                  {!loading && responses.length > 0 && (
+                    <div className="w-full flex flex-col justify-center items-center px-4 mt-20">
+                      <p className="text-center text-gray-600 text-sm mb-2">
+                        Which response would you like?
+                      </p>
+                      <p className="text-center text-xs text-gray-500 mb-6">
+                        Your response will help VChat improve
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                        {responses.map((response, index) => (
+                          <div
+                            key={index}
+                            onClick={() =>
+                              chooseResponse(response.text, response.type)
+                            }
+                            className="p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:border-gray-500 hover:shadow-md transition-all cursor-pointer"
+                          >
+                            <div className="text-gray-800 text-sm prose max-w-none">
+                              <ReactMarkdown>{response.text}</ReactMarkdown>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2">
+                              Source: {response.type}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </>
+              </div>
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center">
+                <h1 className="text-lg md:text-3xl text-gray-700 mb-20">
+                  How can I help you today?
+                </h1>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                  {cards.map((card, index) => (
+                    <Card
+                      key={index}
+                      prompt={card.prompt}
+                      image={card.image}
+                      bgColor={card.bgColor}
+                      setPrompt={setPrompt}
+                    />
+                  ))}
+                </div>
+              </div>
             )}
+
+            {/* Input Area - Fixed at bottom */}
+            <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-[750px] px-4 py-2 z-20">
+              <div className="w-full bg-gray-100 border border-gray-300 rounded-2xl px-4 py-2 flex justify-between shadow-sm flex-col">
+                <textarea
+                  value={prompt}
+                  onChange={(e) => {
+                    controlHeight(e);
+                    // Clear responses when user starts typing
+                  }}
+                  onKeyDown={(e) => {
+                    handleKeyDown(e);
+                    // Clear responses when user presses Enter
+                    if (e.key === "Enter") {
+                      setResponses([]);
+                    }
+                  }}
+                  placeholder="Send a message..."
+                  rows={1}
+                  className="w-full resize-none focus:outline-none text-base text-black bg-transparent max-h-[200px] overflow-y-auto rounded-lg px-4 py-2 placeholder:text-gray-400"
+                  style={{ minHeight: "40px", height: "auto" }}
+                />
+
+                <div className="flex justify-between items-center mt-2">
+                  <div className="flex gap-x-2">
+                    <button
+                      onClick={() => setShowUploadDialog((prev) => !prev)}
+                      className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
+                    >
+                      <Plus
+                        className="w-5 h-5 text-gray-500"
+                        strokeWidth={1.5}
+                      />
+                    </button>
+
+                    <button
+                      onClick={() => setIsOpen(true)}
+                      className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
+                    >
+                      <Volume2
+                        className="w-5 h-5 text-gray-500"
+                        strokeWidth={1.5}
+                      />
+                    </button>
+
+                    <button className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white">
+                      <Mic
+                        className="w-5 h-5 text-gray-500"
+                        strokeWidth={1.5}
+                      />
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      handleResponse();
+                      // Clear responses when submitting new message
+                      setResponses([]);
+                    }}
+                    className="w-10 h-10 p-2 rounded-full flex items-center justify-center shadow-sm bg-[#262626] text-white hover:bg-neutral-900 transition-all mr-1"
+                  >
+                    {loading ? (
+                      <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Send className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
           {showPopup && <AuthPopup />}
         </div>
@@ -541,4 +441,4 @@ const page = ({ params }) => {
   );
 };
 
-export default page;
+export default Page;

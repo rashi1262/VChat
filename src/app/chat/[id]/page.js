@@ -110,6 +110,21 @@ const ChatPage = ({ params }) => {
   const textareaRef = useRef(null);
 
   const uploadRef = useRef(null);
+  const mirrorRef = useRef(null);
+  useEffect(() => {
+    adjustSize();
+  }, [editMessage]);
+
+  const adjustSize = () => {
+    const textarea = textareaRef.current;
+    const mirror = mirrorRef.current;
+
+    if (textarea && mirror) {
+      mirror.textContent = editMessage || " ";
+      textarea.style.height = mirror.scrollHeight + "px";
+      textarea.style.width = mirror.scrollWidth + "px";
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -527,150 +542,10 @@ const ChatPage = ({ params }) => {
     <>
       {hasCredits ? (
         <div className="flex w-full  bg-gray-50 text-sm overflow-y-scroll">
-          <Navbar/>
-            <SecondNavbar />
-            <MobileSidebar />
-          {/* <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center  md:hidden">
-            <div
-              className="max-w absolute top-4  overflow-y-scroll rounded-md h-[75%] p-4 text-center  mt-20  "
-              ref={chatContainerRef}
-            >
-              <div className="flex flex-col sticky  h-full w-full ">
-                {isloading ? (
-                  <div className="flex flex-col gap-1 ">
-                    {Array(1)
-                      .fill(0)
-                      .map((_, index) => (
-                        <div
-                          key={index}
-                          className="animate-pulse flex flex-col gap-1 "
-                        >
-                          <div className="self-end bg-gray-200 h-6 w-1/5 rounded-lg"></div>
-                          <div className="self-start bg-gray-300 h-6 w-1/3 rounded-lg ml-36"></div>
-                        </div>
-                      ))}
-                  </div>
-                ) : (
-                  chatHistory.map((chat, index) => (
-                    <div key={index} className="flex flex-col gap-1 ">
-                      <div
-                        className="flex flex-col overflow-y-auto  h-[500px] "
-                        style={{ maxHeight: "calc(h-500px - 100px)" }}
-                      >
-                        <div className="flex justify-end w-full ">
-                          {editIndex !== index && (
-                            <button
-                              onClick={() => {
-                                setEditIndex(index);
-                                setEditMessage(chat.userMessage);
-                              }}
-                              className="text-black rounded-md text-sm "
-                            >
-                              <Pencil size={15} />
-                            </button>
-                          )}
-                          <div
-                            className={`relative mt-2 px-3 py-2  max-w-[70%] flex flex-col rounded-[24px_4px_24px_24px]  gap-2 transition-all duration-200 ${
-                              editIndex === index
-                                ? "bg-[#e9eef6] w-[70%]"
-                                : "bg-[#dbdbdb]"
-                            }`}
-                          >
-                            {editIndex === index ? (
-                              <div className="flex flex-col w-full">
-                                <input
-                                  type="text"
-                                  value={editMessage}
-                                  onChange={(e) =>
-                                    setEditMessage(e.target.value)
-                                  }
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                      handleSaveEdit(index);
-                                      handleAddChat();
-                                      setEditIndex(null);
-                                    }
-                                  }}
-                                  className="w-full bg-transparent text-white p-2 rounded-md outline-none "
-                                  autoFocus
-                                />
-                                <div className="flex justify-end gap-3 mt-3">
-                                  <button
-                                    onClick={() => setEditIndex(null)}
-                                    className="px-4 py-2 bg-red-500 text-white rounded-full shadow-sm hover:bg-red-600 transition-all duration-200"
-                                  >
-                                    Cancel
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      handleSaveEdit(index);
-                                      handleAddChat();
-                                      setEditIndex(null);
-                                    }}
-                                    className="px-4 py-2 bg-green-500 text-white rounded-full shadow-sm hover:bg-green-600 transition-all duration-200"
-                                  >
-                                    Send
-                                  </button>
-                                </div>
-                              </div>
-                            ) : (
-                              <span className="break-words bg-black text-white">
-                                {chat.userMessage}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
-                {morePrompt !== "" && (
-                  <div className="flex flex-col gap-1 ">
-                    {loading && (
-                      <div className="mself-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[5%] flex items-center gap-2">
-                        <span className="animate-pulse">...</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-              <div className="mb-5 ml-10 w-3/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
-                <input
-                  type="text"
-                  value={moreChat}
-                  onChange={(e) => setMoreChat(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Send a messaghio3rqwl;kasz."
-                  className="w-3/4 p-1 rounded focus:outline-none text-black bg-gray-100"
-                />
+          <Navbar />
+          <SecondNavbar />
+          <MobileSidebar />
 
-                <button
-                  onClick={handleAddChat}
-                  className=" p-1 rounded-full bg-white flex items-center justify-center"
-                >
-                  {loading ? (
-                    <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                  ) : (
-                    <div className="w-7 h-6 p-1">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 18 18"
-                        className="text-gray-400 CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
-                      >
-                        <path
-                          fill="currentColor"
-                          fillRule="evenodd"
-                          d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
-                          clipRule="evenodd"
-                        ></path>
-                      </svg>
-                    </div>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div> */}
           <div className="min-h-screen md:flex relative bg-gray-50  items-center w-full  justify-center">
             <div
               className=" absolute top-4  overflow-y-auto w-full rounded-md h-[70%] p-4 text-start  mt-20  max-w-4xl mx-auto "
@@ -705,47 +580,72 @@ const ChatPage = ({ params }) => {
                             </button>
                           )}
                           <div
-                            className={`relative  px-3 py-2 text-lg flex flex-col rounded-[24px_4px_24px_24px] w-fit break-words gap-2 transition-all duration-200 ${
+                            className={`relative overflow-hidden  px-3 py-2 text-lg flex flex-col rounded-[24px_4px_24px_24px] w-fit break-words gap-2 transition-all duration-200 ${
                               editIndex === index
                                 ? "bg-[#dbdbdb]"
                                 : "bg-[#e9eef6]"
                             }`}
                           >
                             {editIndex === index ? (
-                              <div className="flex flex-col w-full">
-                                <input
-                                  type="text"
-                                  value={editMessage}
-                                  onChange={(e) =>
-                                    setEditMessage(e.target.value)
-                                  }
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                      handleSaveEdit(index);
-                                      handleAddChat();
-                                      setEditIndex(null);
-                                    }
+                              <div className="flex items-start w-full">
+                                {/* Hidden Mirror Element for height adjustment */}
+                                <div
+                                  ref={mirrorRef}
+                                  className="invisible absolute whitespace-pre-wrap break-words px-4 py-2 text-base leading-snug"
+                                  style={{
+                                    visibility: "hidden",
+                                    whiteSpace: "pre-wrap",
+                                    wordWrap: "break-word",
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    zIndex: -1,
+                                    padding: "8px 16px",
+                                    fontSize: "inherit",
+                                    fontFamily: "inherit",
+                                    maxWidth: "600px",
                                   }}
-                                  className="w-full bg-transparent text-[#3d3d3d] p-2 rounded-md outline-none "
-                                  autoFocus
-                                />
-                                <div className="flex justify-end gap-3 mt-3">
-                                  <button
-                                    onClick={() => setEditIndex(null)}
-                                    className="px-4 py-2 bg-[#dc3545] text-white rounded-full shadow-sm hover:bg-gray-700 transition-all duration-200 text-sm w-[80px]"
-                                  >
-                                    Cancel
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      handleSaveEdit(index);
-                                      handleAddChat();
-                                      setEditIndex(null);
+                                ></div>
+
+                                {/* Main editable container */}
+                                <div className="bg-[#efefef] rounded-2xl px-4 py-2 max-w-[600px] w-full">
+                                  <textarea
+                                    ref={textareaRef}
+                                    value={editMessage}
+                                    onChange={(e) =>
+                                      setEditMessage(e.target.value)
+                                    }
+                                    onInput={adjustSize}
+                                    rows={1}
+                                    autoFocus
+                                    className="bg-transparent outline-none resize-none text-sm text-black w-full whitespace-pre-wrap break-words"
+                                    style={{
+                                      overflow: "hidden",
+                                      fontFamily: "inherit",
+                                      fontSize: "1rem",
+                                      lineHeight: "1.5",
                                     }}
-                                    className="px-4 py-2 bg-green-600 text-white rounded-full shadow-sm hover:bg-green-700 transition-all duration-200 text-sm w-[80px]"
-                                  >
-                                    Send
-                                  </button>
+                                  />
+
+                                  {/* Buttons */}
+                                  <div className="flex justify-end gap-2 mt-2">
+                                    <button
+                                      onClick={() => setEditIndex(null)}
+                                      className="bg-white text-black border px-3 py-1 rounded-full text-sm hover:bg-gray-100"
+                                    >
+                                      Cancel
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        handleSaveEdit(index);
+                                        handleAddChat();
+                                        setEditIndex(null);
+                                      }}
+                                      className="bg-black text-white px-4 py-1 rounded-full text-sm hover:opacity-90"
+                                    >
+                                      Send
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
                             ) : (
@@ -834,36 +734,39 @@ const ChatPage = ({ params }) => {
                           <div className=" w-fit max-w-sm px-5 py-3   flex items-center space-x-3 animate-pulse">
                             {/* Spinning Gradient Sparkle Icon (Filled) */}
                             <svg
-  width="28"
-  height="28"
-  viewBox="0 0 24 24"
-  className="animate-spin-slow"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <defs>
-    <linearGradient
-      id="sparkleGradient"
-      x1="0"
-      y1="0"
-      x2="24"
-      y2="24"
-      gradientUnits="userSpaceOnUse"
-    >
-      <stop offset="0%" stopColor="#3b82f6" /> {/* Tailwind Blue-500 */}
-      <stop offset="100%" stopColor="#f9a8d4" /> {/* Tailwind Pink-300 */}
-    </linearGradient>
-  </defs>
-  <path
-    fill="url(#sparkleGradient)"
-    stroke="#1f2937"  // Tailwind slate-800
-    strokeWidth="1"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"
-  />
-</svg>
-
-
+                              width="28"
+                              height="28"
+                              viewBox="0 0 24 24"
+                              className="animate-spin-slow"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <defs>
+                                <linearGradient
+                                  id="sparkleGradient"
+                                  x1="0"
+                                  y1="0"
+                                  x2="24"
+                                  y2="24"
+                                  gradientUnits="userSpaceOnUse"
+                                >
+                                  <stop offset="0%" stopColor="#3b82f6" />{" "}
+                                  {/* Tailwind Blue-500 */}
+                                  <stop
+                                    offset="100%"
+                                    stopColor="#f9a8d4"
+                                  />{" "}
+                                  {/* Tailwind Pink-300 */}
+                                </linearGradient>
+                              </defs>
+                              <path
+                                fill="url(#sparkleGradient)"
+                                stroke="#1f2937" // Tailwind slate-800
+                                strokeWidth="1"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"
+                              />
+                            </svg>
 
                             {/* Text and Animated Dots */}
                             <span className="text-gray-700 text-base font-medium flex items-center">

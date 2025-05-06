@@ -10,6 +10,7 @@ import { useCredits } from "@/context/creditContext";
 import InsufficientBalance from "@/components/InsufficientBalance";
 import { AuthPopup } from "../model/page";
 import { Send, Plus, Volume2, Mic } from "lucide-react";
+import SecondNavbar from "../SecondNavbar";
 
 const page = () => {
   const { hasCredits } = useCredits();
@@ -41,7 +42,6 @@ const page = () => {
   //   }
   // }, []);
 
-
   const controlHeight = (e) => {
     const textarea = e.target;
     textarea.style.height = "auto";
@@ -49,7 +49,6 @@ const page = () => {
     textarea.style.height = `${newHeight}px`;
     setPrompt(textarea.value);
   };
-  
 
   useEffect(() => {
     const handleClick = (event) => {
@@ -195,6 +194,8 @@ const page = () => {
           <Toaster position="top-center" richColors />
 
           <Navbar />
+          <SecondNavbar />
+
           {msg ? (
             <>
               <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
@@ -294,61 +295,67 @@ const page = () => {
                   <p className="text-[18px] mt-5 text-gray-400">
                     Bring your ideas to life—create stunning images from just a
                     few words!
-                 </p>
+                  </p>
 
                   <p></p>
-
-               
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-[750px] px-4 py-2 z-2">
- <div className="w-full bg-gray-100 border border-gray-300 rounded-2xl px-4 py-2 flex justify-between shadow-sm flex-col">
- <textarea
-    value={prompt}
-    onChange={controlHeight}
-    onKeyDown={handleKeyDown}
-    placeholder="Send a message..."
-    rows={1}
-    className="w-full resize-none focus:outline-none text-base text-[#444] bg-transparent max-h-[200px] overflow-y-auto rounded-lg px-2 py-2 placeholder:text-gray-400"
-    style={{ minHeight: "40px", height: "auto" }}
-  />
+                  <div className="w-full bg-gray-100 border border-gray-300 rounded-2xl px-4 py-2 flex justify-between shadow-sm flex-col">
+                    <textarea
+                      value={prompt}
+                      onChange={controlHeight}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Send a message..."
+                      rows={1}
+                      className="w-full resize-none focus:outline-none text-base text-[#444] bg-transparent max-h-[200px] overflow-y-auto rounded-lg px-2 py-2 placeholder:text-gray-400"
+                      style={{ minHeight: "40px", height: "auto" }}
+                    />
 
-  {/* Icons Section */}
-  <div className="flex justify-between items-center mt-2">
-    {/* Left Side Icons */}
-    <div className="flex gap-x-2">
-      {/* Upload/Plus */}
-      <button
-        onClick={() => setShowUploadDialog((prev) => !prev)}
-        className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
-      >
-        <Plus className="w-5 h-5 text-gray-500" strokeWidth={1.5} />
-      </button>
+                    {/* Icons Section */}
+                    <div className="flex justify-between items-center mt-2">
+                      {/* Left Side Icons */}
+                      <div className="flex gap-x-2">
+                        {/* Upload/Plus */}
+                        <button
+                          onClick={() => setShowUploadDialog((prev) => !prev)}
+                          className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
+                        >
+                          <Plus
+                            className="w-5 h-5 text-gray-500"
+                            strokeWidth={1.5}
+                          />
+                        </button>
 
-      {/* Speaker */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
-      >
-        <Volume2 className="w-5 h-5 text-gray-500" strokeWidth={1.5} />
-      </button>
+                        {/* Speaker */}
+                        <button
+                          onClick={() => setIsOpen(true)}
+                          className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
+                        >
+                          <Volume2
+                            className="w-5 h-5 text-gray-500"
+                            strokeWidth={1.5}
+                          />
+                        </button>
 
-      {/* Mic */}
-      <div className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white">
-        <Mic className="w-5 h-5 text-gray-500" strokeWidth={1.5} />
-      </div>
-    </div>
+                        {/* Mic */}
+                        <div className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white">
+                          <Mic
+                            className="w-5 h-5 text-gray-500"
+                            strokeWidth={1.5}
+                          />
+                        </div>
+                      </div>
 
-    {/* Send Button */}
-    <button
-      onClick={handleResponse}
-      className="w-10 h-10 p-2 rounded-full flex items-center justify-center shadow-sm bg-neutral-800 text-white hover:bg-neutral-900 transition-all"
-    >
-      <Send className="w-5 h-5" />
-    </button>
-  </div>
-  </div>
-
-</div>
+                      {/* Send Button */}
+                      <button
+                        onClick={handleResponse}
+                        className="w-10 h-10 p-2 rounded-full flex items-center justify-center shadow-sm bg-neutral-800 text-white hover:bg-neutral-900 transition-all"
+                      >
+                        <Send className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           )}

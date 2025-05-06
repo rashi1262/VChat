@@ -20,17 +20,13 @@ export const cards = [
 export const Card = ({ prompt, image, bgColor, setPrompt }) => {
   return (
     <div
-      className={`relative border rounded-md p-4 hover:bg-white cursor-pointer ${bgColor}`}
+      className={`relative rounded-xl p-4 shadow-md transition-all duration-300 hover:shadow-lg hover:bg-white cursor-pointer ${bgColor}`}
       onClick={() => setPrompt(prompt)}
     >
-      <div className="w-10 h-10 mb-2">
-        <img
-          src={image}
-          alt="Card image"
-          className="w-full h-full object-contain"
-        />
+      <div className="w-12 h-12 mb-3 flex items-center justify-center bg-white rounded-full shadow-inner mx-auto">
+        <img src={image} alt="Card icon" className="w-6 h-6 object-contain" />
       </div>
-      <p className="text-gray-500 text-sm">{prompt}</p>
+      <p className="text-center text-gray-700 text-sm font-medium">{prompt}</p>
     </div>
   );
 };
