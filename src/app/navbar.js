@@ -17,6 +17,7 @@ const Page = () => {
 
   const { chatThread, setChatThread } = useChat();
   const { isNavVisible, setIsNavVisible } = useNav();
+  const [showUser, setShowUser] = useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -32,7 +33,21 @@ const Page = () => {
     );
   }, [pathname]);
 
-  // Auth Check
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    let isLoggedIn = false;
+    try {
+      // isLoggedIn = user && JSON.parse(user)?.id;
+      if (user) {
+        isLoggedIn = true;
+      } else {
+        isLoggedIn = false;
+      }
+    } catch (e) {
+      isLoggedIn = false;
+    }
+    setShowUser(isLoggedIn);
+  }, []);
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (!storedUser) {
@@ -200,18 +215,20 @@ const Page = () => {
                     <span className="ml-2">Explore</span>
                   </Link>
                 </li>
-                {isNavVisible && (
+                {showUser && (
                   <div className="ml-2 text-sm ">
-                    {" "}
                     <li className="mt-[5%] flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-sm cursor-pointer border-t border-gray-400 relative">
                       <Link href="/profile" className="flex">
-                        <div className="w-5 h-5 p-5 flex items-center justify-center rounded-full text-white font-bold bg-green-700">
-                          {email ? email[0].toUpperCase() : "?"}
-                        </div>
-
+                        {email ? (
+                          <div className="w-5 h-5 p-5 flex items-center justify-center rounded-full text-white font-bold bg-green-700">
+                            {email ? email[0].toUpperCase() : "?"}
+                          </div>
+                        ) : (
+                          ""
+                        )}
                         <div className="flex flex-col ml-3">
                           <span className="font-medium text-gray-900">
-                            {name ? name : "User"}
+                            {name ? name : ""}
                           </span>
                           <div className="text-xs overflow-hidden text-gray-500">
                             {email}
