@@ -1,8 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useEffect, useState ,use } from "react";
+import { useEffect, useState, use } from "react";
 import { useSearchParams } from "next/navigation";
-import Navbar from '../../../navbar'
+import Navbar from "../../../navbar";
 import { useChat } from "../../../chatContext";
 
 const SharedChatPage = ({ params }) => {
@@ -12,10 +12,10 @@ const SharedChatPage = ({ params }) => {
   const [morePrompt, setMorePrompt] = useState("");
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(null);
-   const [response, setResponse] = useState("");
-    const { chatThread, setChatThread } = useChat();
-  const[userId,setUserId] = useState(null)
- useEffect(() => {
+  const [response, setResponse] = useState("");
+  const { chatThread, setChatThread } = useChat();
+  const [userId, setUserId] = useState(null);
+  useEffect(() => {
     if (typeof window !== "undefined") {
       try {
         const storedUser = localStorage.getItem("user");
@@ -24,7 +24,7 @@ const SharedChatPage = ({ params }) => {
           return;
         } else {
           const user = JSON.parse(storedUser);
-         
+
           setUserId(user?.id);
         }
       } catch (error) {
@@ -32,8 +32,6 @@ const SharedChatPage = ({ params }) => {
       }
     }
   }, []);
-
-
 
   useEffect(() => {
     if (!chatId) return;
@@ -43,17 +41,17 @@ const SharedChatPage = ({ params }) => {
         const searchRes = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${chatId}`
         );
-    
+
         if (!searchRes.ok) {
           throw new Error("Error fetching bot response");
         }
-    
+
         const data = await searchRes.json();
         const formattedChats = (data?.userSearch || []).map((chat) => ({
           ...chat,
           parsedResponse: extractCodeBlocks(chat.botResponse),
         }));
-    
+
         setChatHistory(formattedChats);
       } catch (error) {
         // setError(error.message);
@@ -61,15 +59,15 @@ const SharedChatPage = ({ params }) => {
         setLoading(false);
       }
     };
-    
-        fetchBotResponse()
-  }, [chatId]); 
+
+    fetchBotResponse();
+  }, [chatId]);
 
   const extractCodeBlocks = (message) => {
     const codeBlockRegex = /```([\s\S]*?)```/g;
     let parts = [];
     let lastIndex = 0;
-  
+
     message.replace(codeBlockRegex, (match, code, index) => {
       if (index > lastIndex) {
         parts.push({ type: "text", content: message.slice(lastIndex, index) });
@@ -77,14 +75,13 @@ const SharedChatPage = ({ params }) => {
       parts.push({ type: "code", content: code });
       lastIndex = index + match.length;
     });
-  
+
     if (lastIndex < message.length) {
       parts.push({ type: "text", content: message.slice(lastIndex) });
     }
-  
+
     return parts.length > 0 ? parts : [{ type: "text", content: message }];
   };
-
 
   // useEffect(() => {
   //   if (!chatId || !userId) return;
@@ -118,7 +115,9 @@ const SharedChatPage = ({ params }) => {
     try {
       // Fetch response from bot
       const searchRes = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/search?message=${encodeURIComponent(prompt)}`
+        `${
+          process.env.NEXT_PUBLIC_BASE_URL
+        }/chatbot/search?message=${encodeURIComponent(prompt)}`
       );
       if (!searchRes.ok) throw new Error("Error fetching bot response");
       const botResponse = await searchRes.text();
@@ -157,63 +156,60 @@ const SharedChatPage = ({ params }) => {
     }
   };
 
-
-const handleKeyDown = (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    handleResponse();
-  }
-};
-
-
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleResponse();
+    }
+  };
 
   if (!chatHistory) return <p className="text-red-400 ">Loading chat...</p>;
 
   return (
     <>
       <div className="flex w-full justify-between bg-gray-50 text-sm ">
-      <Navbar/>
-   
+        <Navbar />
+
         <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center  w-4/5">
           <div className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  ">
-          <div
-      // ref={chatContainerRef}
-      className="flex flex-col sticky  h-full w-full "
-    >
-      
-      {chatHistory.map((chat, index) => (
-  <div key={index} className="flex flex-col gap-1 ">
-   
-    <div className="mr-36 mt-2 self-end bg-blue-500 text-white px-3 py-2 rounded-xl max-w-[70%]">
-      {chat.userMessage}
-    </div>
+            <div
+              // ref={chatContainerRef}
+              className="flex flex-col sticky  h-full w-full "
+            >
+              {chatHistory.map((chat, index) => (
+                <div key={index} className="flex flex-col gap-1 ">
+                  <div className="mr-36 mt-2 self-end bg-blue-500 text-white px-3 py-2 rounded-xl max-w-[70%]">
+                    {chat.userMessage}
+                  </div>
 
-    {/* Bot Response */}
-    <div className="self-start text-left text-lg text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
-      {chat.parsedResponse.map((part, i) =>
-        part.type === "code" ? (
-          <pre key={i} className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto">
-            <code>{part.content}</code>
-          </pre>
-        ) : (
-          <span key={i}>{part.content}</span>
-        )
-      )}
-    </div>
-  </div>
-))}
+                  {/* Bot Response */}
+                  <div className="self-start text-left text-lg text-black px-3 py-2 m-2 rounded-xl max-w-[70%] break-words whitespace-pre-wrap">
+                    {chat.parsedResponse.map((part, i) =>
+                      part.type === "code" ? (
+                        <pre
+                          key={i}
+                          className="bg-gray-900 text-green-300 px-3 py-2 rounded-md overflow-x-auto"
+                        >
+                          <code>{part.content}</code>
+                        </pre>
+                      ) : (
+                        <span key={i}>{part.content}</span>
+                      )
+                    )}
+                  </div>
+                </div>
+              ))}
 
-
-      {morePrompt !== "" && (
-        <div className="flex flex-col gap-1 ">
-          {loading && (
-            <div className="mself-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[5%] flex items-center gap-2">
-              <span className="animate-pulse">...</span>
+              {morePrompt !== "" && (
+                <div className="flex flex-col gap-1 ">
+                  {loading && (
+                    <div className="mself-start bg-gray-300 text-black px-3 py-2 rounded-xl max-w-[5%] flex items-center gap-2">
+                      <span className="animate-pulse">...</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      )}
-    </div>
 
             <div className="mb-5 ml-20 w-2/4 p-1 flex bg-gray-100 justify-between items-center fixed bottom-0 left-1/2 transform -translate-x-1/2  rounded-l-full rounded-r-full">
               {/* <button className="ml-2 p-2 rounded-full bg-white">
@@ -288,7 +284,6 @@ const handleKeyDown = (e) => {
             </div>
           </div>
         </div>
-      
       </div>
 
       <div className="fixed top-3 right-5 flex items-center ">
@@ -311,8 +306,8 @@ const handleKeyDown = (e) => {
           </div>
           Go Pro
         </button> */}
-      <button className="flex items-center">
-                {/* <Link
+        <button className="flex items-center">
+          {/* <Link
                   href="/model"
                   className="flex items-center hover:bg-gray-200 rounded text-black p-2"
                 >
@@ -357,7 +352,7 @@ const handleKeyDown = (e) => {
                   </div>
                   OpenAI GPT-4o mini
                 </Link> */}
-              </button>
+        </button>
       </div>
     </>
   );

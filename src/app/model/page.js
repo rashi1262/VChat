@@ -229,6 +229,13 @@ const page = ({ params }) => {
     setSelectedFile(null);
   };
 
+  function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // zero-padded
+    const day = String(date.getDate()).padStart(2, "0"); // zero-padded
+    return `${year}-${month}-${day}`;
+  }
+
   useEffect(() => {
     if (!userId) return;
 
@@ -244,6 +251,17 @@ const page = ({ params }) => {
 
         const data = await response.json();
         localStorage.setItem("remainingCredits", JSON.stringify(data.credits));
+        console.log(data.chatMessages);
+        const today = new Date();
+        const formattedDate = formatDate(today);
+        // const cd = data.chatMessages
+        //   .filter((chat) => chat.message?.userId?.date?.includes(formattedDate))
+        //   .map((chat) => ({
+        //     chatId: chat.id,
+        //     message: chat.userSearch?.[0]?.userMessage || "No message",
+        //   }));
+
+        // console.log("cd : ", cd);
 
         setChatThread(
           Array.isArray(data?.chatMessages)

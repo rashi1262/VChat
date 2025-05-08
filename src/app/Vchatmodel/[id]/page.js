@@ -1,8 +1,7 @@
 "use client";
-import { useEffect, useState, use, useRef } from "react";
+import { useEffect, useState, useRef, use } from "react";
 import Link from "next/link";
 import Navbar from "../../navbar";
-import { useChat } from "../../chatContext";
 import { useRouter } from "next/navigation";
 import { Edit, Pencil, X } from "lucide-react";
 import { useCredits } from "@/context/creditContext";
@@ -13,30 +12,26 @@ import SecondNavbar from "@/app/SecondNavbar";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { useChat } from "@/app/chatContext";
 
 const ChatPage = ({ params }) => {
   const { id } = use(params);
-  const { hasCredits, setHasCredits } = useCredits();
+  const { hasCredits } = useCredits();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const { chatThread, setChatThread } = useChat();
   const router = useRouter();
-  const [botResponse, setBotResponse] = useState("");
   const [loading, setLoading] = useState(true);
   const [morePrompt, setMorePrompt] = useState("");
-  const [moreResponse, setMoreResponse] = useState("");
   const [userId, setUserId] = useState(null);
   const [moreChat, setMoreChat] = useState("");
   const [chatModel, setChatModel] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
   const [isloading, setisLoading] = useState(false);
   const chatContainerRef = useRef(null);
-  const [imgLoading, setImgLoading] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
   const [editMessage, setEditMessage] = useState("");
-  const [generatedImage, setGeneratedImage] = useState([]);
-  console.log(chatHistory, "chatHistorychatHistory");
   const [copiedIndex, setCopiedIndex] = useState(null);
   const textareaRef = useRef(null);
   const mirrorRef = useRef(null);
@@ -60,7 +55,7 @@ const ChatPage = ({ params }) => {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedIndex(index);
-      setTimeout(() => setCopiedIndex(null), 2000); // Reset after 2s
+      setTimeout(() => setCopiedIndex(null), 2000);
     } catch (err) {
       console.error("Failed to copy:", err);
     }
@@ -73,10 +68,8 @@ const ChatPage = ({ params }) => {
 
     try {
       let newBotResponse, newParsedResponse;
-      setLoading(true);
 
       if (chatModel === "openAI") {
-        console.log("Fetching updated bot response for:", editMessage);
         const response = await fetch(
           `${
             process.env.NEXT_PUBLIC_BASE_URL
@@ -89,12 +82,9 @@ const ChatPage = ({ params }) => {
           throw new Error("Error fetching updated bot response");
 
         const data = await response.json();
-        console.log("Updated bot response received:", data);
-
         newBotResponse = data.botResponse;
         newParsedResponse = extractCodeBlocks(newBotResponse);
       } else {
-        console.log("Fetching updated bot response for:", editMessage);
         const response = await fetch(
           `${
             process.env.NEXT_PUBLIC_BASE_URL
@@ -107,8 +97,6 @@ const ChatPage = ({ params }) => {
           throw new Error("Error fetching updated bot response");
 
         const data = await response.json();
-        console.log("Updated bot response received:", data);
-
         newBotResponse = data.botResponse;
         newParsedResponse = extractCodeBlocks(newBotResponse);
       }
@@ -137,8 +125,6 @@ const ChatPage = ({ params }) => {
         ],
       });
 
-      console.log("PUT Request Body:", requestBody);
-
       const updateRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
         {
@@ -150,11 +136,9 @@ const ChatPage = ({ params }) => {
 
       if (!updateRes.ok) {
         const errorText = await updateRes.text();
-        console.error("Update API Error Response:", errorText);
         throw new Error(`Error updating chat data: ${errorText}`);
       }
 
-      console.log("Chat updated successfully!");
       fetchBotResponse();
       setEditIndex(null);
     } catch (error) {
@@ -164,7 +148,9 @@ const ChatPage = ({ params }) => {
     }
   };
 
-  useEffect(() => setisLoading(true), [id]);
+  useEffect(() => {
+    setisLoading(true);
+  }, [id]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -209,16 +195,13 @@ const ChatPage = ({ params }) => {
       const searchRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${id}`
       );
-      if (searchRes.ok === 402) {
+      if (searchRes.status === 402) {
         toast.error("Insufficient credits");
-
-        setMsg(null);
         setLoading(false);
         return;
       }
       if (!searchRes.ok) throw new Error("Error fetching bot response");
       const data = await searchRes.json();
-      console.log(data, "datadata");
 
       setisLoading(false);
       setChatModel(data?.type);
@@ -273,26 +256,26 @@ const ChatPage = ({ params }) => {
   };
 
   const handleAddChat = async () => {
-    if (!id || !moreChat) {
+    if (!id || !moreChat.trim()) {
       return;
     }
 
-    setMorePrompt(moreChat);
+    const userMessage = moreChat;
     setMoreChat("");
+    setMorePrompt(userMessage);
+
+    // Add only user message to chat history
+    setChatHistory((prevChats) => [
+      ...prevChats,
+      {
+        userMessage,
+        botResponse: null,
+        parsedResponse: null,
+      },
+    ]);
     setLoading(true);
 
     try {
-      console.log("Fetching existing chat for ID:", id);
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${id}`
-      );
-
-      const chatData = await response.json();
-
-      const existingUserSearch = Array.isArray(chatData?.userSearch)
-        ? chatData.userSearch
-        : [];
-
       let newChat;
 
       if (chatModel === "openAI") {
@@ -301,18 +284,18 @@ const ChatPage = ({ params }) => {
             process.env.NEXT_PUBLIC_BASE_URL
           }/chatbot/openai?userId=${encodeURIComponent(
             userId
-          )}&message=${encodeURIComponent(current)}`
+          )}&message=${encodeURIComponent(userMessage)}`
         );
 
         if (searchRes.status === 402) {
           toast.error("Insufficient credits");
+          setChatHistory((prevChats) => prevChats.slice(0, -1));
+          setLoading(false);
           return;
         }
 
-        if (searchRes.message) {
-          toast.error("Insufficient credits");
-
-          return;
+        if (!searchRes.ok) {
+          throw new Error("Error fetching bot response");
         }
 
         const data = await searchRes.json();
@@ -320,32 +303,29 @@ const ChatPage = ({ params }) => {
           localStorage.setItem("remainingCredits", data.remainingCredits);
         }
 
-        const responseText =
-          typeof data === "string" ? data : JSON.stringify(data);
         newChat = {
-          userMessage: moreChat,
+          userMessage,
           botResponse: data.botResponse || "no data found",
           parsedResponse: extractCodeBlocks(data.botResponse),
         };
       } else {
-        console.log("Fetching bot response for message:", moreChat);
         const searchRes = await fetch(
           `${
             process.env.NEXT_PUBLIC_BASE_URL
           }/chatbot/search?userId=${encodeURIComponent(
             userId
-          )}&message=${encodeURIComponent(moreChat)}`
+          )}&message=${encodeURIComponent(userMessage)}`
         );
 
         if (searchRes.status === 402) {
           toast.error("Insufficient credits");
+          setChatHistory((prevChats) => prevChats.slice(0, -1));
+          setLoading(false);
           return;
         }
 
-        if (searchRes.message) {
-          toast.error("Insufficient credits");
-
-          return;
+        if (!searchRes.ok) {
+          throw new Error("Error fetching bot response");
         }
 
         const data = await searchRes.json();
@@ -353,23 +333,26 @@ const ChatPage = ({ params }) => {
           localStorage.setItem("remainingCredits", data.remainingCredits);
         }
 
-        const responseText =
-          typeof data === "string" ? data : JSON.stringify(data);
         newChat = {
-          userMessage: moreChat,
+          userMessage,
           botResponse: data.botResponse || "no data found",
           parsedResponse: extractCodeBlocks(data.botResponse),
         };
       }
 
-      // Constructing the correct PUT request body
+      // Update chat history with bot response and hide loader
+      setChatHistory((prevChats) => {
+        const updatedChats = [...prevChats];
+        updatedChats[updatedChats.length - 1] = newChat;
+        return updatedChats;
+      });
+      setLoading(false); // Hide loader immediately after updating chat history
+
+      // Update backend
       const requestBody = JSON.stringify({
-        id, // Ensuring ID is included in the request
+        id,
         userSearch: [newChat],
       });
-
-      console.log("PUT Request Body:", requestBody);
-      console.log(newChat, "newChat");
 
       const updateRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
@@ -380,34 +363,27 @@ const ChatPage = ({ params }) => {
         }
       );
 
-      const updateResponseText = await updateRes.text();
-
       if (!updateRes.ok) {
-        console.error("Update API Error Response:", updateResponseText);
-        throw new Error(`Error updating chat data: ${updateResponseText}`);
+        const errorText = await updateRes.text();
+        throw new Error(`Error updating chat data: ${errorText}`);
       }
 
       console.log("Chat updated successfully!");
-      setChatHistory((prevChats) => [...prevChats, newChat]);
     } catch (error) {
-      toast.error("error");
-    } finally {
+      console.error("Error in handleAddChat:", error);
+      toast.error("Failed to get bot response");
+      setChatHistory((prevChats) => prevChats.slice(0, -1));
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (!id) return;
-
-    fetchBotResponse();
-  }, [id]);
-
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleAddChat();
     }
   };
+
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTo({
@@ -419,7 +395,7 @@ const ChatPage = ({ params }) => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [chatHistory]);
+  }, [chatHistory, loading]);
 
   return (
     <>
@@ -427,21 +403,18 @@ const ChatPage = ({ params }) => {
 
       {hasCredits ? (
         <div className="flex w-full justify-between bg-gray-50 text-sm h-screen">
-          {/* Sidebars - visible on desktop */}
           <div className="hidden md:flex">
             <Navbar />
             <SecondNavbar />
           </div>
 
-          {/* Main chat area */}
           <div className="flex-1 flex flex-col h-full overflow-hidden">
-            {/* Chat content area */}
             <div
               className="flex-1 overflow-y-auto p-4 mt-14"
               ref={chatContainerRef}
             >
               {isloading ? (
-                <div className="flex flex-col jurisdictions-4 p-4">
+                <div className="flex flex-col gap-4 p-4">
                   {Array(3)
                     .fill(0)
                     .map((_, index) => (
@@ -482,7 +455,6 @@ const ChatPage = ({ params }) => {
                           >
                             {editIndex === index ? (
                               <div className="flex items-start w-full">
-                                {/* Hidden Mirror Element for height adjustment */}
                                 <div
                                   ref={mirrorRef}
                                   className="invisible absolute whitespace-pre-wrap break-words px-4 py-2 text-base leading-snug"
@@ -501,7 +473,6 @@ const ChatPage = ({ params }) => {
                                   }}
                                 ></div>
 
-                                {/* Main editable container */}
                                 <div className="bg-[#efefef] rounded-2xl px-4 py-2 max-w-[600px] w-full">
                                   <textarea
                                     ref={textareaRef}
@@ -521,7 +492,6 @@ const ChatPage = ({ params }) => {
                                     }}
                                   />
 
-                                  {/* Buttons */}
                                   <div className="flex justify-end gap-2 mt-2">
                                     <button
                                       onClick={() => setEditIndex(null)}
@@ -532,7 +502,6 @@ const ChatPage = ({ params }) => {
                                     <button
                                       onClick={() => {
                                         handleSaveEdit(index);
-                                        handleAddChat();
                                         setEditIndex(null);
                                       }}
                                       className="bg-black text-white px-4 py-1 rounded-full text-sm hover:opacity-90"
@@ -554,80 +523,82 @@ const ChatPage = ({ params }) => {
                         </div>
                       </div>
 
-                      {/* Bot response */}
-                      <div className="flex justify-start">
-                        <div className="bg-gray-200 text-gray-800 px-4 py-3 rounded-2xl max-w-[70%] break-words">
-                          {(chat.parsedResponse?.length > 0
-                            ? chat.parsedResponse
-                            : [{ type: "text", content: chat.botResponse }]
-                          ).map((part, i) =>
-                            part.type === "code" ? (
-                              <div
-                                key={i}
-                                className="my-4 border border-gray-300 rounded-md overflow-hidden"
-                              >
-                                <div className="flex justify-between items-center bg-gray-100 px-3 py-2 text-sm text-gray-700 font-medium">
-                                  <span className="capitalize">
-                                    {part.language || "Code"}
-                                  </span>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleCopy(part.content, i);
-                                    }}
-                                    className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700"
-                                  >
-                                    {copiedIndex === i ? (
-                                      <>
-                                        <Check size={12} />
-                                        Copied!
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Clipboard size={12} />
-                                        Copy code
-                                      </>
-                                    )}
-                                  </button>
-                                </div>
-
-                                <SyntaxHighlighter
-                                  style={oneLight}
-                                  language={part.language || "javascript"}
-                                  customStyle={{
-                                    margin: 0,
-                                    fontSize: "0.875rem",
-                                    lineHeight: "1.5",
-                                    backgroundColor: "#f8fafc",
-                                  }}
-                                  codeTagProps={{
-                                    style: {
-                                      fontFamily: "monospace",
-                                    },
-                                  }}
-                                  wrapLongLines={true}
-                                  showLineNumbers={true}
+                      {/* Bot response, only render if botResponse exists */}
+                      {chat.botResponse && (
+                        <div className="flex justify-start">
+                          <div className="bg-gray-200 text-gray-800 px-4 py-3 rounded-2xl max-w-[70%] break-words">
+                            {(chat.parsedResponse?.length > 0
+                              ? chat.parsedResponse
+                              : [{ type: "text", content: chat.botResponse }]
+                            ).map((part, i) =>
+                              part.type === "code" ? (
+                                <div
+                                  key={i}
+                                  className="my-4 border border-gray-300 rounded-md overflow-hidden"
                                 >
-                                  {String(part.content).replace(/\n$/, "")}
-                                </SyntaxHighlighter>
-                              </div>
-                            ) : (
-                              <span
-                                key={i}
-                                className="whitespace-pre-wrap break-words"
-                                style={{ fontSize: "inherit" }}
-                              >
-                                <ReactMarkdown>{part.content}</ReactMarkdown>
-                              </span>
-                            )
-                          )}
+                                  <div className="flex justify-between items-center bg-gray-100 px-3 py-2 text-sm text-gray-700 font-medium">
+                                    <span className="capitalize">
+                                      {part.language || "Code"}
+                                    </span>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCopy(part.content, i);
+                                      }}
+                                      className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700"
+                                    >
+                                      {copiedIndex === i ? (
+                                        <>
+                                          <Check size={12} />
+                                          Copied!
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Clipboard size={12} />
+                                          Copy code
+                                        </>
+                                      )}
+                                    </button>
+                                  </div>
+
+                                  <SyntaxHighlighter
+                                    style={oneLight}
+                                    language={part.language || "javascript"}
+                                    customStyle={{
+                                      margin: 0,
+                                      fontSize: "0.875rem",
+                                      lineHeight: "1.5",
+                                      backgroundColor: "#f8fafc",
+                                    }}
+                                    codeTagProps={{
+                                      style: {
+                                        fontFamily: "monospace",
+                                      },
+                                    }}
+                                    wrapLongLines={true}
+                                    showLineNumbers={true}
+                                  >
+                                    {String(part.content).replace(/\n$/, "")}
+                                  </SyntaxHighlighter>
+                                </div>
+                              ) : (
+                                <span
+                                  key={i}
+                                  className="whitespace-pre-wrap break-words"
+                                  style={{ fontSize: "inherit" }}
+                                >
+                                  <ReactMarkdown>{part.content}</ReactMarkdown>
+                                </span>
+                              )
+                            )}
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   ))}
 
-                  {/* Loading indicator for additional prompts */}
-                  {morePrompt !== "" && loading && (
+                  {/* Loader after the last user message */}
+                  {loading && (
                     <div className="flex justify-start px-4 py-2">
                       <div className="bg-gray-200 text-gray-800 px-4 py-2 rounded-2xl max-w-xs">
                         <div className="flex space-x-1">
@@ -642,7 +613,6 @@ const ChatPage = ({ params }) => {
               )}
             </div>
 
-            {/* Input area - fixed at bottom */}
             <div className="p-4 border-t border-gray-200">
               <div className="flex items-end gap-2 max-w-3xl mx-auto bg-gray-100 rounded-xl px-3 py-2">
                 <div className="flex-1 relative">
@@ -656,19 +626,13 @@ const ChatPage = ({ params }) => {
                         150
                       )}px`;
                     }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        handleAddChat();
-                      }
-                    }}
+                    onKeyDown={handleKeyDown}
                     placeholder="Ask anything..."
                     className="w-full p-3 pr-10 bg-transparent focus:outline-none resize-none max-h-[150px] whitespace-pre-wrap break-words"
                     style={{
                       minHeight: "24px",
                       overflowY: "auto",
                       fontSize: "inherit",
-                      // Inherit font size
                     }}
                     rows={1}
                   />

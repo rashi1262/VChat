@@ -202,174 +202,138 @@ const page = () => {
   return (
     <>
       {hasCredits ? (
-        <div className="flex w-full justify-between bg-gray-50">
+        <div className="flex min-h-screen bg-gray-50">
           <Toaster position="top-center" richColors />
-
           <Navbar />
           <SecondNavbar />
-
-          {msg ? (
-            <>
-              {msg && (
-                <div className="flex flex-col w-full h-screen bg-gray-50 text-sm">
-                  {/* Chat Messages Area */}
-                  <div className="flex-1 overflow-y-auto px-4 py-6 max-w-4xl mx-auto w-full space-y-4">
-                    <div className="animate-pulse flex flex-col gap-2">
-                      <div className="self-start bg-white shadow-md py-2 px-4 rounded-2xl max-w-xs">
-                        <div className="flex space-x-1">
-                          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+          <div className="flex-1 flex flex-col items-center p-4 relative">
+            {msg ? (
+              <div
+                className="w-full max-w-4xl"
+                style={{
+                  height: "calc(100vh - 200px)",
+                  overflowY: "auto",
+                  paddingBottom: "120px",
+                }}
+              >
+                <div className="w-full flex flex-col justify-start items-center">
+                  <div className="flex flex-col gap-4 mt-16 px-4 w-full">
+                    <div className="self-end bg-gray-200 text-gray-800 p-3 rounded-lg max-w-md">
+                      {msg}
+                    </div>
+                    {loading && (
+                      <div className="flex justify-start">
+                        <div className="flex items-center space-x-3 px-5 py-3 rounded-xl animate-pulse w-fit max-w-sm">
+                          <svg
+                            width="28"
+                            height="28"
+                            viewBox="0 0 24 24"
+                            className="animate-spin-slow"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <defs>
+                              <linearGradient
+                                id="sparkleGradient"
+                                x1="0"
+                                y1="0"
+                                x2="24"
+                                y2="24"
+                                gradientUnits="userSpaceOnUse"
+                              >
+                                <stop offset="0%" stopColor="#3b82f6" />
+                                <stop offset="100%" stopColor="#f9a8d4" />
+                              </linearGradient>
+                            </defs>
+                            <path
+                              fill="url(#sparkleGradient)"
+                              stroke="#1f2937"
+                              strokeWidth="1"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"
+                            />
+                          </svg>
+                          <span className="text-gray-700 text-base font-medium">
+                            Just a second
+                          </span>
                         </div>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Input Area */}
-                  <div className="w-full sticky bottom-0 bg-gray-50 border-t border-gray-200 z-10">
-                    <div className="max-w-4xl mx-auto px-4 py-3 bg-white shadow-md rounded-t-xl">
-                      <textarea
-                        value={prompt}
-                        onChange={controlHeight}
-                        onKeyDown={handleKeyDown}
-                        placeholder="Send a message..."
-                        rows={1}
-                        className="w-full resize-none text-base text-black bg-transparent focus:outline-none max-h-[200px] overflow-y-auto rounded-md px-3 py-2 placeholder:text-gray-400"
-                        style={{ minHeight: "40px" }}
-                      />
-
-                      <div className="flex justify-between items-center mt-3">
-                        {/* Left Icons */}
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => setShowUploadDialog((prev) => !prev)}
-                            className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition"
-                          >
-                            <Plus
-                              className="w-5 h-5 text-gray-500"
-                              strokeWidth={1.5}
-                            />
-                          </button>
-
-                          <button
-                            onClick={() => setIsOpen(true)}
-                            className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition"
-                          >
-                            <Volume2
-                              className="w-5 h-5 text-gray-500"
-                              strokeWidth={1.5}
-                            />
-                          </button>
-
-                          <button className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition">
-                            <Mic
-                              className="w-5 h-5 text-gray-500"
-                              strokeWidth={1.5}
-                            />
-                          </button>
-                        </div>
-
-                        {/* Send Button */}
-                        <button
-                          onClick={handleResponse}
-                          className="w-10 h-10 rounded-full flex items-center justify-center bg-black text-white hover:bg-neutral-900 transition"
-                        >
-                          {loading ? (
-                            <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <Send className="w-5 h-5" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
-              )}
-
-              <div className="fixed top-3 right-5 flex items-center "></div>
-            </>
-          ) : (
-            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  ml-auto w-full relative">
-              <div className="max-w-4xl w-full rounded-md p-6 text-center ">
-                <h1 className="md:text-3xl mb-5 text-lg text-gray-600 md:mb-16 text-center">
+              </div>
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center">
+                <h1 className="text-lg md:text-3xl text-gray-700 mb-20">
                   How can I help you today?
                 </h1>
-                <div className="grid md:grid-cols-4 grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                   {cards.map((card, index) => (
                     <Card
                       key={index}
                       prompt={card.prompt}
-                      image={card.image} // Ensure image is passed correctly
+                      image={card.image}
                       bgColor={card.bgColor}
                       setPrompt={setPrompt}
                     />
                   ))}
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-[750px] px-4 py-2 z-20">
-                  <div className="w-full bg-gray-100 border border-gray-300 rounded-2xl px-4 py-2 flex justify-between shadow-sm flex-col">
-                    {/* Textarea Input */}
-                    <textarea
-                      value={prompt}
-                      onChange={controlHeight}
-                      onKeyDown={handleKeyDown}
-                      placeholder="Send a message..."
-                      rows={1}
-                      className="w-full resize-none focus:outline-none text-base text-black bg-transparent max-h-[200px] overflow-y-auto rounded-lg px-4 py-2 placeholder:text-gray-400"
-                      style={{ minHeight: "40px", height: "auto" }}
-                    />
-
-                    {/* Icons and Send */}
-                    <div className="flex justify-between items-center mt-2">
-                      {/* Left Icons */}
-                      <div className="flex gap-x-2">
-                        {/* Upload */}
-                        <button
-                          onClick={() => setShowUploadDialog((prev) => !prev)}
-                          className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
-                        >
-                          <Plus
-                            className="w-5 h-5 text-gray-500"
-                            strokeWidth={1.5}
-                          />
-                        </button>
-
-                        {/* Speaker */}
-                        <button
-                          onClick={() => setIsOpen(true)}
-                          className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
-                        >
-                          <Volume2
-                            className="w-5 h-5 text-gray-500"
-                            strokeWidth={1.5}
-                          />
-                        </button>
-
-                        {/* Mic */}
-                        <button className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white">
-                          <Mic
-                            className="w-5 h-5 text-gray-500"
-                            strokeWidth={1.5}
-                          />
-                        </button>
-                      </div>
-
-                      {/* Send Button */}
-                      <button
-                        onClick={handleResponse}
-                        className="w-10 h-10 p-2 rounded-full flex items-center justify-center shadow-sm bg-[#262626] text-white hover:bg-neutral-900 transition-all mr-1"
-                      >
-                        {loading ? (
-                          <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <Send className="w-5 h-5" />
-                        )}
-                      </button>
-                    </div>
+              </div>
+            )}
+            <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-[750px] px-4 py-2 z-20">
+              <div className="w-full bg-gray-100 border border-gray-300 rounded-2xl px-4 py-2 flex justify-between shadow-sm flex-col">
+                <textarea
+                  value={prompt}
+                  onChange={(e) => {
+                    controlHeight(e);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Send a message..."
+                  rows={1}
+                  className="w-full resize-none focus:outline-none text-base text-black bg-transparent max-h-[200px] overflow-y-auto rounded-lg px-4 py-2 placeholder:text-gray-400"
+                  style={{ minHeight: "40px", height: "auto" }}
+                />
+                <div className="flex justify-between items-center mt-2">
+                  <div className="flex gap-x-2">
+                    <button
+                      onClick={() => setShowUploadDialog((prev) => !prev)}
+                      className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
+                    >
+                      <Plus
+                        className="w-5 h-5 text-gray-500"
+                        strokeWidth={1.5}
+                      />
+                    </button>
+                    <button
+                      onClick={() => setIsOpen(true)}
+                      className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
+                    >
+                      <Volume2
+                        className="w-5 h-5 text-gray-500"
+                        strokeWidth={1.5}
+                      />
+                    </button>
+                    <button className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white">
+                      <Mic
+                        className="w-5 h-5 text-gray-500"
+                        strokeWidth={1.5}
+                      />
+                    </button>
                   </div>
+                  <button
+                    onClick={handleResponse}
+                    className="w-10 h-10 p-2 rounded-full flex items-center justify-center shadow-sm bg-[#262626] text-white hover:bg-neutral-900 transition-all mr-1"
+                  >
+                    {loading ? (
+                      <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Send className="w-5 h-5" />
+                    )}
+                  </button>
                 </div>
               </div>
             </div>
-          )}
+          </div>
           {showPopup && <AuthPopup />}
         </div>
       ) : (

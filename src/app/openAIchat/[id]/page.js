@@ -18,14 +18,12 @@ import InsufficientBalance from "@/components/InsufficientBalance";
 import { useCredits } from "@/context/creditContext";
 import dynamic from "next/dynamic";
 
-// Dynamically import SyntaxHighlighter and ReactMarkdown with SSR disabled
 const SyntaxHighlighter = dynamic(
   () => import("react-syntax-highlighter").then((mod) => mod.Prism),
   { ssr: false }
 );
 const ReactMarkdown = dynamic(() => import("react-markdown"), { ssr: false });
 
-// Import the oneLight style for SyntaxHighlighter
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 const ChatPage = ({ params }) => {
@@ -36,10 +34,8 @@ const ChatPage = ({ params }) => {
   const [error, setError] = useState("");
   const { chatThread, setChatThread } = useChat();
   const router = useRouter();
-  const [botResponse, setBotResponse] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Initialize as false
   const [morePrompt, setMorePrompt] = useState("");
-  const [moreResponse, setMoreResponse] = useState("");
   const [userId, setUserId] = useState(null);
   const [moreChat, setMoreChat] = useState("");
   const [chatModel, setChatModel] = useState("");
@@ -160,41 +156,65 @@ const ChatPage = ({ params }) => {
   };
 
   const handleAddChat = async () => {
-    if (!id || !moreChat) return;
+    if (!id || !moreChat.trim()) return;
 
-    setMorePrompt(moreChat);
+    const userMessage = moreChat;
     setMoreChat("");
+    setMorePrompt(userMessage);
+
+    // Add only user message to chat history
+    setChatHistory((prevChats) => [
+      ...prevChats,
+      {
+        userMessage,
+        botResponse: null,
+        parsedResponse: null,
+      },
+    ]);
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${id}`
-      );
-      if (!response.ok) throw new Error("Error fetching existing chat data");
-
-      const chatData = await response.json();
-      const existingUserSearch = Array.isArray(chatData?.userSearch)
-        ? chatData.userSearch
-        : [];
-
       let newChat;
+
       const searchRes = await fetch(
         `${
           process.env.NEXT_PUBLIC_BASE_URL
         }/chatbot/openai?userId=${encodeURIComponent(
           userId
-        )}&message=${encodeURIComponent(moreChat)}`
+        )}&message=${encodeURIComponent(userMessage)}`
       );
 
-      if (!searchRes.ok) throw new Error("Error fetching bot response");
+      if (searchRes.status === 402) {
+        toast.error("Insufficient credits");
+        setChatHistory((prevChats) => prevChats.slice(0, -1));
+        setLoading(false);
+        return;
+      }
+
+      if (!searchRes.ok) {
+        throw new Error("Error fetching bot response");
+      }
 
       const data = await searchRes.json();
+      if (data?.remainingCredits !== undefined) {
+        localStorage.setItem("remainingCredits", data.remainingCredits);
+      }
+
       newChat = {
-        userMessage: moreChat,
-        botResponse: data.botResponse,
+        userMessage,
+        botResponse: data.botResponse || "no data found",
         parsedResponse: extractCodeBlocks(data.botResponse),
       };
 
+      // Update chat history with bot response and hide loader
+      setChatHistory((prevChats) => {
+        const updatedChats = [...prevChats];
+        updatedChats[updatedChats.length - 1] = newChat;
+        return updatedChats;
+      });
+      setLoading(false); // Hide loader immediately after updating chat history
+
+      // Update backend
       const requestBody = JSON.stringify({
         id,
         userSearch: [newChat],
@@ -211,15 +231,14 @@ const ChatPage = ({ params }) => {
 
       if (!updateRes.ok) {
         const updateResponseText = await updateRes.text();
-        console.error("Update API Error Response:", updateResponseText);
         throw new Error(`Error updating chat data: ${updateResponseText}`);
       }
 
-      setChatHistory((prevChats) => [...prevChats, newChat]);
+      console.log("Chat updated successfully!");
     } catch (error) {
-      console.error("Error adding new chat:", error);
+      console.error("Error in handleAddChat:", error);
       toast.error("Failed to add chat. Please try again.");
-    } finally {
+      setChatHistory((prevChats) => prevChats.slice(0, -1));
       setLoading(false);
     }
   };
@@ -230,12 +249,71 @@ const ChatPage = ({ params }) => {
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
-  const handleSaveEdit = (index) => {
-    setChatHistory((prevChats) =>
-      prevChats.map((chat, i) =>
-        i === index ? { ...chat, userMessage: editMessage } : chat
-      )
-    );
+  const handleSaveEdit = async (index) => {
+    if (!editMessage.trim()) return;
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_BASE_URL
+        }/chatbot/openai?userId=${encodeURIComponent(
+          userId
+        )}&message=${encodeURIComponent(editMessage)}`
+      );
+
+      if (!response.ok) throw new Error("Error fetching updated bot response");
+
+      const data = await response.json();
+      const newBotResponse = data.botResponse;
+      const newParsedResponse = extractCodeBlocks(newBotResponse);
+
+      setChatHistory((prevChats) =>
+        prevChats.map((chat, i) =>
+          i === index
+            ? {
+                ...chat,
+                userMessage: editMessage,
+                botResponse: newBotResponse,
+                parsedResponse: newParsedResponse,
+              }
+            : chat
+        )
+      );
+
+      const requestBody = JSON.stringify({
+        id,
+        userSearch: [
+          {
+            userMessage: editMessage,
+            botResponse: newBotResponse,
+            parsedResponse: newParsedResponse,
+          },
+        ],
+      });
+
+      const updateRes = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: requestBody,
+        }
+      );
+
+      if (!updateRes.ok) {
+        const errorText = await updateRes.text();
+        throw new Error(`Error updating chat data: ${errorText}`);
+      }
+
+      setEditIndex(null);
+    } catch (error) {
+      console.error("Error updating chat:", error);
+      toast.error("Failed to update chat. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const adjustSize = useCallback(() => {
@@ -265,7 +343,7 @@ const ChatPage = ({ params }) => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [chatHistory]);
+  }, [chatHistory, loading]);
 
   return (
     <>
@@ -300,6 +378,7 @@ const ChatPage = ({ params }) => {
                   {chatHistory && chatHistory.length > 0 ? (
                     chatHistory.map((chat, index) => (
                       <div key={index} className="flex flex-col gap-4">
+                        {/* User message */}
                         <div className="flex justify-end">
                           <div className="flex items-start gap-2 max-w-[70%]">
                             {editIndex !== index && (
@@ -324,7 +403,7 @@ const ChatPage = ({ params }) => {
                                 <div className="flex items-start w-full">
                                   <div
                                     ref={mirrorRef}
-                                    className="invisible absoluta whitespace-pre-wrap break-words px-4 py-2 text-base leading-snug"
+                                    className="invisible absolute whitespace-pre-wrap break-words px-4 py-2 text-base leading-snug"
                                     style={{
                                       visibility: "hidden",
                                       whiteSpace: "pre-wrap",
@@ -367,7 +446,6 @@ const ChatPage = ({ params }) => {
                                       <button
                                         onClick={() => {
                                           handleSaveEdit(index);
-                                          handleAddChat();
                                           setEditIndex(null);
                                         }}
                                         className="bg-black text-white px-4 py-1 rounded-full text-sm hover:opacity-90"
@@ -388,82 +466,88 @@ const ChatPage = ({ params }) => {
                             </div>
                           </div>
                         </div>
-                        <div className="flex justify-start">
-                          <div className="bg-gray-200 text-gray-800 px-4 py-3 rounded-2xl max-w-[70%] break-words">
-                            {(chat.parsedResponse &&
-                            chat.parsedResponse.length > 0
-                              ? chat.parsedResponse
-                              : [
-                                  {
-                                    type: "text",
-                                    content: chat.botResponse || "No response",
-                                  },
-                                ]
-                            ).map((part, i) =>
-                              part.type === "code" ? (
-                                <div
-                                  key={i}
-                                  className="my-4 border border-gray-300 rounded-md overflow-hidden"
-                                >
-                                  <div className="flex justify-between items-center bg-gray-100 px-3 py-2 text-sm text-gray-700 font-medium">
-                                    <span className="capitalize">
-                                      {part.language || "Code"}
-                                    </span>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleCopy(part.content, i);
-                                      }}
-                                      className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700"
-                                    >
-                                      {copiedIndex === i ? (
-                                        <>
-                                          <CheckCircle size={12} />
-                                          Copied!
-                                        </>
-                                      ) : (
-                                        <>
-                                          <Copy size={12} />
-                                          Copy code
-                                        </>
-                                      )}
-                                    </button>
-                                  </div>
-                                  <SyntaxHighlighter
-                                    style={oneLight}
-                                    language={part.language || "javascript"}
-                                    customStyle={{
-                                      margin: 0,
-                                      fontSize: "0.875rem",
-                                      lineHeight: "1.5",
-                                      backgroundColor: "#f8fafc",
-                                    }}
-                                    codeTagProps={{
-                                      style: {
-                                        fontFamily: "monospace",
-                                      },
-                                    }}
-                                    wrapLongLines={true}
-                                    showLineNumbers={true}
+                        {/* Bot response, only render if botResponse exists */}
+                        {chat.botResponse && (
+                          <div className="flex justify-start">
+                            <div className="bg-gray-200 text-gray-800 px-4 py-3 rounded-2xl max-w-[70%] break-words">
+                              {(chat.parsedResponse &&
+                              chat.parsedResponse.length > 0
+                                ? chat.parsedResponse
+                                : [
+                                    {
+                                      type: "text",
+                                      content:
+                                        chat.botResponse || "No response",
+                                    },
+                                  ]
+                              ).map((part, i) =>
+                                part.type === "code" ? (
+                                  <div
+                                    key={i}
+                                    className="my-4 border border-gray-300 rounded-md overflow-hidden"
                                   >
-                                    {String(part.content || "").replace(
-                                      /\n$/,
-                                      ""
-                                    )}
-                                  </SyntaxHighlighter>
-                                </div>
-                              ) : (
-                                <span
-                                  key={i}
-                                  className="whitespace-pre-wrap break-words"
-                                  style={{ fontSize: "inherit" }}
-                                >
-                                  <ReactMarkdown>{part.content}</ReactMarkdown>
-                                </span>
-                              )
-                            )}
+                                    <div className="flex justify-between items-center bg-gray-100 px-3 py-2 text-sm text-gray-700 font-medium">
+                                      <span className="capitalize">
+                                        {part.language || "Code"}
+                                      </span>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleCopy(part.content, i);
+                                        }}
+                                        className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700"
+                                      >
+                                        {copiedIndex === i ? (
+                                          <>
+                                            <CheckCircle size={12} />
+                                            Copied!
+                                          </>
+                                        ) : (
+                                          <>
+                                            <Copy size={12} />
+                                            Copy code
+                                          </>
+                                        )}
+                                      </button>
+                                    </div>
+                                    <SyntaxHighlighter
+                                      style={oneLight}
+                                      language={part.language || "javascript"}
+                                      customStyle={{
+                                        margin: 0,
+                                        fontSize: "0.875rem",
+                                        lineHeight: "1.5",
+                                        backgroundColor: "#f8fafc",
+                                      }}
+                                      codeTagProps={{
+                                        style: {
+                                          fontFamily: "monospace",
+                                        },
+                                      }}
+                                      wrapLongLines={true}
+                                      showLineNumbers={true}
+                                    >
+                                      {String(part.content || "").replace(
+                                        /\n$/,
+                                        ""
+                                      )}
+                                    </SyntaxHighlighter>
+                                  </div>
+                                ) : (
+                                  <span
+                                    key={i}
+                                    className="whitespace-pre-wrap break-words"
+                                    style={{ fontSize: "inherit" }}
+                                  >
+                                    <ReactMarkdown>
+                                      {part.content}
+                                    </ReactMarkdown>
+                                  </span>
+                                )
+                              )}
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     ))
                   ) : (
@@ -471,7 +555,7 @@ const ChatPage = ({ params }) => {
                       No chat history available.
                     </div>
                   )}
-                  {morePrompt !== "" && loading && (
+                  {loading && (
                     <div className="flex justify-start px-4 py-2">
                       <div className="bg-gray-200 text-gray-800 px-4 py-2 rounded-2xl max-w-xs">
                         <div className="flex space-x-1">

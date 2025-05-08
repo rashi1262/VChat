@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, use, useRef } from "react";
+import { useEffect, useState, useRef, use } from "react";
 import Link from "next/link";
 import Navbar from "../../navbar";
 import { useChat } from "../../chatContext";
@@ -14,31 +14,19 @@ import {
   Volume2,
   Sparkle,
 } from "lucide-react";
-
-import {
-  Plus,
-  Mic,
-  // Image as ImageIcon,
-  File,
-  // Volume2,
-  Send,
-} from "lucide-react";
-
+import { Plus, Mic, File, Send } from "lucide-react";
 import { useCredits } from "@/context/creditContext";
 import InsufficientBalance from "@/components/InsufficientBalance";
 import ReactMarkdown from "react-markdown";
 import VoiceToText from "@/components/VoiceToText";
-
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
-
 import hljs from "highlight.js";
 import SpeechToSpeech from "@/components/SpeechToSpeech";
 import SecondNavbar from "@/app/SecondNavbar";
 import MobileSidebar from "@/app/MobileSidebar";
 
 const CodeBlock = ({ code, language = "text", onCopy, copied }) => {
-  // Auto-detect the language if not provided
   const detectedLanguage =
     language === "text" ? hljs.highlightAuto(code).language : language;
 
@@ -53,7 +41,6 @@ const CodeBlock = ({ code, language = "text", onCopy, copied }) => {
           {copied ? "Copied!" : "Copy"}
         </button>
       </div>
-
       <SyntaxHighlighter
         language={detectedLanguage}
         style={oneLight}
@@ -82,10 +69,7 @@ const ChatPage = ({ params }) => {
   const [error, setError] = useState("");
   const { chatThread, setChatThread } = useChat();
   const router = useRouter();
-  const [botResponse, setBotResponse] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [morePrompt, setMorePrompt] = useState("");
-  const [moreResponse, setMoreResponse] = useState("");
+  const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState(null);
   const [moreChat, setMoreChat] = useState("");
   const [chatModel, setChatModel] = useState("");
@@ -94,23 +78,19 @@ const ChatPage = ({ params }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
-
   const [isloading, setisLoading] = useState(false);
   const chatContainerRef = useRef(null);
-  const [imgLoading, setImgLoading] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
   const [editMessage, setEditMessage] = useState("");
   const [generatedImage, setGeneratedImage] = useState([]);
   const [copiedIndex, setCopiedIndex] = useState(null);
-  const [response, setResponse] = useState("");
-  const [displayedResponse, setDisplayedResponse] = useState("");
   const [expandedIndexes, setExpandedIndexes] = useState([]);
   const [image, setImage] = useState("");
   const [fileName, setFileName] = useState("");
   const textareaRef = useRef(null);
-
   const uploadRef = useRef(null);
   const mirrorRef = useRef(null);
+
   useEffect(() => {
     adjustSize();
   }, [editMessage]);
@@ -118,7 +98,6 @@ const ChatPage = ({ params }) => {
   const adjustSize = () => {
     const textarea = textareaRef.current;
     const mirror = mirrorRef.current;
-
     if (textarea && mirror) {
       mirror.textContent = editMessage || " ";
       textarea.style.height = mirror.scrollHeight + "px";
@@ -132,11 +111,9 @@ const ChatPage = ({ params }) => {
         setShowUploadDialog(false);
       }
     };
-
     if (showUploadDialog) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -144,20 +121,16 @@ const ChatPage = ({ params }) => {
 
   const controlHeight = (e) => {
     const textarea = e.target;
-
-    // Reset height to calculate scrollHeight accurately
     textarea.style.height = "auto";
-
-    // Limit height to max 200px
     const newHeight = Math.min(textarea.scrollHeight, 200);
     textarea.style.height = `${newHeight}px`;
-
     setMoreChat(textarea.value);
   };
 
   const handleplusicon = () => {
     setIsVisible(!isVisible);
   };
+
   useEffect(() => {
     const storedImage = localStorage.getItem("image");
     if (storedImage) {
@@ -170,7 +143,6 @@ const ChatPage = ({ params }) => {
     setIsVisible(false);
     if (file) {
       setFileName(file.name);
-
       if (file.type.startsWith("image/")) {
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -183,6 +155,7 @@ const ChatPage = ({ params }) => {
       }
     }
   };
+
   const handleCancelSelection = () => {
     setImage(null);
     setFileName("");
@@ -191,10 +164,10 @@ const ChatPage = ({ params }) => {
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      setSelectedFile(file); // Save file for later API use
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result); // Preview
+        setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -212,6 +185,7 @@ const ChatPage = ({ params }) => {
       prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
     );
   };
+
   const handleVoiceInput = (voiceText) => {
     setMoreChat((prevPrompt) => prevPrompt + " " + voiceText);
   };
@@ -220,7 +194,7 @@ const ChatPage = ({ params }) => {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedIndex(index);
-      setTimeout(() => setCopiedIndex(null), 2000); // Reset after 2s
+      setTimeout(() => setCopiedIndex(null), 2000);
     } catch (err) {
       console.error("Failed to copy:", err);
     }
@@ -231,9 +205,7 @@ const ChatPage = ({ params }) => {
     setLoading(true);
     try {
       let newBotResponse, newParsedResponse;
-      setLoading(true);
       if (chatModel === "ImageGeneration") {
-        console.log("Generating updated image for prompt:", editMessage);
         const imageRes = await fetch(
           `${
             process.env.NEXT_PUBLIC_BASE_URL
@@ -246,7 +218,6 @@ const ChatPage = ({ params }) => {
         newBotResponse = imageData.imageUrl;
         newParsedResponse = null;
       } else {
-        console.log("Fetching updated bot response for:", editMessage);
         const response = await fetch(
           `${
             process.env.NEXT_PUBLIC_BASE_URL
@@ -257,7 +228,6 @@ const ChatPage = ({ params }) => {
         if (!response.ok)
           throw new Error("Error fetching updated bot response");
         const data = await response.json();
-        console.log("Updated bot response received:", data);
         newBotResponse = data.botResponse;
         newParsedResponse = extractCodeBlocks(newBotResponse);
       }
@@ -283,7 +253,6 @@ const ChatPage = ({ params }) => {
           },
         ],
       });
-      console.log("PUT Request Body:", requestBody);
       const updateRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
         {
@@ -294,10 +263,8 @@ const ChatPage = ({ params }) => {
       );
       if (!updateRes.ok) {
         const errorText = await updateRes.text();
-        console.error("Update API Error Response:", errorText);
         throw new Error(`Error updating chat data: ${errorText}`);
       }
-      console.log("Chat updated successfully!");
       fetchBotResponse();
       setEditIndex(null);
     } catch (error) {
@@ -307,14 +274,8 @@ const ChatPage = ({ params }) => {
     }
   };
 
-  // const handleCopy = (code, index) => {
-  //   navigator.clipboard.writeText(code).then(() => {
-  //     setCopiedIndex(index);
-  //     setTimeout(() => setCopiedIndex(null), 2000);
-  //   });
-  // };
-
   useEffect(() => setisLoading(true), [id]);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
@@ -330,6 +291,7 @@ const ChatPage = ({ params }) => {
       }
     }
   }, []);
+
   useEffect(() => {
     if (!userId) return;
     const fetchUserChats = async () => {
@@ -351,6 +313,7 @@ const ChatPage = ({ params }) => {
     };
     fetchUserChats();
   }, [userId]);
+
   const fetchBotResponse = async () => {
     try {
       const searchRes = await fetch(
@@ -358,7 +321,6 @@ const ChatPage = ({ params }) => {
       );
       if (!searchRes.ok) throw new Error("Error fetching bot response");
       const data = await searchRes.json();
-      console.log(data, "datadata");
       setisLoading(false);
       setChatModel(data?.type);
       setChatHistory(
@@ -374,9 +336,11 @@ const ChatPage = ({ params }) => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     if (id) fetchBotResponse();
   }, [id]);
+
   const extractCodeBlocks = (message) => {
     if (!message) {
       console.error(
@@ -397,7 +361,14 @@ const ChatPage = ({ params }) => {
           content: messageStr.slice(lastIndex, index),
         });
       }
-      parts.push({ type: "code", content: code });
+      const language = messageStr
+        .substring(
+          index + 3,
+          index + 3 + messageStr.slice(index + 3).indexOf("\n")
+        )
+        .trim();
+      const codeContent = code.trim();
+      parts.push({ type: "code", content: codeContent, language });
       lastIndex = index + match.length;
     });
     if (lastIndex < messageStr.length) {
@@ -405,56 +376,54 @@ const ChatPage = ({ params }) => {
     }
     return parts.length > 0 ? parts : [{ type: "text", content: messageStr }];
   };
-  const handleAddChat = async () => {
-    if (!id || (!moreChat.trim() && !selectedFile)) {
-      return;
-    }
 
-    setMorePrompt(moreChat);
+  const handleAddChat = async () => {
+    if (!id || (!moreChat.trim() && !selectedFile)) return;
+
+    const userMessage = moreChat;
     setMoreChat("");
-    setLoading(true);
     setIsVisible(false);
     const el = textareaRef.current;
     if (el) {
       el.style.height = "40px";
       el.style.overflowY = "hidden";
     }
+
+    // Add user message to chat history
+    setChatHistory((prevChats) => [
+      ...prevChats,
+      {
+        userMessage,
+        botResponse: null,
+        parsedResponse: null,
+      },
+    ]);
+    setLoading(true);
+
     try {
-      console.log("Fetching existing chat for ID:", id);
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/get-By/${id}`
-      );
-      if (!response.ok) throw new Error("Error fetching existing chat data");
-      const chatData = await response.json();
-      const existingUserSearch = Array.isArray(chatData?.userSearch)
-        ? chatData.userSearch
-        : [];
       let newChat;
       if (chatModel === "ImageGeneration") {
-        console.log("Generating image for prompt:", moreChat);
         const imageRes = await fetch(
           `${
             process.env.NEXT_PUBLIC_BASE_URL
           }/chatbot/generate-image?userId=${encodeURIComponent(
             userId
-          )}&prompt=${encodeURIComponent(moreChat)}`
+          )}&prompt=${encodeURIComponent(userMessage)}`
         );
-
         if (!imageRes.ok) throw new Error("Error generating image");
         const imageData = await imageRes.json();
         newChat = {
-          userMessage: moreChat,
+          userMessage,
           botResponse: imageData.imageUrl,
           parsedResponse: null,
         };
         setGeneratedImage(imageData.imageUrl);
-        setImgLoading(false);
       } else {
         const formData = new FormData();
         formData.append("userId", userId);
-        formData.append("message", moreChat);
+        formData.append("message", userMessage);
         if (selectedFile) {
-          formData.append("file", selectedFile); // 👈 Pass the file here
+          formData.append("file", selectedFile);
         }
         const searchRes = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/searchs`,
@@ -465,29 +434,31 @@ const ChatPage = ({ params }) => {
         );
         if (!searchRes.ok) throw new Error("Error fetching bot response");
         const data = await searchRes.json();
-        setSelectedFile(null);
-        setImagePreview(null);
-        setMoreChat("");
-        if (
-          typeof window !== "undefined" &&
-          data?.remainingCredits !== undefined
-        ) {
+        if (data?.remainingCredits !== undefined) {
           localStorage.setItem("remainingCredits", data.remainingCredits);
         }
-        const responseText =
-          typeof data === "string" ? data : JSON.stringify(data);
         newChat = {
-          userMessage: moreChat,
-          botResponse: data.botResponse,
+          userMessage,
+          botResponse: data.botResponse || "No response",
           parsedResponse: extractCodeBlocks(data.botResponse),
         };
       }
+
+      // Update chat history with bot response
+      setChatHistory((prevChats) => {
+        const updatedChats = [...prevChats];
+        updatedChats[updatedChats.length - 1] = newChat;
+        return updatedChats;
+      });
+      setLoading(false); // Hide loader immediately after updating UI
+      setSelectedFile(null);
+      setImagePreview(null);
+
+      // Update backend
       const requestBody = JSON.stringify({
-        id, // Ensuring ID is included in the request
+        id,
         userSearch: [newChat],
       });
-      console.log("PUT Request Body:", requestBody);
-      console.log(newChat, "newChat");
       const updateRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/update-by/${id}`,
         {
@@ -496,34 +467,24 @@ const ChatPage = ({ params }) => {
           body: requestBody,
         }
       );
-      const updateResponseText = await updateRes.text();
       if (!updateRes.ok) {
-        console.error("Update API Error Response:", updateResponseText);
+        const updateResponseText = await updateRes.text();
         throw new Error(`Error updating chat data: ${updateResponseText}`);
       }
-      console.log("Chat updated successfully!");
-      setChatHistory((prevChats) => [...prevChats, newChat]);
+      fetchBotResponse();
     } catch (error) {
       console.error("Error adding new chat:", error);
-    } finally {
+      setChatHistory((prevChats) => prevChats.slice(0, -1));
       setLoading(false);
+      setSelectedFile(null);
+      setImagePreview(null);
     }
   };
-  useEffect(() => {
-    if (!id) return;
-    fetchBotResponse();
-  }, [id]);
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleAddChat();
-      setMoreChat("");
-      const el = textareaRef.current;
-      if (el) {
-        el.style.height = "40px";
-        el.style.overflowY = "hidden";
-      }
     }
   };
 
@@ -535,37 +496,38 @@ const ChatPage = ({ params }) => {
       });
     }
   };
+
   useEffect(() => {
     scrollToBottom();
-  }, [chatHistory]);
+  }, [chatHistory, loading]);
+
   return (
     <>
       {hasCredits ? (
-        <div className="flex w-full  bg-gray-50 text-sm overflow-y-scroll">
+        <div className="flex w-full bg-gray-50 text-sm overflow-y-scroll">
           <Navbar />
           <SecondNavbar />
           <MobileSidebar />
-
-          <div className="min-h-screen md:flex relative bg-gray-50  items-center w-full  justify-center">
+          <div className="min-h-screen md:flex relative bg-gray-50 items-center w-full justify-center">
             <div
-              className=" absolute top-4  overflow-y-auto w-full rounded-md h-[70%] p-4 text-start  mt-20  max-w-4xl mx-auto "
+              className="absolute top-4 overflow-y-auto w-full rounded-md h-[70%] p-4 text-start mt-20 max-w-4xl mx-auto"
               ref={chatContainerRef}
             >
-              <div className="flex flex-col sticky  h-full w-full ">
+              <div className="flex flex-col sticky h-full w-full">
                 {isloading ? (
-                  <div className="flex flex-col gap-1 ">
+                  <div className="flex flex-col gap-1">
                     {Array(1)
                       .fill(0)
                       .map((_, index) => (
                         <div
                           key={index}
-                          className="animate-pulse flex flex-col gap-1 "
+                          className="animate-pulse flex flex-col gap-1"
                         ></div>
                       ))}
                   </div>
                 ) : (
                   chatHistory.map((chat, index) => (
-                    <div key={index} className="flex flex-col ">
+                    <div key={index} className="flex flex-col">
                       <div className="flex flex-col overflow-y-auto max-h-[500px]">
                         <div className="flex justify-end">
                           {editIndex !== index && (
@@ -574,13 +536,13 @@ const ChatPage = ({ params }) => {
                                 setEditIndex(index);
                                 setEditMessage(chat.userMessage);
                               }}
-                              className="text-black rounded-md text-sm "
+                              className="text-black rounded-md text-sm"
                             >
                               <Pencil size={15} />
                             </button>
                           )}
                           <div
-                            className={`relative overflow-hidden  px-3 py-2 text-lg flex flex-col rounded-[24px_4px_24px_24px] w-fit break-words gap-2 transition-all duration-200 ${
+                            className={`relative overflow-hidden px-3 py-2 text-lg flex flex-col rounded-[24px_4px_24px_24px] w-fit break-words gap-2 transition-all duration-200 ${
                               editIndex === index
                                 ? "bg-[#dbdbdb]"
                                 : "bg-[#e9eef6]"
@@ -588,7 +550,6 @@ const ChatPage = ({ params }) => {
                           >
                             {editIndex === index ? (
                               <div className="flex items-start w-full">
-                                {/* Hidden Mirror Element for height adjustment */}
                                 <div
                                   ref={mirrorRef}
                                   className="invisible absolute whitespace-pre-wrap break-words px-4 py-2 text-base leading-snug"
@@ -606,8 +567,6 @@ const ChatPage = ({ params }) => {
                                     maxWidth: "600px",
                                   }}
                                 ></div>
-
-                                {/* Main editable container */}
                                 <div className="bg-[#efefef] rounded-2xl px-4 py-2 max-w-[600px] w-full">
                                   <textarea
                                     ref={textareaRef}
@@ -626,8 +585,6 @@ const ChatPage = ({ params }) => {
                                       lineHeight: "1.5",
                                     }}
                                   />
-
-                                  {/* Buttons */}
                                   <div className="flex justify-end gap-2 mt-2">
                                     <button
                                       onClick={() => setEditIndex(null)}
@@ -638,7 +595,6 @@ const ChatPage = ({ params }) => {
                                     <button
                                       onClick={() => {
                                         handleSaveEdit(index);
-                                        handleAddChat();
                                         setEditIndex(null);
                                       }}
                                       className="bg-black text-white px-4 py-1 rounded-full text-sm hover:opacity-90"
@@ -650,31 +606,31 @@ const ChatPage = ({ params }) => {
                               </div>
                             ) : (
                               <div className="flex justify-end">
-                                <div className="max-w-96  w-fit text-black break-words relative">
+                                <div className="max-w-96 w-fit text-black break-words relative">
                                   <span
                                     className={`${
                                       !expandedIndexes.includes(index)
                                         ? "line-clamp-3"
                                         : ""
-                                    } `}
+                                    }`}
                                   >
                                     <div className="mr-[25px]">
-                                      {chat.userMessage}
+                                      {chat.userMessage || "No message"}
                                     </div>
                                   </span>
-
-                                  {chat.userMessage.length > 100 && (
-                                    <button
-                                      onClick={() => toggleExpand(index)}
-                                      className="text-white bg-black rounded-full text-sm absolute right-0  top-0"
-                                    >
-                                      {expandedIndexes.includes(index) ? (
-                                        <ChevronUp />
-                                      ) : (
-                                        <ChevronDown />
-                                      )}
-                                    </button>
-                                  )}
+                                  {chat.userMessage &&
+                                    chat.userMessage.length > 100 && (
+                                      <button
+                                        onClick={() => toggleExpand(index)}
+                                        className="text-white bg-black rounded-full text-sm absolute right-0 top-0"
+                                      >
+                                        {expandedIndexes.includes(index) ? (
+                                          <ChevronUp />
+                                        ) : (
+                                          <ChevronDown />
+                                        )}
+                                      </button>
+                                    )}
                                 </div>
                               </div>
                             )}
@@ -683,113 +639,91 @@ const ChatPage = ({ params }) => {
                       </div>
                       {chatModel === "ImageGeneration" && chat.botResponse ? (
                         <div className="ml-36 self-start">
-                          {loading && chat.userMessage === morePrompt ? (
-                            <div className="w-48 h-48 bg-gray-300 flex items-center justify-center rounded-xl">
-                              <div className="w-8 h-8 border-4 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
-                            </div>
-                          ) : (
-                            <img
-                              src={chat.botResponse}
-                              alt={`Generated image for ${chat.userMessage}`}
-                              className="rounded-xl max-w-96  h-auto"
-                            />
-                          )}
+                          <img
+                            src={chat.botResponse}
+                            alt={`Generated image for ${chat.userMessage}`}
+                            className="rounded-xl max-w-96 h-auto"
+                          />
                         </div>
                       ) : (
-                        <div className="  self-start text-left text-lg text-black px-3 py-2 m-2 rounded-xl md:max-w-[70%] w-full break-words whitespace-pre-wrap">
-                          {(chat.parsedResponse &&
-                          chat.parsedResponse.length > 0
-                            ? chat.parsedResponse
-                            : [{ type: "text", content: chat.botResponse }]
-                          ).map((part, i) =>
-                            part.type === "code" ? (
-                              <CodeBlock
-                                key={i}
-                                code={part.content}
-                                language={part.language || "text"} // You can default to "text" or auto-detect
-                                copied={copiedIndex === i}
-                                onCopy={() => handleCopy(part.content, i)}
-                              />
-                            ) : (
-                              <ReactMarkdown key={i}>
-                                {part.content}
-                              </ReactMarkdown>
-                            )
-                          )}
-                        </div>
+                        chat.botResponse && (
+                          <div className="self-start text-left text-lg text-black px-3 py-2 m-2 rounded-xl md:max-w-[70%] w-full break-words whitespace-pre-wrap">
+                            {(chat.parsedResponse &&
+                            chat.parsedResponse.length > 0
+                              ? chat.parsedResponse
+                              : [{ type: "text", content: chat.botResponse }]
+                            ).map((part, i) =>
+                              part.type === "code" ? (
+                                <CodeBlock
+                                  key={i}
+                                  code={part.content}
+                                  language={part.language || "text"}
+                                  copied={copiedIndex === i}
+                                  onCopy={() => handleCopy(part.content, i)}
+                                />
+                              ) : (
+                                <ReactMarkdown key={i}>
+                                  {part.content}
+                                </ReactMarkdown>
+                              )
+                            )}
+                          </div>
+                        )
                       )}
                     </div>
                   ))
                 )}
-
-                {morePrompt !== "" && (
-                  <div className="flex flex-col gap-1 ">
-                    {loading ? (
-                      chatModel === "ImageGeneration" ? (
-                        <div className="w-48 h-48 bg-gray-300 flex items-center justify-center rounded-xl my-5">
-                          <div className="w-8 h-8 border-4 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
-                        </div>
-                      ) : (
-                        <div className="flex justify-start mb-4">
-                          <div className=" w-fit max-w-sm px-5 py-3   flex items-center space-x-3 animate-pulse">
-                            {/* Spinning Gradient Sparkle Icon (Filled) */}
-                            <svg
-                              width="28"
-                              height="28"
-                              viewBox="0 0 24 24"
-                              className="animate-spin-slow"
-                              xmlns="http://www.w3.org/2000/svg"
+                {loading && (
+                  <div className="flex justify-start mb-4">
+                    {chatModel === "ImageGeneration" ? (
+                      <div className="w-48 h-48 bg-gray-300 flex items-center justify-center rounded-xl my-5">
+                        <div className="w-8 h-8 border-4 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    ) : (
+                      <div className="w-fit max-w-sm px-5 py-3 flex items-center space-x-3 animate-pulse">
+                        <svg
+                          width="28"
+                          height="28"
+                          viewBox="0 0 24 24"
+                          className="animate-spin-slow"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <defs>
+                            <linearGradient
+                              id="sparkleGradient"
+                              x1="0"
+                              y1="0"
+                              x2="24"
+                              y2="24"
+                              gradientUnits="userSpaceOnUse"
                             >
-                              <defs>
-                                <linearGradient
-                                  id="sparkleGradient"
-                                  x1="0"
-                                  y1="0"
-                                  x2="24"
-                                  y2="24"
-                                  gradientUnits="userSpaceOnUse"
-                                >
-                                  <stop offset="0%" stopColor="#3b82f6" />{" "}
-                                  {/* Tailwind Blue-500 */}
-                                  <stop
-                                    offset="100%"
-                                    stopColor="#f9a8d4"
-                                  />{" "}
-                                  {/* Tailwind Pink-300 */}
-                                </linearGradient>
-                              </defs>
-                              <path
-                                fill="url(#sparkleGradient)"
-                                stroke="#1f2937" // Tailwind slate-800
-                                strokeWidth="1"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"
-                              />
-                            </svg>
-
-                            {/* Text and Animated Dots */}
-                            <span className="text-gray-700 text-base font-medium flex items-center">
-                              Just a second
-                              {/* <span className="ml-2 flex space-x-1">
-                                <span className="w-1.5 h-1.5 bg-gray-600 rounded-full animate-bounce [animation-delay:0s]" />
-                                <span className="w-1.5 h-1.5 bg-gray-600 rounded-full animate-bounce [animation-delay:0.15s]" />
-                                <span className="w-1.5 h-1.5 bg-gray-600 rounded-full animate-bounce [animation-delay:0.3s]" />
-                              </span> */}
-                            </span>
-                          </div>
-                        </div>
-                      )
-                    ) : null}
+                              <stop offset="0%" stopColor="#3b82f6" />
+                              <stop offset="100%" stopColor="#f9a8d4" />
+                            </linearGradient>
+                          </defs>
+                          <path
+                            fill="url(#sparkleGradient)"
+                            stroke="#1f2937"
+                            strokeWidth="1"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"
+                          />
+                        </svg>
+                        <span className="text-gray-700 text-base font-medium flex items-center">
+                          Just a second
+                        </span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             </div>
-            <div className=" absolute bottom-0 left-0 right-0 mx-auto max-w-[750px] px-4 py-2 z-20 ">
+            <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-[750px] px-4 py-2 z-20">
               {showUploadDialog && (
                 <div
                   ref={uploadRef}
-                  className="absolute bottom-0 left-0  w-64 bg-white shadow-lg border border-gray-300 rounded-xl p-2 "
+                  className="absolute bottom-0 left-0 w-64 bg-white shadow-lg border border-gray-300 rounded-xl p-2"
                 >
                   <button
                     onClick={() => {
@@ -811,7 +745,7 @@ const ChatPage = ({ params }) => {
                   </button>
                   <button
                     onClick={() => {
-                      fileInputRef.current.value = null; // Reset input so onChange fires even for same file
+                      fileInputRef.current.value = null;
                       fileInputRef.current.click();
                     }}
                     className="w-full text-left px-3 py-2 rounded hover:bg-gray-100 text-sm flex items-center gap-2"
@@ -827,8 +761,7 @@ const ChatPage = ({ params }) => {
                   />
                 </div>
               )}
-              <div className=" w-full bg-gray-100 border border-gray-300 rounded-2xl px-4 py-2 flex justify-between shadow-sm flex-col">
-                {/* Text Area */}
+              <div className="w-full bg-gray-100 border border-gray-300 rounded-2xl px-4 py-2 flex justify-between shadow-sm flex-col">
                 <div className="flex-grow overflow-y-auto">
                   <textarea
                     ref={textareaRef}
@@ -841,8 +774,6 @@ const ChatPage = ({ params }) => {
                     style={{ minHeight: "40px", height: "auto" }}
                   />
                 </div>
-
-                {/* Bottom Action Bar */}
                 <div className="flex justify-between items-center">
                   <div className="flex items-center space-x-2">
                     <button
@@ -859,27 +790,23 @@ const ChatPage = ({ params }) => {
                       <Volume2 className="w-5 h-5" strokeWidth={1.5} />
                     </button>
                   </div>
-
-                  {/* Middle: Image Preview */}
                   <div className="w-full px-2">
                     {imagePreview && (
                       <div className="relative mb-2 w-full max-w-xs">
                         <img
                           src={imagePreview}
                           alt="Preview"
-                          className="rounded-lg  h-[100px] w-[100px] object-contain"
+                          className="rounded-lg h-[100px] w-[100px] object-contain"
                         />
                         <button
                           onClick={removeImage}
                           className="absolute top-1 right-1 bg-white text-black rounded-full w-6 h-6 flex items-center justify-center shadow hover:bg-gray-100"
                         >
-                          &times;
+                          ×
                         </button>
                       </div>
                     )}
                   </div>
-
-                  {/* Right: Send Button */}
                   <button
                     onClick={handleAddChat}
                     className="bg-neutral-800 hover:bg-neutral-900 text-white p-2 rounded-full transition-all flex items-center justify-center h-10 w-10"
@@ -891,8 +818,6 @@ const ChatPage = ({ params }) => {
                     )}
                   </button>
                 </div>
-
-                {/* Upload Dialog */}
                 {isVisible && (
                   <div className="bg-white text-gray-700 p-3 rounded-md shadow-lg absolute z-10 bottom-[65px] left-[90px] space-y-2 w-40 border border-gray-200">
                     <button
@@ -901,7 +826,7 @@ const ChatPage = ({ params }) => {
                       }
                       className="flex items-center space-x-2 hover:text-black"
                     >
-                      <ImageIcon className="w-5 h-5" />
+                      <File className="w-5 h-5" />
                       <span>Image</span>
                     </button>
                     <button
@@ -913,7 +838,6 @@ const ChatPage = ({ params }) => {
                       <File className="w-5 h-5" />
                       <span>Files</span>
                     </button>
-
                     <input
                       type="file"
                       id="imageInput"
@@ -936,7 +860,6 @@ const ChatPage = ({ params }) => {
       ) : (
         <InsufficientBalance />
       )}
-
       {isOpen && (
         <SpeechToSpeech setIsOpen={setIsOpen} userId={userId} id={id} />
       )}
