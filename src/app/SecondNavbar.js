@@ -165,6 +165,8 @@ const SecondNavbar = () => {
                     href={feature.href}
                     className={`flex items-center justify-center px-2 py-1 mb-4 text-sm text-gray-600 rounded-[30px] transition ${
                       pathname === feature.href ||
+                      (feature.href === "/model" &&
+                        pathname.split("/")[1].includes("chat")) ||
                       pathname
                         .toLowerCase()
                         .split("/")[1]
@@ -193,7 +195,7 @@ const SecondNavbar = () => {
                 <li className="mt-6">
                   <div className="mb-2 text-sm text-gray-600">Recent Chats</div>
                   {Array.isArray(chatThread) &&
-                    chatThread.map((chat) => (
+                    [...chatThread].reverse().map((chat) => (
                       <div
                         key={chat.chatId}
                         className="relative flex items-center justify-between pl-5 pr-2 py-1 mb-3 rounded-lg hover:bg-gray-200"

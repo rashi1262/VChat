@@ -39,7 +39,7 @@ const page = ({ params }) => {
   const [isSpeechOpen, setIsSpeechOpen] = useState(false);
   const [chatId, setChatId] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-  const { chatThread, setChatThread } = useChat();
+  const { chatThread, setChatThread, loadNav } = useChat();
   console.log(chatThread);
   const handleVoiceInput = (voiceText) => {
     setPrompt((prevPrompt) => prevPrompt + " " + voiceText);
@@ -251,17 +251,17 @@ const page = ({ params }) => {
 
         const data = await response.json();
         localStorage.setItem("remainingCredits", JSON.stringify(data.credits));
-        console.log(data.chatMessages);
-        const today = new Date();
-        const formattedDate = formatDate(today);
-        // const cd = data.chatMessages
-        //   .filter((chat) => chat.message?.userId?.date?.includes(formattedDate))
-        //   .map((chat) => ({
-        //     chatId: chat.id,
-        //     message: chat.userSearch?.[0]?.userMessage || "No message",
-        //   }));
+        // console.log(data.chatMessages);
+        // const today = new Date();
+        // const formattedDate = formatDate(today);
+        // // const cd = data.chatMessages
+        // //   .filter((chat) => chat.message?.userId?.date?.includes(formattedDate))
+        // //   .map((chat) => ({
+        // //     chatId: chat.id,
+        // //     message: chat.userSearch?.[0]?.userMessage || "No message",
+        // //   }));
 
-        // console.log("cd : ", cd);
+        // // console.log("cd : ", cd);
 
         setChatThread(
           Array.isArray(data?.chatMessages)
@@ -277,7 +277,7 @@ const page = ({ params }) => {
     };
 
     fetchUserChats();
-  }, [userId]);
+  }, [userId, loadNav]);
 
   return (
     <>

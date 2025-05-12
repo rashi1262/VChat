@@ -90,6 +90,7 @@ const ChatPage = ({ params }) => {
   const textareaRef = useRef(null);
   const uploadRef = useRef(null);
   const mirrorRef = useRef(null);
+  const [reload, setReload] = useState(false);
 
   useEffect(() => {
     adjustSize();
@@ -312,7 +313,7 @@ const ChatPage = ({ params }) => {
       }
     };
     fetchUserChats();
-  }, [userId]);
+  }, [userId, reload]);
 
   const fetchBotResponse = async () => {
     try {
@@ -339,7 +340,7 @@ const ChatPage = ({ params }) => {
 
   useEffect(() => {
     if (id) fetchBotResponse();
-  }, [id]);
+  }, [id, reload]);
 
   const extractCodeBlocks = (message) => {
     if (!message) {
@@ -567,6 +568,7 @@ const ChatPage = ({ params }) => {
                                     maxWidth: "600px",
                                   }}
                                 ></div>
+
                                 <div className="bg-[#efefef] rounded-2xl px-4 py-2 max-w-[600px] w-full">
                                   <textarea
                                     ref={textareaRef}
@@ -585,6 +587,7 @@ const ChatPage = ({ params }) => {
                                       lineHeight: "1.5",
                                     }}
                                   />
+
                                   <div className="flex justify-end gap-2 mt-2">
                                     <button
                                       onClick={() => setEditIndex(null)}
@@ -605,34 +608,12 @@ const ChatPage = ({ params }) => {
                                 </div>
                               </div>
                             ) : (
-                              <div className="flex justify-end">
-                                <div className="max-w-96 w-fit text-black break-words relative">
-                                  <span
-                                    className={`${
-                                      !expandedIndexes.includes(index)
-                                        ? "line-clamp-3"
-                                        : ""
-                                    }`}
-                                  >
-                                    <div className="mr-[25px]">
-                                      {chat.userMessage || "No message"}
-                                    </div>
-                                  </span>
-                                  {chat.userMessage &&
-                                    chat.userMessage.length > 100 && (
-                                      <button
-                                        onClick={() => toggleExpand(index)}
-                                        className="text-white bg-black rounded-full text-sm absolute right-0 top-0"
-                                      >
-                                        {expandedIndexes.includes(index) ? (
-                                          <ChevronUp />
-                                        ) : (
-                                          <ChevronDown />
-                                        )}
-                                      </button>
-                                    )}
-                                </div>
-                              </div>
+                              <span
+                                className="whitespace-pre-wrap break-words"
+                                style={{ fontSize: "inherit" }}
+                              >
+                                {chat.userMessage}
+                              </span>
                             )}
                           </div>
                         </div>
@@ -861,7 +842,12 @@ const ChatPage = ({ params }) => {
         <InsufficientBalance />
       )}
       {isOpen && (
-        <SpeechToSpeech setIsOpen={setIsOpen} userId={userId} id={id} />
+        <SpeechToSpeech
+          setIsOpen={setIsOpen}
+          userId={userId}
+          id={id}
+          setReload={setReload}
+        />
       )}
     </>
   );
