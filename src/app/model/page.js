@@ -8,7 +8,6 @@ import { useCredits } from "@/context/creditContext";
 import VoiceToText from "@/components/VoiceToText";
 import Navbar from "../navbar";
 import { useChat } from ".././chatContext";
-
 import {
   ChevronDown,
   ChevronUp,
@@ -22,6 +21,7 @@ import InsufficientBalance from "@/components/InsufficientBalance";
 import { cards, Card } from "@/components/utils";
 import SpeechToSpeech from "@/components/SpeechToSpeech";
 import SecondNavbar from "../SecondNavbar";
+
 const page = ({ params }) => {
   const { hasCredits } = useCredits();
   const [showPopup, setShowPopup] = useState(false);
@@ -39,32 +39,33 @@ const page = ({ params }) => {
   const [isSpeechOpen, setIsSpeechOpen] = useState(false);
   const [chatId, setChatId] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-  const { chatThread, setChatThread } = useChat();
-
+  const { chatThread, setChatThread, loadNav } = useChat();
+  console.log(chatThread);
   const handleVoiceInput = (voiceText) => {
     setPrompt((prevPrompt) => prevPrompt + " " + voiceText);
   };
 
   const controlHeight = (e) => {
     const textarea = e.target;
-
-    // Reset height to allow shrinking
     textarea.style.height = "auto";
-
-    // Limit height to max 200px
     const newHeight = Math.min(textarea.scrollHeight, 200);
     textarea.style.height = `${newHeight}px`;
-
-    setPrompt(textarea.value); // or setMoreChat depending on your state name
+    setPrompt(textarea.value);
   };
 
   useEffect(() => {
     const handleClick = (event) => {
       const user = localStorage.getItem("user");
-
-      if (!user) {
-        const isTextarea = event.target.closest("textarea");
-        if (isTextarea) {
+      let isLoggedIn = false;
+      try {
+        isLoggedIn = user && JSON.parse(user)?.id;
+      } catch (e) {
+        isLoggedIn = false;
+      }
+      if (!isLoggedIn && !showPopup) {
+        const isButton = event.target.closest("button");
+        const isLink = event.target.closest("a");
+        if (!isButton && !isLink) {
           setShowPopup(true);
         }
       }
@@ -75,7 +76,7 @@ const page = ({ params }) => {
     return () => {
       document.removeEventListener("click", handleClick);
     };
-  }, []);
+  }, [showPopup]);
 
   const toggleExpand = (index) => {
     setExpandedIndexes((prev) =>
@@ -130,23 +131,22 @@ const page = ({ params }) => {
       setPrompt("");
       const formData = new FormData();
       formData.append("userId", userId);
-      formData.append("message", current); // `current` is your message text
+      formData.append("message", current);
 
       if (selectedFile) {
-        formData.append("file", selectedFile); // Attach the file if selected
+        formData.append("file", selectedFile);
       }
 
       const searchRes = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/searchs`,
         {
           method: "POST",
-          body: formData, // No need to set headers — browser auto-handles it
+          body: formData,
         }
       );
 
       if (searchRes.status === 402) {
         toast.error("Insufficient credits");
-
         setMsg(null);
         setLoading(false);
         return;
@@ -209,13 +209,14 @@ const page = ({ params }) => {
       handleResponse();
     }
   };
+
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      setSelectedFile(file); // Save file for later API use
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result); // Preview
+        setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -227,6 +228,14 @@ const page = ({ params }) => {
     setImagePreview(null);
     setSelectedFile(null);
   };
+
+  function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // zero-padded
+    const day = String(date.getDate()).padStart(2, "0"); // zero-padded
+    return `${year}-${month}-${day}`;
+  }
+
   useEffect(() => {
     if (!userId) return;
 
@@ -242,6 +251,17 @@ const page = ({ params }) => {
 
         const data = await response.json();
         localStorage.setItem("remainingCredits", JSON.stringify(data.credits));
+        // console.log(data.chatMessages);
+        // const today = new Date();
+        // const formattedDate = formatDate(today);
+        // // const cd = data.chatMessages
+        // //   .filter((chat) => chat.message?.userId?.date?.includes(formattedDate))
+        // //   .map((chat) => ({
+        // //     chatId: chat.id,
+        // //     message: chat.userSearch?.[0]?.userMessage || "No message",
+        // //   }));
+
+        // // console.log("cd : ", cd);
 
         setChatThread(
           Array.isArray(data?.chatMessages)
@@ -257,7 +277,7 @@ const page = ({ params }) => {
     };
 
     fetchUserChats();
-  }, [userId]);
+  }, [userId, loadNav]);
 
   return (
     <>
@@ -266,17 +286,15 @@ const page = ({ params }) => {
           <Toaster position="top-center" richColors />
           <div className="flex w-full justify-between bg-gray-50 text-sm">
             <Navbar />
-            <SecondNavbar/>
-            
+            <SecondNavbar />
+
             {msg ? (
               <>
                 <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
-                  {/* <Navbar /> */}
-
-                  <div className="min-h-screen md:flex relative bg-gray-50  items-center w-full  justify-center">
-                    <div className=" absolute top-4 overflow-y-auto w-full rounded-md h-[calc(100%-100px)] p-4 text-start mt-20 max-w-4xl mx-auto">
-                      <div className="flex flex-col sticky  h-full w-full ">
-                        <div className="flex flex-col gap-1 ">
+                  <div className="min-h-screen md:flex relative bg-gray-50 items-center w-full justify-center">
+                    <div className="absolute top-4 overflow-y-auto w-full rounded-md h-[calc(100%-100px)] p-4 text-start mt-20 max-w-4xl mx-auto">
+                      <div className="flex flex-col sticky h-full w-full">
+                        <div className="flex flex-col gap-1">
                           {Array(1)
                             .fill(0)
                             .map((_, index) => (
@@ -284,14 +302,13 @@ const page = ({ params }) => {
                                 className="flex flex-col gap-2 p-4"
                                 key={index}
                               >
-                                {/* User Message - Right Side */}
                                 <div className="flex justify-end">
                                   <div
                                     className={`text-black w-fit bg-[#e9eef6] rounded-[24px_4px_24px_24px] max-w-[444px] px-4 py-2 text-center text-lg relative pr-[38px] ${
                                       !expandedIndexes.includes(index)
                                         ? "line-clamp-3"
                                         : ""
-                                    } `}
+                                    }`}
                                   >
                                     {msg}
                                     {msg.length > 100 && (
@@ -308,11 +325,8 @@ const page = ({ params }) => {
                                     )}
                                   </div>
                                 </div>
-
-                                {/* Bot Typing - Left Side */}
                                 <div className="flex justify-start mb-4">
-                                  <div className="w-fit max-w-sm px-5 py-3  flex items-center space-x-3 animate-pulse">
-                                    {/* Spinning Gradient Sparkle Icon (Filled) */}
+                                  <div className="w-fit max-w-sm px-5 py-3 flex items-center space-x-3 animate-pulse">
                                     <svg
                                       width="28"
                                       height="28"
@@ -332,33 +346,24 @@ const page = ({ params }) => {
                                           <stop
                                             offset="0%"
                                             stopColor="#3b82f6"
-                                          />{" "}
-                                          {/* Tailwind Blue-500 */}
+                                          />
                                           <stop
                                             offset="100%"
                                             stopColor="#f9a8d4"
-                                          />{" "}
-                                          {/* Tailwind Pink-300 */}
+                                          />
                                         </linearGradient>
                                       </defs>
                                       <path
                                         fill="url(#sparkleGradient)"
-                                        stroke="#1f2937" // Tailwind slate-800
+                                        stroke="#1f2937"
                                         strokeWidth="1"
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
                                         d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"
                                       />
                                     </svg>
-
-                                    {/* Text and Animated Dots */}
                                     <span className="text-gray-700 text-base font-medium flex items-center">
                                       Just a second
-                                      {/* <span className="ml-2 flex space-x-1">
-                                        <span className="w-1.5 h-1.5 bg-gray-600 rounded-full animate-bounce [animation-delay:0s]" />
-                                        <span className="w-1.5 h-1.5 bg-gray-600 rounded-full animate-bounce [animation-delay:0.15s]" />
-                                        <span className="w-1.5 h-1.5 bg-gray-600 rounded-full animate-bounce [animation-delay:0.3s]" />
-                                      </span> */}
                                     </span>
                                   </div>
                                 </div>
@@ -367,10 +372,9 @@ const page = ({ params }) => {
                         </div>
                       </div>
 
-                      <div className=" absolute bottom-0 left-0 right-0 mx-auto max-w-[750px] px-4 py-2 z-20 ">
-                        <div className=" w-full bg-gray-100 border border-gray-300 rounded-2xl px-4 py-2 flex justify-between shadow-sm flex-col">
-                          {/* Text Area */}
-                          <div className="flex-grow overflow-y-auto ">
+                      <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-[750px] px-4 py-2 z-20">
+                        <div className="w-full bg-gray-100 border border-gray-300 rounded-2xl px-4 py-2 flex justify-between shadow-sm flex-col">
+                          <div className="flex-grow overflow-y-auto">
                             <input
                               type="text"
                               value={prompt}
@@ -381,10 +385,7 @@ const page = ({ params }) => {
                               style={{ minHeight: "40px", height: "auto" }}
                             />
                           </div>
-
-                          {/* Bottom Action Bar */}
-                          <div className="flex  items-center justify-between">
-                            {/* Left Action Buttons (Optional, placeholders shown) */}
+                          <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-2">
                               <button className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white">
                                 <svg
@@ -397,20 +398,10 @@ const page = ({ params }) => {
                                   <path d="M12 4v16m8-8H4" />
                                 </svg>
                               </button>
-
-                             
-                              <button className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white">
+                              <button className="w-10 h-10 p-etted">
                                 <Volume2 strokeWidth={1} />
                               </button>
-                              {/* Add more optional action buttons here */}
                             </div>
-
-                            {/* Middle: Image Preview Placeholder (if needed later) */}
-                            <div className="w-full px-2">
-                              {/* Add your image preview section here if needed */}
-                            </div>
-
-                            {/* Right: Send Button */}
                             <button
                               onClick={handleResponse}
                               className="bg-neutral-800 hover:bg-neutral-900 text-white p-2 rounded-full transition-all flex items-center justify-center h-10 w-10"
@@ -427,9 +418,9 @@ const page = ({ params }) => {
                                   <path
                                     fill="currentColor"
                                     fillRule="evenodd"
-                                    d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.685-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
+                                    d="M2.017 2.25c-.053.135.02.355.166.795l1.713 5.162A1 1 0 0 1 4 8.2h5.5a.8.8 0 1 1 0 1.6H4a1 1 0 0 1-.151-.014l-1.66 4.96c-.148.44-.222.66-.169.796a.4.4 0 0 0 .267.242c.14.039.352-.056.776-.247l13.45-6.053c.415-.186.622-.28.686-.409a.4.4 0 0 0 0-.356c-.064-.13-.271-.223-.686-.41L3.059 2.256c-.423-.19-.635-.285-.775-.246a.4.4 0 0 0-.267.24"
                                     clipRule="evenodd"
-                                  ></path>
+                                  />
                                 </svg>
                               )}
                             </button>
@@ -439,34 +430,32 @@ const page = ({ params }) => {
                     </div>
                   </div>
                 </div>
-
-                <div className="fixed top-3 right-5 flex items-center "></div>
+                <div className="fixed top-3 right-5 flex items-center"></div>
               </>
             ) : (
               <>
-                <div className="h-screen w-full bg-gray-50  flex-col items-center justify-center  hidden">
-                  <div className="max-w-4xl w-full  rounded-md p-6 text-center">
+                <div className="h-screen w-full bg-gray-50 flex-col items-center justify-center hidden">
+                  <div className="max-w-4xl w-full rounded-md p-6 text-center">
                     <button
                       className="h-6 mt-10 flex w-full justify-center items-center text-center text-black rounded"
                       onClick={() => setShowButtons(!showButtons)}
                     >
                       Gemini <ChevronDown />
                     </button>
-
                     {showButtons && (
-                      <div className="flex flex-col  items-center justify-center  ">
-                        <ul className="bg-gray-200  rounded-lg w-4/5">
+                      <div className="flex flex-col items-center justify-center">
+                        <ul className="bg-gray-200 rounded-lg w-4/5">
                           <li className="text-center">
                             <Link
                               href="/mybot"
                               className="flex border-black p-2 ml-16 hover:bg-gray-300 rounded text-sm mt-[10%] mr-5"
                             >
-                              <div className="w-5  h-[2%] p-1 ">
+                              <div className="w-5 h-[2%] p-1">
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
                                   fill="none"
                                   viewBox="0 0 18 18"
-                                  className=" bg-white rounded-full  CustomIcon-module__icon___zGR29 CustomIcon-module__icon--tiny___trsDz"
+                                  className="bg-white rounded-full CustomIcon-module__icon___zGR29 CustomIcon-module__icon--tiny___trsDz"
                                 >
                                   <g clipPath="url(#your-bots_svg__a)">
                                     <path
@@ -474,7 +463,7 @@ const page = ({ params }) => {
                                       strokeLinecap="round"
                                       strokeLinejoin="round"
                                       strokeWidth="1.5"
-                                      d="m9 1.5-.976 3.904c-.19.762-.286 1.143-.484 1.453a2.25 2.25 0 0 1-.683.683c-.31.198-.69.293-1.453.484L1.5 9l3.904.976c.762.19 1.143.286 1.453.484.275.176.507.408.683.683.198.31.293.69.484 1.452L9 16.5l.976-3.905c.19-.761.286-1.142.484-1.452.176-.275.408-.507.683-.683.31-.198.69-.293 1.452-.484L16.5 9l-3.905-.976c-.761-.19-1.142-.286-1.452-.484a2.25 2.25 0 0 1-.683-.683c-.198-.31-.293-.69-.484-1.453z"
+                                      d="m9 1.5-.976 3.904c-.19.762-.286 1.143-.484 1.453a2.25 2.25 0 0 1-.683.683c-.31.198-.69.293-1.453.484L1.5 9l3.904.976c.762.19 1.143.286 1.453.484.275.176.507.408.683.683.198.31.293.69.484 1.452L9 16.5l.976-3.905c.19-.761.286-1.142.484-1.452.176-.275.408-.507.683-.683.31-.198.69-.293 1.452-.484L.quote16.5 9l-3.905-.976c-.761-.19-1.142-.286-1.452-.484a2.25 2.25 0 0 1-.683-.683c-.198-.31-.293-.69-.484-1.453z"
                                       fill="black"
                                     ></path>
                                   </g>
@@ -496,7 +485,7 @@ const page = ({ params }) => {
                               href="/model"
                               className="flex border-black items-center ml-16 p-[1%] text-gray-400 hover:bg-gray-100 rounded text-sm mr-5"
                             >
-                              <div className="w-8  h-[2%] p-1 ">
+                              <div className="w-8 h-[2%] p-1">
                                 <svg
                                   viewBox="0 0 42 42"
                                   fill="none"
@@ -547,16 +536,15 @@ const page = ({ params }) => {
                         </ul>
                       </div>
                     )}
-
-                    <h1 className="text-3xl mt-48 text-gray-600 ">
+                    <h1 className="text-3xl mt-48 text-gray-600">
                       How can I help you today?
                     </h1>
                   </div>
                 </div>
-                <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center  md:ml-auto md:w-full relative ">
-                  <div className="max-w-4xl w-full rounded-md p-6 text-center ">
+                <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center md:ml-auto md:w-full relative">
+                  <div className="max-w-4xl w-full rounded-md p-6 text-center">
                     <h1 className="md:text-3xl mb-5 text-lg text-gray-600 md:mb-16 text-center">
-                      How can I help you today ?
+                      How can I help you today?
                     </h1>
                     <div className="grid md:grid-cols-4 grid-cols-2 gap-6">
                       {cards.map((card, index) => (
@@ -569,11 +557,9 @@ const page = ({ params }) => {
                         />
                       ))}
                     </div>
-
                     <div>
-                      <div className=" absolute bottom-0 left-0 right-0 mx-auto max-w-[750px] px-4 py-2 z-20 ">
-                        <div className=" w-full bg-gray-100 border border-gray-300 rounded-2xl px-4 py-2 flex justify-between shadow-sm flex-col">
-                          {/* Text Area */}
+                      <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-[750px] px-4 py-2 z-20">
+                        <div className="w-full bg-gray-100 border border-gray-300 rounded-2xl px-4 py-2 flex justify-between shadow-sm flex-col">
                           <div className="flex-grow overflow-y-auto">
                             <textarea
                               value={prompt}
@@ -585,27 +571,22 @@ const page = ({ params }) => {
                               style={{ minHeight: "40px", height: "auto" }}
                             />
                           </div>
-
-                          {/* Image Preview */}
                           {imagePreview && (
                             <div className="relative w-full max-w-xs">
                               <img
                                 src={imagePreview}
                                 alt="Preview"
-                                className="rounded-lg  h-[100px] w-[100px] object-contain"
+                                className="rounded-lg h-[100px] w-[100px] object-contain"
                               />
                               <button
                                 onClick={removeImage}
                                 className="absolute top-1 right-1 bg-white text-black rounded-full w-6 h-6 flex items-center justify-center shadow hover:bg-gray-100"
                               >
-                                &times;
+                                ×
                               </button>
                             </div>
                           )}
-
-                          {/* Bottom Action Bar */}
                           <div className="flex justify-between items-center">
-                            {/* Left Side */}
                             <div className="flex items-center space-x-2">
                               <button
                                 onClick={() =>
@@ -615,10 +596,7 @@ const page = ({ params }) => {
                               >
                                 <Plus className="w-5 h-5" strokeWidth={1.5} />
                               </button>
-
-  <VoiceToText onResult={handleVoiceInput} />
-
-
+                              <VoiceToText onResult={handleVoiceInput} />
                               <button
                                 onClick={() => setIsOpen(true)}
                                 className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
@@ -629,8 +607,6 @@ const page = ({ params }) => {
                                 />
                               </button>
                             </div>
-
-                            {/* Right Side - Send Button */}
                             <button
                               onClick={handleResponse}
                               className="bg-neutral-800 hover:bg-neutral-900 text-white p-2 rounded-full transition-all flex items-center justify-center h-10 w-10"
@@ -642,8 +618,6 @@ const page = ({ params }) => {
                               )}
                             </button>
                           </div>
-
-                          {/* Upload Dialog */}
                           {showUploadDialog && (
                             <div className="bg-white text-gray-700 p-3 rounded-md shadow-lg absolute z-50 bottom-[70px] left-[60px] space-y-2 w-44 border border-gray-200">
                               <button
@@ -673,7 +647,7 @@ const page = ({ params }) => {
               </>
             )}
           </div>
-          {showPopup && <AuthPopup />}
+          {showPopup && <AuthPopup setShowPopup={setShowPopup} />}
         </div>
       ) : (
         <InsufficientBalance />
@@ -685,32 +659,48 @@ const page = ({ params }) => {
 
 export default page;
 
-export const AuthPopup = () => {
+export const AuthPopup = ({ setShowPopup }) => {
+  const router = useRouter();
+
+  const handleClose = () => {
+    setShowPopup(false);
+  };
+
   return (
-    <>
-      <div className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center">
-        <div className="bg-neutral-800 p-12  w-96 rounded-lg shadow-lg text-center text-white">
-          <h2 className="text-2xl  font-bold">Welcome back</h2>
-          <p className=" p-2  text-lg ">
-            Log in or sign up to unlock smarter responses, upload files, and
-            make the most of VChat — your AI assistant.
-          </p>
-          <div className=" p-2 mt-4">
-            <button
-              onClick={() => router.push("/login")}
-              className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
-            >
-              Log in
-            </button>
-            <button
-              onClick={() => router.push("/signup")}
-              className="  w-full px-4 py-2 bg-transparent text-white border border-white rounded-full hover:bg-gray-600"
-            >
-              Sign up
-            </button>
-          </div>
+    <div
+      className="z-50 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center"
+      onClick={handleClose}
+    >
+      <div
+        className="bg-neutral-800 p-12 w-96 rounded-lg shadow-lg text-center text-white"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-2xl font-bold">Welcome back</h2>
+        <p className="p-2 text-lg">
+          Log in or sign up to unlock smarter responses, upload files, and make
+          the most of VChat — your AI assistant.
+        </p>
+        <div className="p-2 mt-4">
+          <button
+            onClick={() => router.push("/login")}
+            className="w-full px-4 py-2 mb-2 bg-white text-gray-800 border border-white rounded-full hover:bg-gray-100"
+          >
+            Log in
+          </button>
+          <button
+            onClick={() => router.push("/signup")}
+            className="w-full px-4 py-2 bg-transparent text-white border border-white rounded-full hover:bg-gray-600"
+          >
+            Sign up
+          </button>
+          <button
+            onClick={handleClose}
+            className="mt-2 text-gray-400 hover:text-white"
+          >
+            Close
+          </button>
         </div>
       </div>
-    </>
+    </div>
   );
 };

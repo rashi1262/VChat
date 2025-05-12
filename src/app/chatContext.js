@@ -6,6 +6,7 @@ const ChatContext = createContext();
 export const ChatProvider = ({ children }) => {
   const [chatThread, setChatThread] = useState([]);
   const [userId, setUserId] = useState(null);
+  const [loadNav, setLoadNav] = useState(false);
 
   const syncUserId = () => {
     if (typeof window !== "undefined") {
@@ -46,7 +47,14 @@ export const ChatProvider = ({ children }) => {
 
   return (
     <ChatContext.Provider
-      value={{ chatThread, setChatThread, userId, fetchChats }}
+      value={{
+        chatThread,
+        setChatThread,
+        userId,
+        fetchChats,
+        loadNav,
+        setLoadNav,
+      }}
     >
       {children}
     </ChatContext.Provider>

@@ -13,16 +13,18 @@ import {
   HelpCircle,
   LogOut,
 } from "lucide-react";
+import { useChat } from "./chatContext";
 
 export default function Sidebar() {
   const router = useRouter();
+  const { chatThread, setChatThread } = useChat();
   const handleLogout = async () => {
     await signOut({ redirect: false });
-
+    setChatThread(() => []);
     localStorage.removeItem("user");
     localStorage.removeItem("remainingCredits");
     localStorage.setItem("hasLoggedIn", false);
-    router.push("/model");
+    router.push("/");
   };
 
   return (

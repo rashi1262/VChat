@@ -1,11 +1,11 @@
 "use client";
-
 import { useState, useEffect, useRef } from "react";
 import Sidebar from "../Sidebar";
 import Link from "next/link";
 import axios from "axios";
 import { toast, Toaster } from "sonner";
 import { Spinner } from "@/components/commonFunc";
+import { useRouter } from "next/navigation";
 export const BackButton = () => {
   return (
     <Link href="/model" className="px-4 py-2 text-gray-500 border rounded-md">
@@ -20,8 +20,14 @@ export default function ProfilePage() {
   const [userId, setUserId] = useState(null);
   const [isSaving, setisSaving] = useState(false);
   const fileInputRef = useRef(null);
+  const router = useRouter();
 
   useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (!user) {
+      return router.push("/");
+    }
+
     if (typeof window !== "undefined") {
       const storedUser = localStorage.getItem("user");
       if (storedUser) {

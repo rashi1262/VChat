@@ -44,8 +44,19 @@ export default function InvoicePage() {
         }
       );
 
-      const data = await response.json();
-      setPayments(data.payments);
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        if (data && Array.isArray(data.payments)) {
+          setPayments(data.payments);
+        } else {
+          setPayments([]); // fallback if response is json but not array
+        }
+      } else {
+        const text = await response.text();
+        console.warn("Non-JSON response:", text);
+        setPayments([]); // fallback for plain text like "No payments found"
+      }
     } catch (error) {
       console.error("Error fetching payments:", error);
     } finally {
@@ -74,12 +85,22 @@ export default function InvoicePage() {
     doc.setFontSize(12);
     doc.text(`Customer: ${payment.name}`, 20, 40);
     doc.text(`Email: ${payment.customerEmail}`, 20, 50);
-    doc.text(`Date: ${new Date(payment.createDate).toLocaleDateString()}`, 20, 60);
+    doc.text(
+      `Date: ${new Date(payment.createDate).toLocaleDateString()}`,
+      20,
+      60
+    );
 
     autoTable(doc, {
       startY: 70,
       head: [["Payment ID", "Amount", "Status"]],
-      body: [[payment.paymentId, `$${(payment.amount / 100).toFixed(2)}`, payment.status]],
+      body: [
+        [
+          payment.paymentId,
+          `$${(payment.amount / 100).toFixed(2)}`,
+          payment.status,
+        ],
+      ],
     });
 
     doc.save(`invoice_${payment.id}.pdf`);
@@ -94,8 +115,12 @@ export default function InvoicePage() {
           <div className="flex-1">
             <div className="mb-6 flex justify-between items-center">
               <div>
-                <h1 className="text-lg font-semibold text-gray-600">Invoices</h1>
-                <p className="text-sm text-gray-500">Access your billing history and invoices</p>
+                <h1 className="text-lg font-semibold text-gray-600">
+                  Invoices
+                </h1>
+                <p className="text-sm text-gray-500">
+                  Access your billing history and invoices
+                </p>
               </div>
               <div className="flex gap-3">
                 <button
@@ -114,7 +139,6 @@ export default function InvoicePage() {
                     </>
                   )}
                 </button>
-
 
                 <BackButton />
               </div>
@@ -138,9 +162,13 @@ export default function InvoicePage() {
                       <tr key={payment.id} className="text-center">
                         <td className="border p-2">{payment.name}</td>
                         <td className="border p-2">{payment.customerEmail}</td>
-                        <td className="border p-2">${(payment.amount / 100).toFixed(2)}</td>
+                        <td className="border p-2">
+                          ${(payment.amount / 100).toFixed(2)}
+                        </td>
                         <td className="border p-2">{payment.status}</td>
-                        <td className="border p-2">{new Date(payment.createDate).toLocaleDateString()}</td>
+                        <td className="border p-2">
+                          {new Date(payment.createDate).toLocaleDateString()}
+                        </td>
                         <td className="border p-2">
                           <button
                             onClick={() => generatePDF(payment)}
@@ -167,7 +195,7 @@ export default function InvoicePage() {
                   ))}
                 </div>
               ) : (
-                <p>No payments found.</p>
+                <p>No Invoice found.</p>
               )}
             </div>
           </div>
