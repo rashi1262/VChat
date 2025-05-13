@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import logo from "../../../public/assests/logo.jpg";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
