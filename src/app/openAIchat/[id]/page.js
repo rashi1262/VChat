@@ -396,7 +396,7 @@ const ChatPage = ({ params }) => {
                               className={`px-4 py-3 rounded-2xl ${
                                 editIndex === index
                                   ? "bg-gray-100 w-full"
-                                  : "bg-blue-500 text-white"
+                                  : "bg-[#dbdbdb] text-black"
                               } max-w-full break-words`}
                             >
                               {editIndex === index ? (
@@ -469,7 +469,7 @@ const ChatPage = ({ params }) => {
                         {/* Bot response, only render if botResponse exists */}
                         {chat.botResponse && (
                           <div className="flex justify-start">
-                            <div className="bg-gray-200 text-gray-800 px-4 py-3 rounded-2xl max-w-[70%] break-words">
+                            <div className=" text-gray-800 px-4 py-3 rounded-2xl max-w-[70%] break-words">
                               {(chat.parsedResponse &&
                               chat.parsedResponse.length > 0
                                 ? chat.parsedResponse

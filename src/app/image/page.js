@@ -199,8 +199,6 @@ const page = () => {
           {msg ? (
             <>
               <div className="flex w-full justify-between bg-gray-50 text-sm overflow-y-scroll">
-                <Navbar />
-
                 <div className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center  w-4/5">
                   <div className="max-w absolute top-4  overflow-y-scroll w-full rounded-md h-[75%] p-4 text-center  mt-20  ">
                     <div className="flex flex-col sticky  h-full w-full ">

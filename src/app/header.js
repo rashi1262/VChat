@@ -56,7 +56,6 @@ const Header = () => {
         setCredits(data?.credits || 0);
         localStorage.setItem("remainingCredits", JSON.stringify(data.credits));
       } catch (error) {
-      
       } finally {
         setloading(false);
       }
@@ -81,19 +80,25 @@ const Header = () => {
     return () => clearInterval(interval);
   }, [credits]);
 
-  if (pathname === "/login" || pathname === "/signup" || pathname === "/verify-email" || pathname === "/verify") return null;
+  if (
+    pathname === "/login" ||
+    pathname === "/signup" ||
+    pathname === "/verify-email" ||
+    pathname === "/verify"
+  )
+    return null;
 
   return (
-    <header className="z-10 fixed top-0 w-full bg-white shadow-sm h-16">
-  <div className="container mx-auto flex items-center justify-between px-5 h-full">
-    {/* Left: Toggle button */}
-    <div className="flex items-center h-full">
-      <button
-        className="flex items-center justify-center h-10 w-10 border text-black hover:bg-gray-100 rounded"
-        onClick={() => setIsNavVisible(!isNavVisible)}
-      >
-        {/* Menu Icon */}
-        <div className="w-6 h-6 p-1 ">
+    <header className="z-10  fixed top-0 w-full bg-white shadow-sm h-16">
+      <div className="container mx-auto flex items-center justify-between px-5 h-full">
+        {/* Left: Toggle button */}
+        <div className="flex items-center h-full">
+          <button
+            className="flex items-center justify-center h-10 w-10 border text-black hover:bg-gray-100 rounded"
+            onClick={() => setIsNavVisible(!isNavVisible)}
+          >
+            {/* Menu Icon */}
+            <div className="w-6 h-6 p-1 ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -109,56 +114,94 @@ const Header = () => {
                 ></path>
               </svg>
             </div>
-      </button>
-    </div>
+          </button>
+        </div>
 
-   
-    <div className="flex items-center space-x-4 h-full">
-      {pathname === "/vChat" && (
-        <Link href="/vChat" className="flex items-center hover:bg-gray-100 text-gray-600  text-sm font-normal">
-          <Image src="/assests/vlogo.avif" width={20} height={20} alt="logo" />
-          <span className="ml-2">VChat</span>
-        </Link>
-      )}
-      {pathname === "/model" && (
-        <Link href="/model" className="flex items-center hover:bg-gray-100 text-gray-600  text-sm font-normal">
-          <Image src="/assests/gemini.png" width={30} height={30} alt="logo" />
-          <span className="ml-2">Gemini</span>
-        </Link>
-      )}
-     
-      {pathname === "/image" && (
-        <Link href="/image" className="flex items-center hover:bg-gray-100 text-gray-600  text-sm font-normal">
-          <Image src="/assests/svgviewer-output (2).svg" width={30} height={30} alt="logo" />
-          <span className="ml-2">Image Generation</span>
-        </Link>
-      )}
-      
-      {pathname === "/openAI" && (
-  <Link href="/openAI" className="flex items-center hover:bg-gray-100 text-gray-600  text-sm font-normal">
-    <Image src="/assests/svgviewer-output.svg" width={20} height={20} alt="logo" />
-    <span className="ml-2">OpenAI</span>
-  </Link>
-)}
+        <div className="flex items-center space-x-4 h-full">
+          {pathname === "/vChat" && (
+            <Link
+              href="/vChat"
+              className="flex items-center hover:bg-gray-100 text-gray-600  text-sm font-normal"
+            >
+              <Image
+                src="/assests/vlogo.avif"
+                width={20}
+                height={20}
+                alt="logo"
+              />
+              <span className="ml-2">VChat</span>
+            </Link>
+          )}
+          {pathname === "/model" && (
+            <Link
+              href="/model"
+              className="flex items-center hover:bg-gray-100 text-gray-600  text-sm font-normal"
+            >
+              <Image
+                src="/assests/gemini.png"
+                width={30}
+                height={30}
+                alt="logo"
+              />
+              <span className="ml-2">Gemini</span>
+            </Link>
+          )}
 
-      {pathname === "/upload" && (
-        <Link href="/upload" className="flex items-center hover:bg-gray-100 text-gray-600  text-sm font-normal">
-          <Image src="/assests/svgviewer-output (3).svg" width={30} height={30} alt="logo" />
-          <span className="ml-2">Upload & Ask PDF</span>
-        </Link>
-      )}
-   
-      <div className="text-gray-600 text-sm font-medium">
-        {credits !== null ? (
-          <p>Free Points: {credits}</p>
-        ) : (
-          <div className="w-20 h-4 bg-gray-300 animate-pulse rounded"></div>
-        )}
+          {pathname === "/image" && (
+            <Link
+              href="/image"
+              className="flex items-center hover:bg-gray-100 text-gray-600  text-sm font-normal"
+            >
+              <Image
+                src="/assests/svgviewer-output (2).svg"
+                width={30}
+                height={30}
+                alt="logo"
+              />
+              <span className="ml-2">Image Generation</span>
+            </Link>
+          )}
+
+          {pathname === "/openAI" && (
+            <Link
+              href="/openAI"
+              className="flex items-center hover:bg-gray-100 text-gray-600  text-sm font-normal"
+            >
+              <Image
+                src="/assests/svgviewer-output.svg"
+                width={20}
+                height={20}
+                alt="logo"
+              />
+              <span className="ml-2">OpenAI</span>
+            </Link>
+          )}
+
+          {pathname === "/upload" && (
+            <Link
+              href="/upload"
+              className="flex items-center hover:bg-gray-100 text-gray-600  text-sm font-normal"
+            >
+              <Image
+                src="/assests/svgviewer-output (3).svg"
+                width={30}
+                height={30}
+                alt="logo"
+              />
+              <span className="ml-2">Upload & Ask PDF</span>
+            </Link>
+          )}
+
+          <div className="text-gray-600 text-sm font-medium">
+            {credits !== null ? (
+              <p>Free Points: {credits}</p>
+            ) : (
+              <div className="w-20 h-4 bg-gray-300 animate-pulse rounded"></div>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</header>
-
+    </header>
   );
 };
 

@@ -76,8 +76,6 @@ export default function DangerZonePage() {
   const confirmDeleteChats = async () => {
     setLoadingChats(true);
     try {
-    
-
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/chatbot/delete-ByUserId/${id}`,
         {
@@ -95,8 +93,9 @@ export default function DangerZonePage() {
       }
 
       setChatThread([]);
-      setLoadingChats(false);
+      toast.success("Chat history cleared successfully!");
     } catch (error) {
+      toast.error("Failed to clear chat history.");
     } finally {
       setLoadingChats(false);
     }
@@ -164,52 +163,54 @@ export default function DangerZonePage() {
       }
 
       toast.success("Your account has been deleted successfully.");
-      confirmDeleteChats();
       localStorage.removeItem("user");
       setLoading(false);
-
       router.push("/login");
     } catch (error) {
-   
+      toast.error("Failed to delete account.");
     } finally {
       setLoadingAccount(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex w-full justify-between bg-gray-50 text-sm">
-      <div className="min-h-screen py-14 bg-gray-50 flex flex-col mx-auto w-3/5">
-        <Toaster position="buttom-right" richColors />
-
-        <div className="flex gap-8 p-10">
-          <Sidebar />
-          <div className="flex-1">
-            <div className="mb-6 flex justify-between items-center">
-              <div>
-                <h1 className="text-lg font-semibold text-gray-600">
-                  Danger Zone
-                </h1>
-                <p className="text-sm text-gray-500">
-                  Delete account and other critical settings userId
-                </p>
+    <div className="min-h-screen bg-gray-50 py-6 flex flex-col sm:py-12">
+      <Toaster position="bottom-right" richColors />
+      <div className="relative py-3 sm:max-w-xl sm:mx-auto">
+        <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-orange-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
+        <div className="relative bg-white shadow-lg sm:rounded-3xl p-8">
+          <div className="lg:flex lg:gap-8">
+            <div className="lg:w-1/4 mb-6 lg:mb-0 lg:mr-6">
+              <Sidebar />
+            </div>
+            <div className="flex-1">
+              <div className="mb-6 flex justify-between items-center">
+                <div>
+                  <h1 className="text-xl font-semibold text-gray-700">
+                    Danger Zone
+                  </h1>
+                  <p className="text-sm text-gray-500">
+                    Delete account and other critical settings
+                  </p>
+                </div>
+                <BackButton />
               </div>
 
-              <BackButton />
-            </div>
-
-            <div className="rounded-lg border p-6 space-y-6">
-              <ActionButton
-                label="Clear All Chats"
-                description="Your chat history will be permanently deleted"
-                onClick={handleDeleteChats}
-                loading={loadingChats}
-              />
-              <ActionButton
-                label="Delete Account"
-                description="Your account and all data will be permanently deleted"
-                onClick={handleDeleteAccount}
-                loading={loading}
-              />
+              <div className="rounded-lg border p-6 space-y-6">
+                <ActionButton
+                  label="Clear All Chats"
+                  description="Your chat history will be permanently deleted"
+                  onClick={handleDeleteChats}
+                  loading={loadingChats}
+                />
+                <ActionButton
+                  label="Delete Account"
+                  description="Your account and all data will be permanently deleted"
+                  onClick={handleDeleteAccount}
+                  loading={loading}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -225,7 +226,7 @@ const ActionButton = ({ label, description, onClick, loading }) => (
       <p className="text-sm text-gray-500">{description}</p>
     </div>
     <button
-      className="px-4 py-2 text-sm bg-white border border-red-300 text-red-600 rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center"
+      className="px-4 py-2 text-sm bg-white border border-red-300 text-red-600 rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center disabled:bg-red-100 disabled:text-red-400 disabled:border-red-200"
       onClick={onClick}
       disabled={loading}
     >

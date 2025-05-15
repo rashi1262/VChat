@@ -31,11 +31,10 @@
 //   );
 // }
 
-
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { NextAuthProvider } from "./Providers";
-import { ChatProvider } from "./chatContext"; 
+import { ChatProvider } from "./chatContext";
 import Header from "./header";
 import { SecondNavProvider } from "../context/SecondNavContext"; // adjust path accordingly
 
@@ -46,7 +45,6 @@ const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
-
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -61,29 +59,23 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        
-          <>
-          
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <>
           <NavProvider>
-              <Header />
+            <Header />
             {/* <Navbar/> */}
             <NextAuthProvider>
               <ChatProvider>
-               <CreditProvider>
-               <SecondNavProvider>
-
-                {children}
-                </SecondNavProvider>
+                <CreditProvider>
+                  <SecondNavProvider>{children}</SecondNavProvider>
                 </CreditProvider>
-                
-                </ChatProvider>
+              </ChatProvider>
             </NextAuthProvider>
-            </NavProvider>
-          </>
-        
+          </NavProvider>
+        </>
       </body>
     </html>
   );
 }
-

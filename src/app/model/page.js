@@ -251,17 +251,6 @@ const page = ({ params }) => {
 
         const data = await response.json();
         localStorage.setItem("remainingCredits", JSON.stringify(data.credits));
-        // console.log(data.chatMessages);
-        // const today = new Date();
-        // const formattedDate = formatDate(today);
-        // // const cd = data.chatMessages
-        // //   .filter((chat) => chat.message?.userId?.date?.includes(formattedDate))
-        // //   .map((chat) => ({
-        // //     chatId: chat.id,
-        // //     message: chat.userSearch?.[0]?.userMessage || "No message",
-        // //   }));
-
-        // // console.log("cd : ", cd);
 
         setChatThread(
           Array.isArray(data?.chatMessages)
@@ -543,10 +532,10 @@ const page = ({ params }) => {
                 </div>
                 <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center md:ml-auto md:w-full relative">
                   <div className="max-w-4xl w-full rounded-md p-6 text-center">
-                    <h1 className="md:text-3xl mb-5 text-lg text-gray-600 md:mb-16 text-center">
+                    <h1 className="md:text-xl font-semibold mb-5 text-lg text-gray-600 md:mb-10 text-center">
                       How can I help you today?
                     </h1>
-                    <div className="grid md:grid-cols-4 grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                       {cards.map((card, index) => (
                         <Card
                           key={index}
@@ -557,6 +546,7 @@ const page = ({ params }) => {
                         />
                       ))}
                     </div>
+
                     <div>
                       <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-[750px] px-4 py-2 z-20">
                         <div className="w-full bg-gray-100 border border-gray-300 rounded-2xl px-4 py-2 flex justify-between shadow-sm flex-col">

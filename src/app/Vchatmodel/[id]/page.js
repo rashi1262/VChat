@@ -400,13 +400,11 @@ const ChatPage = ({ params }) => {
   return (
     <>
       <Toaster position="top-center" richColors />
-
+      <Navbar />
+      <SecondNavbar />
       {hasCredits ? (
         <div className="flex w-full justify-between bg-gray-50 text-sm h-screen">
-          <div className="hidden md:flex">
-            <Navbar />
-            <SecondNavbar />
-          </div>
+          <div className="hidden md:flex"></div>
 
           <div className="flex-1 flex flex-col h-full overflow-hidden">
             <div
@@ -450,7 +448,7 @@ const ChatPage = ({ params }) => {
                             className={`px-4 py-3 rounded-2xl ${
                               editIndex === index
                                 ? "bg-gray-100 w-full"
-                                : "bg-blue-500 text-white"
+                                : "bg-[#e9eef6] text-black"
                             } max-w-full break-words`}
                           >
                             {editIndex === index ? (
@@ -526,7 +524,7 @@ const ChatPage = ({ params }) => {
                       {/* Bot response, only render if botResponse exists */}
                       {chat.botResponse && (
                         <div className="flex justify-start">
-                          <div className="bg-gray-200 text-gray-800 px-4 py-3 rounded-2xl max-w-[70%] break-words">
+                          <div className=" text-gray-800 px-4 py-3 rounded-2xl max-w-[70%] break-words">
                             {(chat.parsedResponse?.length > 0
                               ? chat.parsedResponse
                               : [{ type: "text", content: chat.botResponse }]

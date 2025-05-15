@@ -38,7 +38,7 @@ const SecondNavbar = () => {
   const { isSecondNavVisible, toggleSecondNav } = useSecondNav();
   const router = useRouter();
   const pathname = usePathname();
-  // Fetch user from localStorage
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (!storedUser) {
@@ -53,9 +53,8 @@ const SecondNavbar = () => {
     } catch (err) {
       console.error("Error parsing user data", err);
     }
-  }, []);
+  }, [router]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
@@ -133,128 +132,150 @@ const SecondNavbar = () => {
   })();
 
   return (
-    <div className="md:block hidden">
-      <div className="relative z-40">
-        <Toaster position="top-center" richColors />
-        <div
-          className={`h-screen overflow-x-hidden overflow-y-auto bg-white text-black left-0 top-0 flex flex-col items-center transition-all duration-300 ${
-            isSecondNavVisible ? "w-64 p-4" : "w-24 p-2"
-          }`}
-        >
-          <nav className="w-full flex flex-col justify-between flex-grow">
-            <ul>
-              {/* Toggle Button */}
-              <li className="flex flex-col gap-y-7">
-                <button
-                  onClick={toggleSecondNav}
-                  aria-label="Toggle Sidebar"
-                  className="group p-2 rounded-full bg-gray-200 hover:bg-gray-300 w-8 h-8 flex justify-center items-center"
+    <div className="relative z-40">
+      <Toaster position="top-center" richColors />
+
+      {/* Mobile Toggle Button */}
+      {/* <button
+        onClick={toggleSecondNav}
+        aria-label="Toggle Sidebar"
+        className="md:hidden fixed top-4 right-4 z-50 p-2 bg-white rounded-full shadow-md"
+      >
+        {isSecondNavVisible ? (
+          <X size={24} strokeWidth={2} />
+        ) : (
+          <SquareMenu size={24} strokeWidth={2} />
+        )}
+      </button> */}
+
+      {/* Sidebar */}
+      <div
+        className={`h-screen  overflow-x-hidden overflow-y-auto bg-white text-black flex flex-col items-center transition-all duration-300 fixed md:static top-0 ${
+          isSecondNavVisible
+            ? "w-60 p-4 left-0"
+            : "w-0 p-0 left-0 md:w-16 md:p-2"
+        } md:flex md:flex-col md:items-center md:transition-all md:duration-300 ${
+          isSecondNavVisible ? "md:w-60 md:p-4" : ""
+        }`}
+      >
+        <nav className="w-full flex flex-col justify-between flex-grow relative">
+          <ul>
+            {/* Toggle Button (Desktop) */}
+            <li className="flex flex-col gap-y-7">
+              <button
+                onClick={toggleSecondNav}
+                aria-label="Toggle Sidebar"
+                className="group p-2 rounded-full bg-transparent hover:bg-gray-300 w-10 h-10 flex justify-center items-center md:block"
+              >
+                {isSecondNavVisible ? (
+                  <X size={20} strokeWidth={2} />
+                ) : (
+                  <SquareMenu className="w-6 h-6" strokeWidth={1} />
+                )}
+              </button>
+            </li>
+
+            {/* Features */}
+            {displayedFeatures.map((feature) => (
+              <div className="group relative mt-3" key={feature.title}>
+                <Link
+                  href={feature.href}
+                  className={`${
+                    isSecondNavVisible ? "flex" : "inline-flex"
+                  } items-center px-2 py-1 mb-2 text-sm text-gray-600 rounded-[8px] transition font-bold ${
+                    pathname === feature.href ||
+                    (feature.href === "/model" &&
+                      pathname.split("/")[1].includes("chat")) ||
+                    pathname
+                      .toLowerCase()
+                      .split("/")[1]
+                      .startsWith(feature.title.toLowerCase())
+                      ? "bg-[#dedede]"
+                      : "hover:bg-[#dedede]"
+                  }`}
                 >
-                  {isSecondNavVisible ? (
-                    <X className="w-6 h-6" strokeWidth={1} />
-                  ) : (
-                    <SquareMenu className="w-6 h-6" strokeWidth={1} />
+                  <div className="w-8 h-8 p-2 bg-white rounded-full shadow-md flex items-center justify-center">
+                    <Image
+                      src={feature.img}
+                      width={26}
+                      height={26}
+                      alt={feature.title}
+                    />
+                  </div>
+                  {isSecondNavVisible && (
+                    <div className="ml-2">{feature.title}</div>
                   )}
-                </button>
-              </li>
+                </Link>
+              </div>
+            ))}
 
-              {/* Features */}
-              {displayedFeatures.map((feature) => (
-                <div className="group relative mt-6" key={feature.title}>
-                  <Link
-                    href={feature.href}
-                    className={`flex items-center justify-center px-2 py-1 mb-4 text-sm text-gray-600 rounded-[30px] transition ${
-                      pathname === feature.href ||
-                      (feature.href === "/model" &&
-                        pathname.split("/")[1].includes("chat")) ||
-                      pathname
-                        .toLowerCase()
-                        .split("/")[1]
-                        .startsWith(feature.title.toLowerCase())
-                        ? "bg-[#dedede]"
-                        : "hover:bg-[#dedede]"
-                    }`}
-                  >
-                    <div className="w-10 h-10 p-2 bg-white rounded-full shadow-md flex items-center justify-center">
-                      <Image
-                        src={feature.img}
-                        width={26}
-                        height={26}
-                        alt={feature.title}
-                      />
-                    </div>
-                    {isSecondNavVisible && (
-                      <div className="ml-2">{feature.title}</div>
-                    )}
-                  </Link>
+            {/* Recent Chats */}
+            {isSecondNavVisible && (
+              <li className="mt-6">
+                <div className="mb-2 text-sm text-gray-600 font-bold">
+                  Recent Chats
                 </div>
-              ))}
-
-              {/* Recent Chats */}
-              {isSecondNavVisible && (
-                <li className="mt-6">
-                  <div className="mb-2 text-sm text-gray-600">Recent Chats</div>
-                  {Array.isArray(chatThread) &&
-                    [...chatThread].reverse().map((chat) => (
+                {/* <hr className="border-gray-400 my-2" /> */}
+                {Array.isArray(chatThread) &&
+                  [...chatThread].reverse().map((chat) => (
+                    <div
+                      key={chat.chatId}
+                      className="relative flex items-center justify-between pl-5 pr-2 py-1 mb-3 rounded-lg hover:bg-gray-200"
+                    >
                       <div
-                        key={chat.chatId}
-                        className="relative flex items-center justify-between pl-5 pr-2 py-1 mb-3 rounded-lg hover:bg-gray-200"
+                        onClick={() => getChatById(chat.chatId)}
+                        className="flex-1 truncate cursor-pointer"
                       >
-                        <div
-                          onClick={() => getChatById(chat.chatId)}
-                          className="flex-1 truncate cursor-pointer"
-                        >
-                          {chat.message}
-                        </div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setOpenMenu((prev) =>
-                              prev === chat.chatId ? null : chat.chatId
-                            );
-                          }}
-                          className="rounded-full p-2 hover:bg-gray-200"
-                          aria-label="Chat Options"
-                        >
-                          <EllipsisVertical size={18} />
-                        </button>
-
-                        {openMenu === chat.chatId && (
-                          <div
-                            ref={chatContainerRef}
-                            className="absolute right-3 top-10 z-50 w-36 py-2 bg-white shadow-lg rounded-lg"
-                          >
-                            <button
-                              onClick={() => {
-                                deleteChat(chat.chatId);
-                                setOpenMenu(null);
-                              }}
-                              className="w-full text-left px-4 py-2 text-red-500 hover:bg-red-50"
-                            >
-                              Delete
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                const link = `${window.location.origin}/share/chat/${chat.chatId}`;
-                                setShareLink(link);
-                                navigator.clipboard.writeText(link);
-                                toast.success(`Link copied: ${link}`);
-                              }}
-                              className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                            >
-                              Copy
-                            </button>
-                          </div>
-                        )}
+                        {chat.message}
                       </div>
-                    ))}
-                </li>
-              )}
-            </ul>
-          </nav>
-        </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenMenu((prev) =>
+                            prev === chat.chatId ? null : chat.chatId
+                          );
+                        }}
+                        className="rounded-full p-2 hover:bg-gray-200"
+                        aria-label="Chat Options"
+                      >
+                        <EllipsisVertical size={18} />
+                      </button>
+
+                      {openMenu === chat.chatId && (
+                        <div
+                          ref={chatContainerRef}
+                          className="absolute right-3 top-10 z-50 w-36 py-2 bg-white shadow-lg rounded-lg"
+                        >
+                          <button
+                            onClick={() => {
+                              deleteChat(chat.chatId);
+                              setOpenMenu(null);
+                            }}
+                            className="w-full text-left px-4 py-2 text-red-500 hover:bg-red-50"
+                          >
+                            Delete
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              const link = `${window.location.origin}/share/chat/${chat.chatId}`;
+                              setShareLink(link);
+                              navigator.clipboard.writeText(link);
+                              toast.success(`Link copied: ${link}`);
+                            }}
+                            className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                          >
+                            Copy
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+              </li>
+            )}
+          </ul>
+        </nav>
       </div>
     </div>
   );

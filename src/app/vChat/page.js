@@ -251,8 +251,8 @@ const Page = ({ params }) => {
           {/* Sidebar */}
           <Navbar />
           <SecondNavbar />
-
-          <div className="flex-1 flex flex-col items-center p-4 relative">
+          {/* flex w-full justify-between bg-gray-50 text-sm */}
+          <div className="flex w-full justify-center bg-gray-50 text-sm relative">
             {/* Main Content Container with fixed height and scroll */}
 
             {msg ? (
@@ -268,7 +268,7 @@ const Page = ({ params }) => {
                   {loading && (
                     <div className="flex flex-col gap-4 mt-16 px-4 w-full ">
                       {/* User message bubble */}
-                      <div className="self-end bg-gray-200 text-gray-800 p-3 rounded-lg max-w-md">
+                      <div className="self-end bg-gray-200 text-gray-800 p-3 mt-4 rounded-lg max-w-md">
                         {msg}
                       </div>
 
@@ -344,90 +344,104 @@ const Page = ({ params }) => {
                 </div>
               </div>
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center">
-                <h1 className="text-lg md:text-3xl text-gray-700 mb-20">
-                  How can I help you today?
-                </h1>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                  {cards.map((card, index) => (
-                    <Card
-                      key={index}
-                      prompt={card.prompt}
-                      image={card.image}
-                      bgColor={card.bgColor}
-                      setPrompt={setPrompt}
-                    />
-                  ))}
+              <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center md:ml-auto md:w-full relative">
+                <div className="max-w-4xl w-full rounded-md p-6 text-center">
+                  <h1 className="md:text-xl font-semibold mb-5 text-xl text-gray-600 md:mb-10 text-center">
+                    How can I help you today?
+                  </h1>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                    {cards.map((card, index) => (
+                      <Card
+                        key={index}
+                        prompt={card.prompt}
+                        image={card.image}
+                        bgColor={card.bgColor}
+                        setPrompt={setPrompt}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
 
             {/* Input Area - Fixed at bottom */}
-            <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-[750px] px-4 py-2 z-20">
-              <div className="w-full bg-gray-100 border border-gray-300 rounded-2xl px-4 py-2 flex justify-between shadow-sm flex-col">
-                <textarea
-                  value={prompt}
-                  onChange={(e) => {
-                    controlHeight(e);
-                    // Clear responses when user starts typing
-                  }}
-                  onKeyDown={(e) => {
-                    handleKeyDown(e);
-                    // Clear responses when user presses Enter
-                    if (e.key === "Enter") {
-                      setResponses([]);
-                    }
-                  }}
-                  placeholder="Send a message..."
-                  rows={1}
-                  className="w-full resize-none focus:outline-none text-base text-black bg-transparent max-h-[200px] overflow-y-auto rounded-lg px-4 py-2 placeholder:text-gray-400"
-                  style={{ minHeight: "40px", height: "auto" }}
-                />
-
-                <div className="flex justify-between items-center mt-2">
-                  <div className="flex gap-x-2">
+            <div>
+              <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-[750px] px-4 py-2 z-20">
+                <div className="w-full bg-gray-100 border border-gray-300 rounded-2xl px-4 py-2 flex justify-between shadow-sm flex-col">
+                  <div className="flex-grow overflow-y-auto">
+                    <textarea
+                      value={prompt}
+                      onChange={controlHeight}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Send a message..."
+                      rows={1}
+                      className="w-full resize-none focus:outline-none text-base text-black bg-transparent max-h-[200px] overflow-y-auto rounded-lg px-4 py-2 placeholder:text-gray-400"
+                      style={{ minHeight: "40px", height: "auto" }}
+                    />
+                  </div>
+                  {imagePreview && (
+                    <div className="relative w-full max-w-xs">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="rounded-lg h-[100px] w-[100px] object-contain"
+                      />
+                      <button
+                        onClick={removeImage}
+                        className="absolute top-1 right-1 bg-white text-black rounded-full w-6 h-6 flex items-center justify-center shadow hover:bg-gray-100"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => setShowUploadDialog((prev) => !prev)}
+                        className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
+                      >
+                        <Plus className="w-5 h-5" strokeWidth={1.5} />
+                      </button>
+                      <VoiceToText onResult={handleVoiceInput} />
+                      <button
+                        onClick={() => setIsOpen(true)}
+                        className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
+                      >
+                        <Volume2 className="w-5 h-5" strokeWidth={1.5} />
+                      </button>
+                    </div>
                     <button
-                      onClick={() => setShowUploadDialog((prev) => !prev)}
-                      className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
+                      onClick={handleResponse}
+                      className="bg-neutral-800 hover:bg-neutral-900 text-white p-2 rounded-full transition-all flex items-center justify-center h-10 w-10"
                     >
-                      <Plus
-                        className="w-5 h-5 text-gray-500"
-                        strokeWidth={1.5}
-                      />
-                    </button>
-
-                    <button
-                      onClick={() => setIsOpen(true)}
-                      className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white"
-                    >
-                      <Volume2
-                        className="w-5 h-5 text-gray-500"
-                        strokeWidth={1.5}
-                      />
-                    </button>
-
-                    <button className="w-10 h-10 p-1 rounded-full flex items-center justify-center shadow-sm bg-white">
-                      <Mic
-                        className="w-5 h-5 text-gray-500"
-                        strokeWidth={1.5}
-                      />
+                      {loading ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Send className="w-5 h-5" />
+                      )}
                     </button>
                   </div>
-
-                  <button
-                    onClick={() => {
-                      handleResponse();
-                      // Clear responses when submitting new message
-                      setResponses([]);
-                    }}
-                    className="w-10 h-10 p-2 rounded-full flex items-center justify-center shadow-sm bg-[#262626] text-white hover:bg-neutral-900 transition-all mr-1"
-                  >
-                    {loading ? (
-                      <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <Send className="w-5 h-5" />
-                    )}
-                  </button>
+                  {showUploadDialog && (
+                    <div className="bg-white text-gray-700 p-3 rounded-md shadow-lg absolute z-50 bottom-[70px] left-[60px] space-y-2 w-44 border border-gray-200">
+                      <button
+                        onClick={() => {
+                          fileInputRef.current.value = null;
+                          fileInputRef.current.click();
+                        }}
+                        className="flex items-center space-x-2 hover:text-black"
+                      >
+                        <span>🖼️</span>
+                        <span>Upload from computer</span>
+                      </button>
+                      <input
+                        type="file"
+                        accept="image/*,application/pdf"
+                        ref={fileInputRef}
+                        onChange={handleFileUpload}
+                        className="hidden"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

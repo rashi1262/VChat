@@ -508,7 +508,7 @@ const ChatPage = ({ params }) => {
         <div className="flex w-full bg-gray-50 text-sm overflow-y-scroll">
           <Navbar />
           <SecondNavbar />
-          <MobileSidebar />
+
           <div className="min-h-screen md:flex relative bg-gray-50 items-center w-full justify-center">
             <div
               className="absolute top-4 overflow-y-auto w-full rounded-md h-[70%] p-4 text-start mt-20 max-w-4xl mx-auto"
