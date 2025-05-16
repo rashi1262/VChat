@@ -179,6 +179,7 @@ const SecondNavbar = () => {
             {displayedFeatures.map((feature) => (
               <div className="group relative mt-3" key={feature.title}>
                 <Link
+                  onClick={() => toggleSecondNav(false)}
                   href={feature.href}
                   className={`${
                     isSecondNavVisible ? "flex" : "inline-flex"

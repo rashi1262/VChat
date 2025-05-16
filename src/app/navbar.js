@@ -196,6 +196,7 @@ const Page = () => {
             ].map(({ label, href, active }) => (
               <li key={label} className="realtive">
                 <Link
+                  onClick={() => setIsNavVisible(false)}
                   href={href}
                   className={`${
                     isNavVisible ? "flex" : "inline-flex"

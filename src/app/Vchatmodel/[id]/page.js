@@ -400,11 +400,13 @@ const ChatPage = ({ params }) => {
   return (
     <>
       <Toaster position="top-center" richColors />
-      <Navbar />
-      <SecondNavbar />
+
       {hasCredits ? (
         <div className="flex w-full justify-between bg-gray-50 text-sm h-screen">
-          <div className="hidden md:flex"></div>
+          <div className=" md:flex">
+            <Navbar />
+            <SecondNavbar />
+          </div>
 
           <div className="flex-1 flex flex-col h-full overflow-hidden">
             <div

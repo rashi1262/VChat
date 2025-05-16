@@ -20,25 +20,20 @@ export default function DangerZonePage() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("user");
+      if (!storedUser) {
+        router.push("/login");
+        return;
+      }
       try {
-        const storedUser = localStorage.getItem("user");
-        if (!storedUser) {
-          router.push("/login");
-          return;
-        } else {
-          const u = JSON.parse(storedUser);
-          setUser(u);
-          const id = u.id;
-          setId(id);
-        }
-        if (!user) {
-          const u = JSON.parse(storedUser);
-          setUser(u);
-          setId(u.id);
-        }
-      } catch (error) {}
+        const u = JSON.parse(storedUser);
+        setUser(u);
+        setId(u.id);
+      } catch (error) {
+        console.error("Error parsing user from localStorage:", error);
+      }
     }
-  }, []);
+  }, [router]);
 
   const handleDeleteChats = async () => {
     toast(
@@ -175,42 +170,40 @@ export default function DangerZonePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6 flex flex-col sm:py-12">
+    <div className="min-h-screen bg-gray-50 py-6 mt-12">
       <Toaster position="bottom-right" richColors />
-      <div className="relative py-3 sm:max-w-xl sm:mx-auto">
-        <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-orange-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
-        <div className="relative bg-white shadow-lg sm:rounded-3xl p-8">
-          <div className="lg:flex lg:gap-8">
-            <div className="lg:w-1/4 mb-6 lg:mb-0 lg:mr-6">
-              <Sidebar />
+      <div className="relative py-3 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-orange-500 shadow-lg transform -skew-y-0 sm:skew-y-0 sm:-rotate-0 sm:rounded-3xl"></div>
+        <div className="relative bg-white shadow-lg sm:rounded-3xl p-8 lg:flex lg:gap-8">
+          <div className="lg:w-1/4 mb-6 lg:mb-0 lg:mr-6">
+            <Sidebar />
+          </div>
+          <div className="flex-1">
+            <div className="mb-6 flex justify-between items-center">
+              <div>
+                <h1 className="text-xl font-semibold text-gray-700">
+                  Danger Zone
+                </h1>
+                <p className="text-sm text-gray-500">
+                  Delete account and other critical settings
+                </p>
+              </div>
+              <BackButton />
             </div>
-            <div className="flex-1">
-              <div className="mb-6 flex justify-between items-center">
-                <div>
-                  <h1 className="text-xl font-semibold text-gray-700">
-                    Danger Zone
-                  </h1>
-                  <p className="text-sm text-gray-500">
-                    Delete account and other critical settings
-                  </p>
-                </div>
-                <BackButton />
-              </div>
 
-              <div className="rounded-lg border p-6 space-y-6">
-                <ActionButton
-                  label="Clear All Chats"
-                  description="Your chat history will be permanently deleted"
-                  onClick={handleDeleteChats}
-                  loading={loadingChats}
-                />
-                <ActionButton
-                  label="Delete Account"
-                  description="Your account and all data will be permanently deleted"
-                  onClick={handleDeleteAccount}
-                  loading={loading}
-                />
-              </div>
+            <div className="rounded-lg border p-6 space-y-6">
+              <ActionButton
+                label="Clear All Chats"
+                description="Your chat history will be permanently deleted"
+                onClick={handleDeleteChats}
+                loading={loadingChats}
+              />
+              <ActionButton
+                label="Delete Account"
+                description="Your account and all data will be permanently deleted"
+                onClick={handleDeleteAccount}
+                loading={loading}
+              />
             </div>
           </div>
         </div>

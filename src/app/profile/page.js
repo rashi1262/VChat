@@ -6,10 +6,11 @@ import axios from "axios";
 import { toast, Toaster } from "sonner";
 import { Spinner } from "@/components/commonFunc";
 import { useRouter } from "next/navigation";
+import { MoveLeft } from "lucide-react";
 
 export const BackButton = () => (
   <Link href="/model" className="px-4 py-2 text-gray-500 border rounded-md">
-    Back to Chat
+    <MoveLeft strokeWidth={2} />
   </Link>
 );
 
@@ -122,102 +123,98 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6 flex flex-col sm:py-12">
+    <div className="min-h-screen bg-gray-50 py-6 mt-12">
       <Toaster position="bottom-right" richColors />
-      <div className="relative py-3 sm:max-w-xl sm:mx-auto">
-        <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
-        <div className="relative bg-white shadow-lg sm:rounded-3xl p-8">
-          <div className="lg:flex lg:gap-8">
-            <div className="lg:w-1/4 mb-6 lg:mb-0">
-              <Sidebar />
-            </div>
-            <div className="flex-1">
-              <div className="mb-6 flex justify-between items-center">
-                <div>
-                  <h1 className="text-xl font-semibold text-gray-700">
-                    Profile
-                  </h1>
-                  <p className="text-sm text-gray-500">
-                    Manage your personal information
-                  </p>
-                </div>
-                <BackButton />
+      <div className="relative py-3 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 shadow-lg transform -skew-y-0 sm:skew-y-0 sm:-rotate-0 sm:rounded-3xl"></div>
+        <div className="relative bg-white shadow-lg sm:rounded-3xl p-8 lg:flex lg:gap-8">
+          <div className="lg:w-1/4 mb-6 lg:mb-0">
+            <Sidebar />
+          </div>
+          <div className="flex-1">
+            <div className="mb-6 flex justify-between items-center">
+              <div>
+                <h1 className="text-xl font-semibold text-gray-700">Profile</h1>
+                <p className="text-sm text-gray-500">
+                  Manage your personal information
+                </p>
               </div>
+              <BackButton />
+            </div>
 
-              <div className="rounded-lg border p-6 space-y-6">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-600 mb-1">
-                    Profile Photo
-                  </h3>
-                  <p className="text-sm text-gray-500 mb-4">
-                    Click on the avatar to upload a custom one from your files.
-                  </p>
-                  <div className="flex items-center gap-4">
-                    <div className="relative">
-                      {profileImage ? (
-                        <img
-                          src={profileImage}
-                          alt="Profile"
-                          className="w-20 h-20 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-20 h-20 rounded-full bg-green-700 flex items-center justify-center text-white text-3xl font-medium">
-                          {email.charAt(0).toUpperCase()}
-                        </div>
-                      )}
-
-                      <input
-                        type="file"
-                        accept="image/*"
-                        ref={fileInputRef}
-                        className="hidden"
-                        onChange={handleImageChange}
+            <div className="rounded-lg border p-6 space-y-6">
+              <div>
+                <h3 className="text-sm font-medium text-gray-600 mb-1">
+                  Profile Photo
+                </h3>
+                <p className="text-sm text-gray-500 mb-4">
+                  Click on the avatar to upload a custom one from your files.
+                </p>
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    {profileImage ? (
+                      <img
+                        src={profileImage}
+                        alt="Profile"
+                        className="w-20 h-20 rounded-full object-cover"
                       />
+                    ) : (
+                      <div className="w-20 h-20 rounded-full bg-green-700 flex items-center justify-center text-white text-3xl font-medium">
+                        {email.charAt(0).toUpperCase()}
+                      </div>
+                    )}
 
-                      <button
-                        onClick={() => fileInputRef.current.click()}
-                        className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white text-gray-400 px-2 py-1 rounded text-sm shadow-lg border flex items-center gap-1"
-                      >
-                        Edit
-                      </button>
-                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={fileInputRef}
+                      className="hidden"
+                      onChange={handleImageChange}
+                    />
+
+                    <button
+                      onClick={() => fileInputRef.current.click()}
+                      className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white text-gray-400 px-2 py-1 rounded text-sm shadow-lg border flex items-center gap-1"
+                    >
+                      Edit
+                    </button>
                   </div>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2 mt-8">
-                    Display Name
-                  </label>
-                  <input
-                    type="text"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    className="w-full sm:w-2/3 lg:w-3/4 px-3 py-2 border border-gray-300 text-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={email}
-                    disabled
-                    className="w-full sm:w-2/3 lg:w-3/4 px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed text-gray-500"
-                  />
-                </div>
               </div>
 
-              <div className="flex justify-end mt-4">
-                <button
-                  onClick={handleSave}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400"
-                  disabled={isSaving}
-                >
-                  {isSaving ? <Spinner /> : "Save"}
-                </button>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 mt-8">
+                  Display Name
+                </label>
+                <input
+                  type="text"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 text-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700"
+                />
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  disabled
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed text-gray-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={handleSave}
+                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400"
+                disabled={isSaving}
+              >
+                {isSaving ? <Spinner /> : "Save"}
+              </button>
             </div>
           </div>
         </div>

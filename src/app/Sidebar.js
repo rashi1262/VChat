@@ -53,35 +53,35 @@ export default function Sidebar() {
   };
 
   const sidebarClasses = `
-    bg-white
-    ${
-      isMobile
-        ? "fixed top-0 left-0 h-full z-10 transition-transform duration-300 transform shadow-md"
-        : "w-64"
-    }
-    ${isMobile && !isOpen ? "-translate-x-full" : ""}
-    ${isMobile && isOpen ? "translate-x-0" : ""}
-  `;
+        bg-white
+        ${
+          isMobile
+            ? "fixed top-0 left-0 h-full z-10 transition-transform duration-300 transform shadow-md"
+            : "w-64"
+        }
+        ${isMobile && !isOpen ? "-translate-x-full" : ""}
+        ${isMobile && isOpen ? "translate-x-0" : ""}
+    `;
 
   const backdropClasses = `
-    fixed top-0 left-0 w-full h-full bg-black opacity-50 z-9
-    ${isMobile && isOpen ? "" : "hidden"}
-  `;
+        fixed top-0 left-0 w-full h-full bg-black opacity-50 z-9
+        ${isMobile && isOpen ? "" : "hidden"}
+    `;
 
   const closeButtonClasses = `
-    absolute top-2 right-2 p-2 text-gray-500 hover:text-gray-700
-    ${isMobile ? "" : "hidden"}
-  `;
+        absolute top-2 right-2 p-2 text-gray-500 hover:text-gray-700
+        ${isMobile ? "" : "hidden"}
+    `;
 
   const mobileMenuButtonClasses = `
-    fixed top-4 left-4 p-2 rounded-md shadow-md z-20 bg-white
-  `;
+        fixed top-4 left-4 p-2 rounded-md shadow-md z-20
+    `;
 
   return (
     <>
       {isMobile && (
         <button onClick={toggleSidebar} className={mobileMenuButtonClasses}>
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
+          {isOpen || <Menu size={24} />}
         </button>
       )}
 
@@ -90,7 +90,11 @@ export default function Sidebar() {
       )}
 
       <div className={sidebarClasses}>
-        <div className="py-6 px-4 space-y-6">
+        <div
+          className={
+            isMobile ? "py-6 px-4 space-y-6 mt-14" : `py-6 px-4 space-y-6`
+          }
+        >
           <div>
             <h2 className="text-gray-500 text-sm font-medium mb-2">Account</h2>
             <div className="space-y-2">
@@ -102,9 +106,9 @@ export default function Sidebar() {
                 Profile
               </Link>
               {/* <Link className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md" href="/change-password" >
-                <Key size={16} />
-                  Change Password
-                </Link> */}
+                                <Key size={16} />
+                                 Change Password
+                             </Link> */}
               <Link
                 className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
                 href="/login-connection"

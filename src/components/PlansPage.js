@@ -23,7 +23,10 @@ export default function PlansPage() {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
-      setUserDetails({ name: parsedUser.name || "", email: parsedUser.email || "" });
+      setUserDetails({
+        name: parsedUser.name || "",
+        email: parsedUser.email || "",
+      });
     }
   }, []);
 
@@ -37,7 +40,9 @@ export default function PlansPage() {
   useEffect(() => {
     async function fetchPlans() {
       try {
-        const response = await fetch("https://chatbot-2vqr.onrender.com/plans/getall");
+        const response = await fetch(
+          "https://chatbot-2vqr.onrender.com/plans/getall"
+        );
         const data = await response.json();
         setPlans(data);
       } catch (error) {
@@ -63,28 +68,36 @@ export default function PlansPage() {
     }
 
     try {
-      const response = await fetch("https://chatbot-2vqr.onrender.com/api/stripe/create-payment-intent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: selectedPlan.pricePerDay * 30 * 100,
-          email: userDetails.email,
-          name: userDetails.name,
-          planId: selectedPlan.id
-        }),
-      });
+      const response = await fetch(
+        "https://chatbot-2vqr.onrender.com/api/stripe/create-payment-intent",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount: selectedPlan.pricePerDay * 30 * 100,
+            email: userDetails.email,
+            name: userDetails.name,
+            planId: selectedPlan.id,
+          }),
+        }
+      );
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Payment intent creation failed");
+      if (!response.ok)
+        throw new Error(data.error || "Payment intent creation failed");
 
-      const { paymentMethod, error: paymentMethodError } = await stripe.createPaymentMethod({
-        type: "card",
-        card: cardElement,
-      });
+      const { paymentMethod, error: paymentMethodError } =
+        await stripe.createPaymentMethod({
+          type: "card",
+          card: cardElement,
+        });
       if (paymentMethodError) throw new Error(paymentMethodError.message);
 
-      const { paymentIntent, error } = await stripe.confirmCardPayment(data.clientSecret, {
-        payment_method: paymentMethod.id,
-      });
+      const { paymentIntent, error } = await stripe.confirmCardPayment(
+        data.clientSecret,
+        {
+          payment_method: paymentMethod.id,
+        }
+      );
       if (error) throw new Error("Payment failed");
 
       setIsPaymentLoading(false);
@@ -106,38 +119,53 @@ export default function PlansPage() {
             <div className="mb-6 flex justify-between items-center">
               <div>
                 <h1 className="text-lg font-semibold text-gray-600">Plans</h1>
-                <p className="text-sm text-gray-500">View and manage your subscription plans</p>
+                <p className="text-sm text-gray-500">
+                  View and manage your subscription plans
+                </p>
               </div>
               <BackButton />
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">
               {loading
-                ? Array(3).fill(null).map((_, index) => (
-                    <div
-                      key={index}
-                      className="bg-gray-200 animate-pulse rounded-lg shadow p-6 w-[280px] h-[370px] flex flex-col justify-between"
-                    >
-                      <div className="h-6 bg-gray-300 rounded w-2/3 mb-4"></div>
-                      <div className="h-4 bg-gray-300 rounded w-1/2 mb-6"></div>
-                      <div className="h-10 bg-gray-300 rounded w-full mb-6"></div>
-                      <div className="space-y-2">
-                        <div className="h-4 bg-gray-300 rounded w-5/6"></div>
-                        <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                        <div className="h-4 bg-gray-300 rounded w-4/6"></div>
+                ? Array(3)
+                    .fill(null)
+                    .map((_, index) => (
+                      <div
+                        key={index}
+                        className="bg-gray-200 animate-pulse rounded-lg shadow p-6 w-[280px] h-[370px] flex flex-col justify-between"
+                      >
+                        <div className="h-6 bg-gray-300 rounded w-2/3 mb-4"></div>
+                        <div className="h-4 bg-gray-300 rounded w-1/2 mb-6"></div>
+                        <div className="h-10 bg-gray-300 rounded w-full mb-6"></div>
+                        <div className="space-y-2">
+                          <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+                          <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                          <div className="h-4 bg-gray-300 rounded w-4/6"></div>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    ))
                 : plans.map((plan) => (
-                    <div key={plan.id} className="bg-white rounded-lg shadow p-6 w-[280px] h-[370px]">
-                      <h3 className="text-xl font-semibold text-gray-600 mb-2">{plan.name} ({plan.duration})</h3>
+                    <div
+                      key={plan.id}
+                      className="bg-white rounded-lg shadow p-6 w-[280px] h-[370px]"
+                    >
+                      <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                        {plan.name} ({plan.duration})
+                      </h3>
                       <p className="text-lg mb-5">
-                        <span className="text-2xl font-bold text-gray-700">${plan.pricePerDay}</span>
+                        <span className="text-2xl font-bold text-gray-700">
+                          ${plan.pricePerDay}
+                        </span>
                         <span className="text-gray-500 text-sm">/ Per Day</span>
                       </p>
                       <button
                         className={`w-full py-2 mb-4 text-sm font-medium text-white rounded-md 
-                          ${plan.id === activePlanId ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-gray-800'}`}
+                          ${
+                            plan.id === activePlanId
+                              ? "bg-gray-400 cursor-not-allowed"
+                              : "bg-gray-900 hover:bg-gray-800"
+                          }`}
                         onClick={() => {
                           if (plan.pricePerDay > 0) {
                             if (plan.id === activePlanId) return;
@@ -159,9 +187,14 @@ export default function PlansPage() {
                       <div className="space-y-3">
                         <h4 className="font-medium text-gray-600">Features:</h4>
                         {plan.features.map((feature, index) => {
-                          const isNegative = /(no|not)/i.test(feature) && !/no limits/i.test(feature);
+                          const isNegative =
+                            /(no|not)/i.test(feature) &&
+                            !/no limits/i.test(feature);
                           return (
-                            <div key={index} className="flex items-center gap-2">
+                            <div
+                              key={index}
+                              className="flex items-center gap-2"
+                            >
                               {isNegative ? (
                                 <XCircle className="w-5 h-5 text-red-500" />
                               ) : (
@@ -182,15 +215,40 @@ export default function PlansPage() {
       {isModalOpen && selectedPlan && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
-            <h2 className="text-lg font-semibold text-gray-700">Enter Details</h2>
-            <input type="text" value={userDetails.name} className="w-full border p-2 my-2 text-black bg-gray-100" disabled />
-            <input type="email" value={userDetails.email} className="w-full border p-2 my-2 text-black bg-gray-100" disabled />
-            <div className="border p-2 my-2"><CardElement /></div>
-            <p className="text-lg text-black">Amount: ${selectedPlan.pricePerDay * 30}</p>
-            <button onClick={handlePayment} className="w-full bg-black text-white p-2 mt-3 rounded-md" disabled={isPaymentLoading}>
+            <h2 className="text-lg font-semibold text-gray-700">
+              Enter Details
+            </h2>
+            <input
+              type="text"
+              value={userDetails.name}
+              className="w-full border p-2 my-2 text-black bg-gray-100"
+              disabled
+            />
+            <input
+              type="email"
+              value={userDetails.email}
+              className="w-full border p-2 my-2 text-black bg-gray-100"
+              disabled
+            />
+            <div className="border p-2 my-2">
+              <CardElement />
+            </div>
+            <p className="text-lg text-black">
+              Amount: ${selectedPlan.pricePerDay * 30}
+            </p>
+            <button
+              onClick={handlePayment}
+              className="w-full bg-black text-white p-2 mt-3 rounded-md"
+              disabled={isPaymentLoading}
+            >
               {isPaymentLoading ? <Spinner /> : "Pay with Stripe"}
             </button>
-            <button onClick={() => setIsModalOpen(false)} className="w-full bg-gray-300 text-black p-2 mt-2 rounded-md">Cancel</button>
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="w-full bg-gray-300 text-black p-2 mt-2 rounded-md"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
@@ -198,8 +256,13 @@ export default function PlansPage() {
       {showPlanAlert && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-[300px] text-center">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Plan Already Active</h2>
-            <p className="text-gray-600 mb-6">You already have a plan. You can't purchase a new one until it ends.</p>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Plan Already Active
+            </h2>
+            <p className="text-gray-600 mb-6">
+              You already have a plan. You can't purchase a new one until it
+              ends.
+            </p>
             <button
               className="bg-black text-white px-4 py-2 rounded-md hover:bg-red-800"
               onClick={() => setShowPlanAlert(false)}

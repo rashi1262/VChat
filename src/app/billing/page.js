@@ -50,85 +50,93 @@ export default function BillingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6 flex flex-col sm:py-12">
-      <div className="relative py-3 sm:max-w-3xl sm:mx-auto">
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 to-cyan-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
-        <div className="relative bg-white shadow-lg sm:rounded-3xl p-8">
-          <div className="lg:flex lg:gap-8">
-            <div className="lg:w-1/4 mb-6 lg:mb-0 lg:mr-6">
-              <Sidebar />
+    <div className="min-h-screen bg-gray-50 py-6 mt-12">
+      <div className="relative py-3 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {" "}
+        {/* Added max-w and mx-auto */}
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 to-cyan-500 shadow-lg transform -skew-y-0 sm:skew-y-0 sm:-rotate-0 sm:rounded-3xl"></div>
+        <div className="relative bg-white shadow-lg sm:rounded-3xl p-8 lg:flex lg:gap-8">
+          {" "}
+          {/* Using lg:flex and lg:gap-8 */}
+          <div className="lg:w-1/4 mb-6 lg:mb-0">
+            {" "}
+            {/* Added mb-6 for small screens */}
+            <Sidebar />
+          </div>
+          <div className="flex-1">
+            <div className="mb-6 flex justify-between items-center">
+              {" "}
+              {/* Added mb-6 */}
+              <div>
+                <h1 className="text-xl font-semibold text-gray-700">
+                  Billing Details
+                </h1>
+                <p className="text-sm text-gray-500">
+                  Update your billing information and payment methods
+                </p>
+              </div>
+              <BackButton />
             </div>
-            <div className="flex-1">
-              <div className="mb-6 flex justify-between items-center">
-                <div>
-                  <h1 className="text-xl font-semibold text-gray-700">
-                    Billing Details
-                  </h1>
-                  <p className="text-sm text-gray-500">
-                    Update your billing information and payment methods
-                  </p>
-                </div>
-                <BackButton />
-              </div>
 
-              <div className="rounded-lg p-6 space-y-6">
-                {loading ? (
-                  <div className="p-4 border rounded-lg bg-white shadow-sm space-y-4 animate-pulse">
-                    {[...Array(3)].map((_, index) => (
-                      <div key={index} className="border-b py-2 space-y-2">
-                        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                        <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                      </div>
-                    ))}
-                  </div>
-                ) : billingDetails.length > 0 ? (
-                  <div className="p-4 border rounded-lg bg-white shadow-sm">
-                    <h2 className="text-md font-semibold text-gray-700 mb-2">
-                      Payment Details
-                    </h2>
-                    {billingDetails.map((detail, index) => (
-                      <div
-                        key={detail.id || index}
-                        className="border-b py-2 text-gray-500"
-                      >
-                        <p>
-                          <strong>Payment ID:</strong> {detail.paymentId}
-                        </p>
-                        <p>
-                          <strong>Name:</strong> {detail.name}
-                        </p>
-                        <p>
-                          <strong>Email:</strong>{" "}
-                          {detail.customerEmail.replace("mailto:", "")}
-                        </p>
-                        <p>
-                          <strong>Amount:</strong> $
-                          {(detail.amount / 100).toFixed(2)}
-                        </p>
-                        <p>
-                          <strong>Status: </strong>
-                          <span
-                            className={`text-${
-                              detail.status === "succeeded" ? "green" : "red"
-                            }-500`}
-                          >
-                            {detail.status}
-                          </span>
-                        </p>
-                        <p>
-                          <strong>Date:</strong>{" "}
-                          {new Date(detail.createDate).toLocaleString()}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500 text-sm text-center">
-                    No billing details available.
-                  </p>
-                )}
-              </div>
+            <div className="rounded-lg border p-6 space-y-6">
+              {" "}
+              {/* Added border and space-y-6 */}
+              {loading ? (
+                <div className="p-4 border rounded-lg bg-white shadow-sm space-y-4 animate-pulse">
+                  {[...Array(3)].map((_, index) => (
+                    <div key={index} className="border-b py-2 space-y-2">
+                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : billingDetails.length > 0 ? (
+                <div className="p-4 border rounded-lg bg-white shadow-sm space-y-4">
+                  <h2 className="text-md font-semibold text-gray-700 mb-4">
+                    Payment Details
+                  </h2>
+                  {billingDetails.map((detail, index) => (
+                    <div
+                      key={detail.id || index}
+                      className="border-b py-3 text-gray-500 last:border-b-0"
+                    >
+                      <p>
+                        <strong>Payment ID:</strong> {detail.paymentId}
+                      </p>
+                      <p>
+                        <strong>Name:</strong> {detail.name}
+                      </p>
+                      <p>
+                        <strong>Email:</strong>{" "}
+                        {detail.customerEmail.replace("mailto:", "")}
+                      </p>
+                      <p>
+                        <strong>Amount:</strong> $
+                        {(detail.amount / 100).toFixed(2)}
+                      </p>
+                      <p>
+                        <strong>Status: </strong>
+                        <span
+                          className={`text-${
+                            detail.status === "succeeded" ? "green" : "red"
+                          }-500`}
+                        >
+                          {detail.status}
+                        </span>
+                      </p>
+                      <p>
+                        <strong>Date:</strong>{" "}
+                        {new Date(detail.createDate).toLocaleString()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-sm text-center">
+                  No billing details available.
+                </p>
+              )}
             </div>
           </div>
         </div>
