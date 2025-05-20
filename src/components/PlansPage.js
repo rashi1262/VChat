@@ -133,39 +133,43 @@ export default function PlansPage() {
                     .map((_, index) => (
                       <div
                         key={index}
-                        className="bg-gray-200 animate-pulse rounded-lg shadow p-6 w-[280px] h-[370px] flex flex-col justify-between"
+                        className="bg-gray-100 animate-pulse rounded-xl shadow-md p-6 w-[280px] h-[370px] flex flex-col justify-between"
                       >
-                        <div className="h-6 bg-gray-300 rounded w-2/3 mb-4"></div>
-                        <div className="h-4 bg-gray-300 rounded w-1/2 mb-6"></div>
-                        <div className="h-10 bg-gray-300 rounded w-full mb-6"></div>
-                        <div className="space-y-2">
-                          <div className="h-4 bg-gray-300 rounded w-5/6"></div>
-                          <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                          <div className="h-4 bg-gray-300 rounded w-4/6"></div>
+                        <div className="h-8 bg-gray-300 rounded-md w-2/3 mb-3"></div>
+                        <div className="h-6 bg-gray-300 rounded-md w-1/2 mb-5"></div>
+                        <div className="h-12 bg-gray-300 rounded-md w-full mb-6"></div>
+                        <div className="space-y-3">
+                          <div className="h-5 bg-gray-300 rounded-md w-5/6"></div>
+                          <div className="h-5 bg-gray-300 rounded-md w-3/4"></div>
+                          <div className="h-5 bg-gray-300 rounded-md w-4/6"></div>
                         </div>
                       </div>
                     ))
                 : plans.map((plan) => (
                     <div
                       key={plan.id}
-                      className="bg-white rounded-lg shadow p-6 w-[280px] h-[370px]"
+                      className="bg-white rounded-xl shadow-md p-6 w-[280px] h-[370px] flex flex-col justify-between border border-gray-100"
                     >
-                      <h3 className="text-xl font-semibold text-gray-600 mb-2">
-                        {plan.name} ({plan.duration})
-                      </h3>
-                      <p className="text-lg mb-5">
-                        <span className="text-2xl font-bold text-gray-700">
-                          ${plan.pricePerDay}
-                        </span>
-                        <span className="text-gray-500 text-sm">/ Per Day</span>
-                      </p>
+                      <div>
+                        <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                          {plan.name} ({plan.duration})
+                        </h3>
+                        <p className="text-lg mb-4">
+                          <span className="text-2xl font-bold text-gray-800">
+                            ${plan.pricePerDay}
+                          </span>
+                          <span className="text-gray-500 text-sm">
+                            / Per Day
+                          </span>
+                        </p>
+                      </div>
                       <button
-                        className={`w-full py-2 mb-4 text-sm font-medium text-white rounded-md 
-                          ${
-                            plan.id === activePlanId
-                              ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-gray-900 hover:bg-gray-800"
-                          }`}
+                        className={`w-full py-2.5 mt-auto text-sm font-medium text-white rounded-lg
+              ${
+                plan.id === activePlanId
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-gray-600 hover:bg-gray-700"
+              }`}
                         onClick={() => {
                           if (plan.pricePerDay > 0) {
                             if (plan.id === activePlanId) return;
@@ -181,10 +185,12 @@ export default function PlansPage() {
                         }}
                         disabled={plan.id === activePlanId}
                       >
-                        {plan.id === activePlanId ? "Current Plan" : "Upgrade"}
+                        {plan.id === activePlanId
+                          ? "Current Plan"
+                          : "Select Plan"}
                       </button>
 
-                      <div className="space-y-3">
+                      <div className="mt-4 space-y-2">
                         <h4 className="font-medium text-gray-600">Features:</h4>
                         {plan.features.map((feature, index) => {
                           const isNegative =
@@ -193,14 +199,14 @@ export default function PlansPage() {
                           return (
                             <div
                               key={index}
-                              className="flex items-center gap-2"
+                              className="flex items-center gap-2 text-gray-600 text-sm"
                             >
                               {isNegative ? (
-                                <XCircle className="w-5 h-5 text-red-500" />
+                                <XCircle className="w-4 h-4 text-red-500" />
                               ) : (
-                                <CheckCircle2 className="w-5 h-5 text-green-500" />
+                                <CheckCircle2 className="w-4 h-4 text-green-500" />
                               )}
-                              <span className="text-gray-600">{feature}</span>
+                              <span>{feature}</span>
                             </div>
                           );
                         })}

@@ -15,7 +15,14 @@ const Header = () => {
   // const { isNavVisible, setIsNavVisible}=useNav()
 
   const router = useRouter();
-
+  const profilesSection = [
+    "/login-connection",
+    "/danger-zone",
+    "/invoices",
+    "/billing",
+    "/plans",
+    "/profile",
+  ];
   //  const [isNavVisible, setIsNavVisible] = useState(false);
   const { isNavVisible, setIsNavVisible } = useNav();
   useEffect(() => {
@@ -93,28 +100,30 @@ const Header = () => {
       <div className="container mx-auto flex items-center justify-between px-5 h-full">
         {/* Left: Toggle button */}
         <div className="flex items-center h-full">
-          <button
-            className="flex items-center justify-center h-10 w-10 border text-black hover:bg-gray-100 rounded"
-            onClick={() => setIsNavVisible(!isNavVisible)}
-          >
-            {/* Menu Icon */}
-            <div className="w-6 h-6 p-1 ">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 18 18"
-                className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
-                  d="M9 9h6.75M9 2.25v13.5M5.85 2.25h6.3c1.26 0 1.89 0 2.371.245.424.216.768.56.984.984.245.48.245 1.11.245 2.371v6.3c0 1.26 0 1.89-.245 2.371a2.25 2.25 0 0 1-.984.984c-.48.245-1.11.245-2.371.245h-6.3c-1.26 0-1.89 0-2.371-.245a2.25 2.25 0 0 1-.984-.984c-.245-.48-.245-1.11-.245-2.371v-6.3c0-1.26 0-1.89.245-2.371a2.25 2.25 0 0 1 .984-.984c.48-.245 1.11-.245 2.371-.245"
-                ></path>
-              </svg>
-            </div>
-          </button>
+          {!profilesSection.includes(pathname) && (
+            <button
+              className="flex items-center justify-center h-10 w-10 border text-black hover:bg-gray-100 rounded"
+              onClick={() => setIsNavVisible(!isNavVisible)}
+            >
+              {/* Menu Icon */}
+              <div className="w-6 h-6 p-1 ">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 18 18"
+                  className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--standart___0Ap1-"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.5"
+                    d="M9 9h6.75M9 2.25v13.5M5.85 2.25h6.3c1.26 0 1.89 0 2.371.245.424.216.768.56.984.984.245.48.245 1.11.245 2.371v6.3c0 1.26 0 1.89-.245 2.371a2.25 2.25 0 0 1-.984.984c-.48.245-1.11.245-2.371.245h-6.3c-1.26 0-1.89 0-2.371-.245a2.25 2.25 0 0 1-.984-.984c-.245-.48-.245-1.11-.245-2.371v-6.3c0-1.26 0-1.89.245-2.371a2.25 2.25 0 0 1 .984-.984c.48-.245 1.11-.245 2.371-.245"
+                  ></path>
+                </svg>
+              </div>
+            </button>
+          )}
         </div>
 
         <div className="flex items-center space-x-4 h-full">

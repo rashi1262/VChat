@@ -1,13 +1,12 @@
-"use client"
+"use client";
 
-import React from "react";
-import { useState, useEffect } from "react";
-import Navbar from "../navbar";
-import Link from "next/link";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
+import Navbar from "../navbar";
 const bots = [
   {
+    id: "bot1",
     name: "Popular",
     title: "AI Search Engine",
     description:
@@ -17,6 +16,7 @@ const bots = [
     path: "/vChat",
   },
   {
+    id: "bot2",
     name: "Popular",
     title: "Claude",
     description:
@@ -26,6 +26,7 @@ const bots = [
     path: "/vChat",
   },
   {
+    id: "bot3",
     name: "Writing",
     title: "VChat AI",
     description:
@@ -35,15 +36,17 @@ const bots = [
     path: "/vChat",
   },
   {
+    id: "bot4",
     name: "Programming",
     title: "VChat AI",
     description:
-      "Get the best of both worlds — powered by OpenAI & Google Gemini for combined and accurate results.",
+      "Get the best of both worlds — powered by OpenAI & Google Gemini for combined...",
     tag: "New",
     details: "Provides results from both OpenAI & Gemini models.",
     path: "/vChat",
   },
   {
+    id: "bot5",
     name: "Popular",
     title: "DeepSeek",
     description:
@@ -53,6 +56,7 @@ const bots = [
     path: "/vChat",
   },
   {
+    id: "bot6",
     name: "Writing",
     title: "Open AI",
     description:
@@ -62,6 +66,7 @@ const bots = [
     path: "/openAI",
   },
   {
+    id: "bot7",
     name: "Popular",
     title: "Image Generation",
     description:
@@ -71,6 +76,7 @@ const bots = [
     path: "/image",
   },
   {
+    id: "bot8",
     name: "Education",
     title: "Music Generation",
     description:
@@ -80,6 +86,7 @@ const bots = [
     path: "/vChat",
   },
   {
+    id: "bot9",
     name: "Lifestyle",
     title: "DeepSeek",
     description:
@@ -89,6 +96,7 @@ const bots = [
     path: "/vChat",
   },
   {
+    id: "bot10",
     name: "Writing",
     title: "Google Gemini",
     description:
@@ -98,6 +106,7 @@ const bots = [
     path: "/model",
   },
   {
+    id: "bot11",
     name: "AI Models",
     title: "Image Generation",
     description:
@@ -107,6 +116,7 @@ const bots = [
     path: "/image",
   },
   {
+    id: "bot12",
     name: "Education",
     title: "Music Generation",
     description:
@@ -123,137 +133,147 @@ const Page = () => {
   const [activeButton, setActiveButton] = useState("Popular");
   const router = useRouter();
 
-  const handleClick = (path) => {
-    router.push(path);
-  };
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
         const storedUser = localStorage.getItem("user");
         if (!storedUser) {
           router.push("/login");
-          return;
         } else {
-          const user = JSON.parse(storedUser);
         }
-      } catch (error) {}
+      } catch (error) {
+        console.error(
+          "Error accessing localStorage or parsing user data:",
+          error
+        );
+      }
     }
-  }, []);
+  }, [router]);
 
-  const handleButtonClick = (category) => {
-    setCategory(category);
-    setActiveButton(category);
-    if (category === "All") {
+  const handleClick = (path) => {
+    router.push(path);
+  };
+
+  const handleButtonClick = (selectedCategory) => {
+    setCategory(selectedCategory);
+    setActiveButton(selectedCategory);
+    if (selectedCategory === "All") {
       setFilteredBots(bots);
     } else {
-      setFilteredBots(bots.filter((bot) => bot.name === category));
+      setFilteredBots(bots.filter((bot) => bot.name === selectedCategory));
     }
   };
 
   return (
-    <>
-      <div className="flex w-full justify-between bg-gray-50 text-sm">
+    <div className="flex flex-col md:flex-row w-full min-h-screen bg-gray-50 text-sm">
+      {/* Navbar Container (Fixed) */}
+      <div className="md:w-64 flex-shrink-0 md:sticky md:top-0 md:h-screen">
         <Navbar />
-        <div className=" bg-gray-50 flex flex-col items-center  w-full ">
-      
-          <div className="grid grid-cols-1 gap-6 items-center mr-20 ml-20">
-           
-            <div className=" p-6 h-screen overflow-y-auto custom-scrollbar">
-            <div className="flex border mt-14 rounded-md p-1 bg-gray-200 rounded-l-full rounded-r-full mr-20 ml-20">
-              {[
-                "Popular",
-                "AI Models",
-                "Writing",
-                "Education",
-                "Lifestyle",
-                "Programming",
-              ].map((categoryName) => (
-                <button
-                  key={categoryName}
-                  onClick={() => handleButtonClick(categoryName)}
-                  className={`items-center text-gray-600 pl-9 pr-9 p-2 rounded-l-full rounded-r-full hover:text-black
-                      ${
-                        activeButton === categoryName ? "bg-white border" : ""
-                      }`}
-                >
-                  {categoryName}
-                </button>
-              ))}
-            </div>
-              <div className="justify-center text-center">
-                <h1 className="text-3xl text-gray-700 mb-3 mt-8 font-bold">
-                  {category}
-                </h1>
-              </div>
-              <header className="mb-8 justify-center text-center">
-                <h1 className="text-lg text-gray-400">
-                  Explore the most popular bots for your everyday tasks.
-                </h1>
-              </header>
-              <div className="grid grid-cols-1 mr-8 ml-8 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredBots.map((bot, index) => (
-                        <div  onClick={() => handleClick(bot.path)}
-                    key={bot.title + index}
-                    className="p-4 bg-white shadow rounded-lg hover:bg-gray-100 cursor-pointer"
-                  >
-                    <div className="flex justify-between items-center">
-                      <div className="w-10 h-10 p-1 mb-5 ">
-                        <svg
-                          viewBox="0 0 42 42"
-                          fill="none"
-                          className="CustomIcon-module__icon___zGR29 CustomIcon-module__icon--large___HBGvG"
-                        >
-                          <g clipPath="url(#clip0_11185_26182)">
+      </div>
+
+      {/* Main Content Container (Scrollable) */}
+      <main className="flex-grow overflow-y-auto">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex mt-16 flex-wrap justify-center border  sm:mt-14 rounded-full p-1 bg-gray-200 mx-auto sm:mx-8 md:mx-12 lg:mx-20 shadow-sm ">
+            {[
+              "Popular",
+              "AI Models",
+              "Writing",
+              "Education",
+              "Lifestyle",
+              "Programming",
+            ].map((categoryName) => (
+              <button
+                key={categoryName}
+                onClick={() => handleButtonClick(categoryName)}
+                className={`items-center text-gray-600 px-3 py-2 sm:px-5 md:px-6 sm:py-2 rounded-full hover:text-black focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-150 ease-in-out m-1 text-xs sm:text-sm
+                    ${
+                      activeButton === categoryName
+                        ? "bg-white border border-gray-300 shadow-md"
+                        : "hover:bg-gray-100"
+                    }`}
+              >
+                {categoryName}
+              </button>
+            ))}
+          </div>
+          <div className="text-center mt-8 sm:mt-12">
+            <h1 className="text-2xl sm:text-3xl text-gray-800 font-bold mb-2 sm:mb-3">
+              {category}
+            </h1>
+            <p className="text-base sm:text-lg text-gray-500 px-4">
+              Explore the most popular bots for your everyday tasks.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-8 mx-auto px-2 sm:px-0 max-w-7xl">
+            {filteredBots.map((bot) => (
+              <div
+                onClick={() => handleClick(bot.path)}
+                key={bot.id || bot.title}
+                className="p-4 bg-white shadow-lg rounded-xl hover:shadow-xl hover:bg-gray-50 cursor-pointer transition-all duration-200 ease-in-out flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex justify-between items-start mb-3 sm:mb-4">
+                    <div className="w-10 h-10 p-1 flex-shrink-0">
+                      <svg
+                        viewBox="0 0 42 42"
+                        fill="none"
+                        aria-hidden="true"
+                        className="w-full h-full"
+                      >
+                        <g clipPath="url(#clip0_11185_26182_page_js)">
+                          <path
+                            d="M0.5 21C0.5 9.678 9.678 0.5 21 0.5C32.322 0.5 41.5 9.678 41.5 21C41.5 32.322 32.322 41.5 21 41.5C9.678 41.5 0.5 32.322 0.5 21Z"
+                            fill="white"
+                          ></path>
+                          <g clipPath="url(#clip1_11185_26182_page_js)">
                             <path
-                              d="M0.5 21C0.5 9.678 9.678 0.5 21 0.5C32.322 0.5 41.5 9.678 41.5 21C41.5 32.322 32.322 41.5 21 41.5C9.678 41.5 0.5 32.322 0.5 21Z"
-                              fill="white"
-                            ></path>
-                            <g clipPath="url(#clip1_11185_26182)">
-                              <path
-                                d="M31.2789 18.8229C31.8234 17.1886 31.6359 15.3984 30.7652 13.9119C29.4557 11.6319 26.8232 10.4589 24.2522 11.0109C23.1084 9.72236 21.4652 8.98961 19.7424 9.00011C17.1144 8.99411 14.7827 10.6861 13.9742 13.1866C12.2859 13.5324 10.8287 14.5891 9.97594 16.0869C8.65669 18.3609 8.95744 21.2274 10.7199 23.1774C10.1754 24.8116 10.3629 26.6019 11.2337 28.0884C12.5432 30.3684 15.1757 31.5414 17.7467 30.9894C18.8897 32.2779 20.5337 33.0106 22.2564 32.9994C24.8859 33.0061 27.2184 31.3126 28.0269 28.8099C29.7152 28.4641 31.1724 27.4074 32.0252 25.9096C33.3429 23.6356 33.0414 20.7714 31.2797 18.8214L31.2789 18.8229ZM22.2579 31.4311C21.2057 31.4326 20.1864 31.0644 19.3787 30.3901C19.4154 30.3706 19.4792 30.3354 19.5204 30.3099L24.2994 27.5499C24.5439 27.4111 24.6939 27.1509 24.6924 26.8696V20.1324L26.7122 21.2986C26.7339 21.3091 26.7482 21.3301 26.7512 21.3541V26.9334C26.7482 29.4144 24.7389 31.4259 22.2579 31.4311ZM12.5949 27.3039C12.0677 26.3934 11.8779 25.3261 12.0587 24.2904C12.0939 24.3114 12.1562 24.3496 12.2004 24.3751L16.9794 27.1351C17.2217 27.2769 17.5217 27.2769 17.7647 27.1351L23.5989 23.7661V26.0986C23.6004 26.1226 23.5892 26.1459 23.5704 26.1609L18.7397 28.9501C16.5879 30.1891 13.8399 29.4526 12.5957 27.3039H12.5949ZM11.3372 16.8721C11.8622 15.9601 12.6909 15.2626 13.6779 14.9004C13.6779 14.9416 13.6757 15.0144 13.6757 15.0654V20.5861C13.6742 20.8666 13.8242 21.1269 14.0679 21.2656L19.9022 24.6339L17.8824 25.8001C17.8622 25.8136 17.8367 25.8159 17.8142 25.8061L12.9827 23.0146C10.8354 21.7711 10.0989 19.0239 11.3364 16.8729L11.3372 16.8721ZM27.9317 20.7339L22.0974 17.3649L24.1172 16.1994C24.1374 16.1859 24.1629 16.1836 24.1854 16.1934L29.0169 18.9826C31.1679 20.2254 31.9052 22.9771 30.6624 25.1281C30.1367 26.0386 29.3087 26.7361 28.3224 27.0991V21.4134C28.3247 21.1329 28.1754 20.8734 27.9324 20.7339H27.9317ZM29.9417 17.7084C29.9064 17.6866 29.8442 17.6491 29.7999 17.6236L25.0209 14.8636C24.7787 14.7219 24.4787 14.7219 24.2357 14.8636L18.4014 18.2326V15.9001C18.3999 15.8761 18.4112 15.8529 18.4299 15.8379L23.2607 13.0509C25.4124 11.8096 28.1634 12.5484 29.4039 14.7009C29.9282 15.6099 30.1179 16.6741 29.9402 17.7084H29.9417ZM17.3034 21.8656L15.2829 20.6994C15.2612 20.6889 15.2469 20.6679 15.2439 20.6439V15.0646C15.2454 12.5806 17.2607 10.5676 19.7447 10.5691C20.7954 10.5691 21.8124 10.9381 22.6202 11.6101C22.5834 11.6296 22.5204 11.6649 22.4784 11.6904L17.6994 14.4504C17.4549 14.5891 17.3049 14.8486 17.3064 15.1299L17.3034 21.8641V21.8656ZM18.4007 19.5001L20.9994 17.9994L23.5982 19.4994V22.5001L20.9994 24.0001L18.4007 22.5001V19.5001Z"
-                                fill="black"
-                              ></path>
-                            </g>
-                            <path
-                              d="M41.3443 21.0002C41.3443 9.76457 32.2359 0.65625 21.0002 0.65625C9.76457 0.65625 0.65625 9.76457 0.65625 21.0002C0.65625 32.2359 9.76457 41.3443 21.0002 41.3443C32.2359 41.3443 41.3443 32.2359 41.3443 21.0002Z"
-                              stroke="#EEEEEE"
-                              strokeWidth="1.313"
+                              d="M31.2789 18.8229C31.8234 17.1886 31.6359 15.3984 30.7652 13.9119C29.4557 11.6319 26.8232 10.4589 24.2522 11.0109C23.1084 9.72236 21.4652 8.98961 19.7424 9.00011C17.1144 8.99411 14.7827 10.6861 13.9742 13.1866C12.2859 13.5324 10.8287 14.5891 9.97594 16.0869C8.65669 18.3609 8.95744 21.2274 10.7199 23.1774C10.1754 24.8116 10.3629 26.6019 11.2337 28.0884C12.5432 30.3684 15.1757 31.5414 17.7467 30.9894C18.8897 32.2779 20.5337 33.0106 22.2564 32.9994C24.8859 33.0061 27.2184 31.3126 28.0269 28.8099C29.7152 28.4641 31.1724 27.4074 32.0252 25.9096C33.3429 23.6356 33.0414 20.7714 31.2797 18.8214L31.2789 18.8229ZM22.2579 31.4311C21.2057 31.4326 20.1864 31.0644 19.3787 30.3901C19.4154 30.3706 19.4792 30.3354 19.5204 30.3099L24.2994 27.5499C24.5439 27.4111 24.6939 27.1509 24.6924 26.8696V20.1324L26.7122 21.2986C26.7339 21.3091 26.7482 21.3301 26.7512 21.3541V26.9334C26.7482 29.4144 24.7389 31.4259 22.2579 31.4311ZM12.5949 27.3039C12.0677 26.3934 11.8779 25.3261 12.0587 24.2904C12.0939 24.3114 12.1562 24.3496 12.2004 24.3751L16.9794 27.1351C17.2217 27.2769 17.5217 27.2769 17.7647 27.1351L23.5989 23.7661V26.0986C23.6004 26.1226 23.5892 26.1459 23.5704 26.1609L18.7397 28.9501C16.5879 30.1891 13.8399 29.4526 12.5957 27.3039H12.5949ZM11.3372 16.8721C11.8622 15.9601 12.6909 15.2626 13.6779 14.9004C13.6779 14.9416 13.6757 15.0144 13.6757 15.0654V20.5861C13.6742 20.8666 13.8242 21.1269 14.0679 21.2656L19.9022 24.6339L17.8824 25.8001C17.8622 25.8136 17.8367 25.8159 17.8142 25.8061L12.9827 23.0146C10.8354 21.7711 10.0989 19.0239 11.3364 16.8729L11.3372 16.8721ZM27.9317 20.7339L22.0974 17.3649L24.1172 16.1994C24.1374 16.1859 24.1629 16.1836 24.1854 16.1934L29.0169 18.9826C31.1679 20.2254 31.9052 22.9771 30.6624 25.1281C30.1367 26.0386 29.3087 26.7361 28.3224 27.0991V21.4134C28.3247 21.1329 28.1754 20.8734 27.9324 20.7339H27.9317ZM29.9417 17.7084C29.9064 17.6866 29.8442 17.6491 29.7999 17.6236L25.0209 14.8636C24.7787 14.7219 24.4787 14.7219 24.2357 14.8636L18.4014 18.2326V15.9001C18.3999 15.8761 18.4112 15.8529 18.4299 15.8379L23.2607 13.0509C25.4124 11.8096 28.1634 12.5484 29.4039 14.7009C29.9282 15.6099 30.1179 16.6741 29.9402 17.7084H29.9417ZM17.3034 21.8656L15.2829 20.6994C15.2612 20.6889 15.2469 20.6679 15.2439 20.6439V15.0646C15.2454 12.5806 17.2607 10.5676 19.7447 10.5691C20.7954 10.5691 21.8124 10.9381 22.6202 11.6101C22.5834 11.6296 22.5204 11.6649 22.4784 11.6904L17.6994 14.4504C17.4549 14.5891 17.3049 14.8486 17.3064 15.1299L17.3034 21.8641V21.8656ZM18.4007 19.5001L20.9994 17.9994L23.5982 19.4994V22.5001L20.9994 24.0001L18.4007 22.5001V19.5001Z"
+                              fill="black"
                             ></path>
                           </g>
-                          <defs>
-                            <clipPath id="clip0_11185_26182">
-                              <rect width="42" height="42" fill="white"></rect>
-                            </clipPath>
-                            <clipPath id="clip1_11185_26182">
-                              <rect
-                                width="24"
-                                height="24"
-                                fill="white"
-                                transform="translate(9 9)"
-                              ></rect>
-                            </clipPath>
-                          </defs>
-                        </svg>
-                      </div>
-
-                      <span className="text-sm bg-green-100 text-green-700 px-2 py-1 rounded">
-                        {bot.tag}
-                      </span>
+                          <path
+                            d="M41.3443 21.0002C41.3443 9.76457 32.2359 0.65625 21.0002 0.65625C9.76457 0.65625 0.65625 9.76457 0.65625 21.0002C0.65625 32.2359 9.76457 41.3443 21.0002 41.3443C32.2359 41.3443 41.3443 32.2359 41.3443 21.0002Z"
+                            stroke="#EEEEEE"
+                            strokeWidth="1.313"
+                          ></path>
+                        </g>
+                        <defs>
+                          <clipPath id="clip0_11185_26182_page_js">
+                            <rect width="42" height="42" fill="white"></rect>
+                          </clipPath>
+                          <clipPath id="clip1_11185_26182_page_js">
+                            <rect
+                              width="24"
+                              height="24"
+                              fill="white"
+                              transform="translate(9 9)"
+                            ></rect>
+                          </clipPath>
+                        </defs>
+                      </svg>
                     </div>
-                    <h2 className="text-lg font-semibold text-black">
-                      {bot.title}
-                    </h2>
-                    <p className="mr-10 text-gray-300">{bot.details}</p>
-                    <p className="mt-2 text-gray-600 mr-3">{bot.description}</p>
-                  </div>
 
-                ))}
+                    <span className="text-xs sm:text-sm bg-green-100 text-green-700 px-2 py-1 rounded-md self-start">
+                      {bot.tag}
+                    </span>
+                  </div>
+                  <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-1">
+                    {bot.title}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-gray-400 mb-2 truncate">
+                    {bot.details}
+                  </p>
+                  <p className="text-sm text-gray-600 line-clamp-3">
+                    {bot.description}
+                  </p>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
-      </div>
-    </>
+      </main>
+    </div>
   );
 };
 

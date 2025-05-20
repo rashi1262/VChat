@@ -10,8 +10,10 @@ import {
   FileText,
   ImagePlus,
   MessageCircleMore,
+  Music,
   Plus,
   SquareMenu,
+  Video,
   X,
 } from "lucide-react";
 import Image from "next/image";
@@ -193,6 +195,8 @@ const Page = () => {
               { label: "Chat", href: "/model", active: isChatRoute },
               { label: "Image", href: "/image" },
               { label: "PDF", href: "/upload" },
+              { label: "Music", href: "" },
+              { label: "Video", href: "" },
             ].map(({ label, href, active }) => (
               <li key={label} className="realtive">
                 <Link
@@ -211,6 +215,8 @@ const Page = () => {
                       <MessageCircleMore strokeWidth={2} size={30} />
                     )}
                     {label === "My Bot" && <Bot strokeWidth={2} size={30} />}
+                    {label === "Music" && <Music strokeWidth={2} size={30} />}
+                    {label === "Video" && <Video strokeWidth={2} size={30} />}
                     {label === "Image" && (
                       <ImagePlus strokeWidth={2} size={30} />
                     )}

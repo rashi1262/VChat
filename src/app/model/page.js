@@ -8,6 +8,7 @@ import { useCredits } from "@/context/creditContext";
 import VoiceToText from "@/components/VoiceToText";
 import Navbar from "../navbar";
 import { useChat } from ".././chatContext";
+import VersionSelector from "@/app/VersionSelector";
 import {
   ChevronDown,
   ChevronUp,
@@ -40,7 +41,24 @@ const page = ({ params }) => {
   const [chatId, setChatId] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const { chatThread, setChatThread, loadNav } = useChat();
-  console.log(chatThread);
+  const availableVersions = [
+    { id: "grok-3", name: "Grok 3", icon: "/grok3_icon.png" },
+    { id: "gpt-4", name: "GPT 4.0", icon: "/gpt4_icon.png" },
+    { id: "o1-mini", name: "O1 Mini", icon: "/o1mini_icon.png" },
+    { id: "o1", name: "O1", icon: "/o1_icon.png" },
+    { id: "deepseek-r1", name: "DeepSeek-R1", icon: "/deepseek_r1_icon.png" },
+    {
+      id: "claude-3.7-sonnet",
+      name: "Claude 3.7 Sonnet",
+      icon: "/claude_3.7_sonnet_icon.png",
+    },
+    {
+      id: "claude-3.5-haiku",
+      name: "Claude 3.5 Haiku",
+      icon: "/claude_3.5_haiku.png",
+    },
+  ];
+
   const handleVoiceInput = (voiceText) => {
     setPrompt((prevPrompt) => prevPrompt + " " + voiceText);
   };
@@ -546,6 +564,9 @@ const page = ({ params }) => {
                         />
                       ))}
                     </div>
+                    <div className="lg:hidden md:block sm:block mr-10 ">
+                      <VersionSelector />
+                    </div>
 
                     <div>
                       <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-[750px] px-4 py-2 z-20">
@@ -576,6 +597,7 @@ const page = ({ params }) => {
                               </button>
                             </div>
                           )}
+
                           <div className="flex justify-between items-center">
                             <div className="flex items-center space-x-2">
                               <button

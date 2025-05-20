@@ -74,7 +74,7 @@ export default function Sidebar() {
     `;
 
   const mobileMenuButtonClasses = `
-        fixed top-4 left-4 p-2 rounded-md shadow-md z-20
+        fixed top-4 left-4 p-2 rounded-md  z-20
     `;
 
   return (
@@ -84,6 +84,9 @@ export default function Sidebar() {
           {isOpen || <Menu size={24} />}
         </button>
       )}
+      {/* {isMobile && (
+        <button onClick={toggleSidebar}>{isOpen || <Menu size={24} />}</button>
+      )} */}
 
       {isMobile && isOpen && (
         <div className={backdropClasses} onClick={toggleSidebar}></div>

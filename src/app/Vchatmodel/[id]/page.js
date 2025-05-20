@@ -526,7 +526,7 @@ const ChatPage = ({ params }) => {
                       {/* Bot response, only render if botResponse exists */}
                       {chat.botResponse && (
                         <div className="flex justify-start">
-                          <div className=" text-gray-800 px-4 py-3 rounded-2xl max-w-[70%] break-words">
+                          <div className=" text-gray-800 px-4 py-3 rounded-2xl max-w-[100%] break-words">
                             {(chat.parsedResponse?.length > 0
                               ? chat.parsedResponse
                               : [{ type: "text", content: chat.botResponse }]
